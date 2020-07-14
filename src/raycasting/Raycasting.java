@@ -103,30 +103,56 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
         bs.show();
     }
+    
+    public void tick(){
+        
+    }
 
-    /**
+    /*
      * Updates once every 1/60th of a second
-     */
+     */  
     @Override
-    public void run() {
+    public void run(){
         long lastTime = System.nanoTime();
-        //60 times per second
-        final double ns = 1000000000.0 / 60.0;
-        double delta = 0;
-        requestFocus();
-        while(running){
+        double NanosPerTick = 1000000000D / 60D;       
+        int ticks = 0;
+        int frames = 0;        
+        long lastTimer = System.currentTimeMillis();
+        double delta = 0;              
+        
+        while(true){
             long now = System.nanoTime();
-            delta = delta + ((now - lastTime) / ns);
+            delta += (now - lastTime) / NanosPerTick;
             lastTime = now;
-            //Making sure the update is happening only 60 times a second
+            boolean shouldRender = true;            
+                
             while(delta >= 1){
-                //handles all of the logic restricted time
+                ticks++;
+                tick();
                 screen.update(camera, pixels);
-                camera.update(map);               
-                delta--;
+                camera.update(map);    
+                delta -= 1;
+                shouldRender = true;
             }
-            //displays to the screen unrestricted time
-            render();
+                                
+            try {
+                //can increase the sleep rate to lower the fps
+                Thread.sleep(5);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            
+            if(shouldRender){                         
+                frames++;
+                render();            
+            }
+            
+            if(System.currentTimeMillis() - lastTimer >= 1000){
+                lastTimer += 1000;
+                System.out.println(ticks + " ticks, " + frames + " frames per second");
+                frames = 0;
+                ticks = 0;                
+            }
         }
     }
 
