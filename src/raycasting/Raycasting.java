@@ -19,6 +19,7 @@ public class Raycasting extends JFrame implements Runnable{
     private boolean running;
     private BufferedImage image;
     public int[] pixels;
+    public ArrayList<Texture> textures;
     public static int[][] map =
         {
             {1,1,1,1,1,1,1,1,2,2,2,2,2,2,2},
@@ -36,12 +37,13 @@ public class Raycasting extends JFrame implements Runnable{
             {1,0,0,0,0,0,1,4,0,3,3,3,3,0,4},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
             {1,1,1,1,1,1,1,4,4,4,4,4,4,4,4}   
-        };  
+        }; 
     
     public Raycasting(){
         thread = new Thread(this);
         image = new BufferedImage(640, 480, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+        
         setSize(640, 480);
         setResizable(false);
         setTitle("veri nice 3d engine yes");
@@ -49,7 +51,21 @@ public class Raycasting extends JFrame implements Runnable{
         setBackground(Color.black);
         setLocationRelativeTo(null);
         setVisible(true);
+        
+        textureInit();
+        
         start();
+    }
+    
+    /**
+     * Used to load all the textures
+     */
+    private void textureInit(){
+        textures = new ArrayList<Texture>();
+        textures.add(Texture.wood);
+        textures.add(Texture.brick);
+        textures.add(Texture.stone);
+        textures.add(Texture.leaves);
     }
     
     private synchronized void start() {
