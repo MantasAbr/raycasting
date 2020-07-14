@@ -20,6 +20,7 @@ public class Raycasting extends JFrame implements Runnable{
     private BufferedImage image;
     public int[] pixels;
     public ArrayList<Texture> textures;
+    public Camera camera;
     public static int[][] map =
         {
             {1,1,1,1,1,1,1,1,2,2,2,2,2,2,2},
@@ -43,6 +44,8 @@ public class Raycasting extends JFrame implements Runnable{
         thread = new Thread(this);
         image = new BufferedImage(640, 480, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+        camera = new Camera(4.5, 4.5, 1, 0, 0, -.66);
+        addKeyListener(camera);
         
         setSize(640, 480);
         setResizable(false);
@@ -116,6 +119,7 @@ public class Raycasting extends JFrame implements Runnable{
             //Making sure the update is happening only 60 times a second
             while(delta >= 1){
                 //handles all of the logic restricted time
+                camera.update(map);
                 delta--;
             }
             //displays to the screen unrestricted time
