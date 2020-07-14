@@ -18,8 +18,9 @@ public class Camera implements KeyListener{
     */
     
     public double xPos, yPos, xDir, yDir, xPlane, yPlane;
-    public boolean left, right, forward, back;
+    public boolean left, right, forward, back, action, shift, debug;
     public final double MOVE_SPEED = .08;
+    public final double FASTER_MOVE_SPEED = .12;
     public final double ROTATION_SPEED = .045;
     
     public Camera(double x, double y, double xd, double yd, double xp, double yp){
@@ -33,62 +34,97 @@ public class Camera implements KeyListener{
     
     @Override
     public void keyTyped(KeyEvent key) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
     @Override
     public void keyPressed(KeyEvent key) {
-        if((key.getKeyCode() == KeyEvent.VK_LEFT)){
+        if((key.getKeyCode() == KeyEvent.VK_LEFT) || (key.getKeyCode() == KeyEvent.VK_A)){
             left = true;
             //System.out.println("Left pressed");
         }		
-	if((key.getKeyCode() == KeyEvent.VK_RIGHT)){
+	if((key.getKeyCode() == KeyEvent.VK_RIGHT) || (key.getKeyCode() == KeyEvent.VK_D)){
             right = true;
             //System.out.println("Right pressed");
         }
 		
-	if((key.getKeyCode() == KeyEvent.VK_UP)){
+	if((key.getKeyCode() == KeyEvent.VK_UP) || (key.getKeyCode() == KeyEvent.VK_W)){
             forward = true;
             //System.out.println("Up pressed");
         }
 		
-	if((key.getKeyCode() == KeyEvent.VK_DOWN)){
+	if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
             back = true;
             //System.out.println("Down pressed");
         }
-		
+	
+        if((key.getKeyCode() == KeyEvent.VK_E)){
+            action = true;
+            
+        }
+        
+        if((key.getKeyCode() == KeyEvent.VK_SHIFT)){
+            shift = true;
+            
+        }
+        
+        if((key.getKeyCode() == KeyEvent.VK_F3)){
+            debug = true;        
+        }
     }
 
     @Override
     public void keyReleased(KeyEvent key) {
-        if((key.getKeyCode() == KeyEvent.VK_LEFT)){
+        if((key.getKeyCode() == KeyEvent.VK_LEFT) || (key.getKeyCode() == KeyEvent.VK_A)){
             left = false;
             //System.out.println("Left released");
         }		
-	if((key.getKeyCode() == KeyEvent.VK_RIGHT)){
+	if((key.getKeyCode() == KeyEvent.VK_RIGHT) || (key.getKeyCode() == KeyEvent.VK_D)){
             right = false;
             //System.out.println("Right released");
         }
 		
-	if((key.getKeyCode() == KeyEvent.VK_UP)){
+	if((key.getKeyCode() == KeyEvent.VK_UP) || (key.getKeyCode() == KeyEvent.VK_W)){
             forward = false;
             //System.out.println("Up released");
         }
 		
-	if((key.getKeyCode() == KeyEvent.VK_DOWN)){
+	if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
             back = false;
             //System.out.println("Down released");
         }
-	
+        
+        if((key.getKeyCode() == KeyEvent.VK_E)){
+            action = false;
+            
+        }
+        
+        if((key.getKeyCode() == KeyEvent.VK_SHIFT)){
+            shift = false;
+            
+        }
+        
+        if((key.getKeyCode() == KeyEvent.VK_F3)){
+            debug = false;        
+        }
     }
     
     public void update(int[][] map) {
         if(forward) {
-            if(map[(int)(xPos + xDir * MOVE_SPEED)][(int)yPos] == 0) {
-                    xPos+=xDir*MOVE_SPEED;
+            if(shift){
+                if(map[(int)(xPos + xDir * MOVE_SPEED)][(int)yPos] == 0) {
+                    xPos+=xDir*FASTER_MOVE_SPEED;
+                }
+                if(map[(int)xPos][(int)(yPos + yDir * MOVE_SPEED)] ==0)
+                    yPos+=yDir*FASTER_MOVE_SPEED;
             }
-            if(map[(int)xPos][(int)(yPos + yDir * MOVE_SPEED)] ==0)
+            else{
+                if(map[(int)(xPos + xDir * MOVE_SPEED)][(int)yPos] == 0) {
+                    xPos+=xDir*MOVE_SPEED;
+                }
+                if(map[(int)xPos][(int)(yPos + yDir * MOVE_SPEED)] ==0)
                     yPos+=yDir*MOVE_SPEED;
+            }
         }
         if(back) {
             if(map[(int)(xPos - xDir * MOVE_SPEED)][(int)yPos] == 0)

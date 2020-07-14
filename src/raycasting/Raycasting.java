@@ -1,5 +1,6 @@
 package raycasting;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -22,6 +23,10 @@ public class Raycasting extends JFrame implements Runnable{
     public ArrayList<Texture> textures;
     public Camera camera;
     public Screen screen;
+    
+    //used for showing the ticks and frames each second on the screen
+    private int finalTicks = 0;
+    private int finalFrames = 0;
     public static int[][] map =
         {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -46,18 +51,11 @@ public class Raycasting extends JFrame implements Runnable{
         image = new BufferedImage(640, 480, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
         textureInit();
-        camera = new Camera(4.5, 4.5, 1, 0, 0, -.66);
+        camera = new Camera(2, 6, 1.2, 0, 0, -.66);
         screen = new Screen(map, mapWidth, mapHeight, textures, 640, 480);
         addKeyListener(camera);
         
-        setSize(640, 480);
-        setResizable(false);
-        setTitle("veri nice 3d engine yes");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBackground(Color.black);
-        setLocationRelativeTo(null);
-        setVisible(true);
-                     
+        jFrameInit();             
         start();
     }
     
@@ -71,6 +69,16 @@ public class Raycasting extends JFrame implements Runnable{
         textures.add(Texture.stone);
         textures.add(Texture.leaves);
         textures.add(Texture.woodBricks);
+    }
+    
+    private void jFrameInit(){
+        setSize(640, 480);
+        setResizable(false);
+        setTitle("veri nice 3d engine yes");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBackground(Color.black);
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
     
     private synchronized void start() {
@@ -91,17 +99,26 @@ public class Raycasting extends JFrame implements Runnable{
     /**
      * Buffer strategy is used so that the updates are smoother;
      * To actually draw the image to the screen, a graphics object is obtained
-     * from the buffer strategy and user to draw our image
+     * from the buffer strategy and used to draw our image
      */
     public void render() {
         BufferStrategy bs = getBufferStrategy();
         if(bs == null){
-            createBufferStrategy(3);
+            createBufferStrategy(2);
             return;
         }
         Graphics g = bs.getDrawGraphics();
         g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
+        if(camera.debug)
+            debugInfo(g);
         bs.show();
+    }
+    
+    public void debugInfo(Graphics g){
+        Font font = new Font("Courier new", Font.BOLD ,16);
+        g.setColor(Color.white);
+        g.setFont(font);
+        g.drawString(finalTicks + " ticks, " + finalFrames + " frames per second", 10, 470);
     }
     
     public void tick(){
@@ -114,7 +131,7 @@ public class Raycasting extends JFrame implements Runnable{
     @Override
     public void run(){
         long lastTime = System.nanoTime();
-        double NanosPerTick = 1000000000D / 60D;       
+        double NanosPerTick = 1000000000D / 60D;              
         int ticks = 0;
         int frames = 0;        
         long lastTimer = System.currentTimeMillis();
@@ -149,7 +166,9 @@ public class Raycasting extends JFrame implements Runnable{
             
             if(System.currentTimeMillis() - lastTimer >= 1000){
                 lastTimer += 1000;
-                System.out.println(ticks + " ticks, " + frames + " frames per second");
+                finalTicks = ticks;
+                finalFrames = frames;
+                //System.out.println(ticks + " ticks, " + frames + " frames per second");               
                 frames = 0;
                 ticks = 0;                
             }
