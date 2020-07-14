@@ -9,12 +9,7 @@ import javax.imageio.ImageIO;
  * @author Mantas Abramavičius
  */
 public class Texture {
-    
-    public static Texture wood = new Texture("src/textures/wood.png", 64);
-    public static Texture brick = new Texture("src/textures/brick.png", 64);
-    public static Texture leaves = new Texture("src/textures/leaves.png", 64);
-    public static Texture stone = new Texture("src/textures/stone.png", 64);
-    
+       
     //Used to hold the data for all the pixels in the image of a texture
     public int[] pixels;
     //Used to indicate where the texture is located
@@ -49,5 +44,11 @@ public class Texture {
             e.printStackTrace();
         }
     }
+    
+    public static Texture wood = new Texture("src/textures/wood.png", 64);
+    public static Texture brick = new Texture("src/textures/brick.png", 64);
+    public static Texture leaves = new Texture("src/textures/leaves.png", 64);
+    public static Texture stone = new Texture("src/textures/stone.png", 64);
+    
 }
 
