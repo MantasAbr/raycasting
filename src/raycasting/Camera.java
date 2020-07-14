@@ -40,21 +40,21 @@ public class Camera implements KeyListener{
     public void keyPressed(KeyEvent key) {
         if((key.getKeyCode() == KeyEvent.VK_LEFT)){
             left = true;
-            System.out.println("Left pressed");
+            //System.out.println("Left pressed");
         }		
 	if((key.getKeyCode() == KeyEvent.VK_RIGHT)){
             right = true;
-            System.out.println("Right pressed");
+            //System.out.println("Right pressed");
         }
 		
 	if((key.getKeyCode() == KeyEvent.VK_UP)){
             forward = true;
-            System.out.println("Up pressed");
+            //System.out.println("Up pressed");
         }
 		
 	if((key.getKeyCode() == KeyEvent.VK_DOWN)){
             back = true;
-            System.out.println("Down pressed");
+            //System.out.println("Down pressed");
         }
 		
     }
@@ -63,21 +63,21 @@ public class Camera implements KeyListener{
     public void keyReleased(KeyEvent key) {
         if((key.getKeyCode() == KeyEvent.VK_LEFT)){
             left = false;
-            System.out.println("Left released");
+            //System.out.println("Left released");
         }		
 	if((key.getKeyCode() == KeyEvent.VK_RIGHT)){
             right = false;
-            System.out.println("Right released");
+            //System.out.println("Right released");
         }
 		
 	if((key.getKeyCode() == KeyEvent.VK_UP)){
             forward = false;
-            System.out.println("Up released");
+            //System.out.println("Up released");
         }
 		
 	if((key.getKeyCode() == KeyEvent.VK_DOWN)){
             back = false;
-            System.out.println("Down released");
+            //System.out.println("Down released");
         }
 	
     }
