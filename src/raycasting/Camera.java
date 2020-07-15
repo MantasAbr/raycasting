@@ -69,7 +69,10 @@ public class Camera implements KeyListener{
         }
         
         if((key.getKeyCode() == KeyEvent.VK_F3)){
-            debug = true;        
+            if(debug)
+                debug = false;
+            else
+                debug = true;        
         }
     }
 
@@ -102,10 +105,6 @@ public class Camera implements KeyListener{
         if((key.getKeyCode() == KeyEvent.VK_SHIFT)){
             shift = false;
             
-        }
-        
-        if((key.getKeyCode() == KeyEvent.VK_F3)){
-            debug = false;        
         }
     }
     

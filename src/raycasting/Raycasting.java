@@ -14,15 +14,25 @@ import javax.swing.JFrame;
  */
 public class Raycasting extends JFrame implements Runnable{
     private static final long serialVersionUID = 1L;
+    //The width and height of the map matrix
     public int mapWidth = 15;
     public int mapHeight = 15;
+    
+    //Used for the run() method
     private Thread thread;
     private boolean running;
+    
+    //Used for displaying the image
     private BufferedImage image;
     public int[] pixels;
+    
+    //ArrayList for all of the textures used
     public ArrayList<Texture> textures;
+    
+    //Objects declarations
     public Camera camera;
     public Screen screen;
+    public ActionHandling actions;
     
     //used for showing the ticks and frames each second on the screen
     private int finalTicks = 0;
@@ -40,9 +50,9 @@ public class Raycasting extends JFrame implements Runnable{
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,5,5,0,0,5,5,0,0,0,0,1},
-            {1,0,0,0,5,0,0,0,0,5,0,0,0,0,1},
-            {1,0,0,0,5,0,0,0,0,5,0,0,0,0,1},
+            {1,5,6,6,5,5,5,7,5,5,5,6,6,5,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,5,0,0,0,5,0,0,0,0,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}   
         }; 
     
@@ -53,6 +63,7 @@ public class Raycasting extends JFrame implements Runnable{
         textureInit();
         camera = new Camera(2, 6, 1.2, 0, 0, -.66);
         screen = new Screen(map, mapWidth, mapHeight, textures, 640, 480);
+        actions = new ActionHandling(camera, screen, map);
         addKeyListener(camera);
         
         jFrameInit();             
@@ -69,6 +80,8 @@ public class Raycasting extends JFrame implements Runnable{
         textures.add(Texture.stone);
         textures.add(Texture.leaves);
         textures.add(Texture.woodBricks);
+        textures.add(Texture.glass);
+        textures.add(Texture.door);
     }
     
     private void jFrameInit(){
@@ -118,15 +131,20 @@ public class Raycasting extends JFrame implements Runnable{
         Font font = new Font("Courier new", Font.BOLD ,16);
         g.setColor(Color.white);
         g.setFont(font);
-        g.drawString(finalTicks + " ticks, " + finalFrames + " frames per second", 10, 470);
+        g.drawString(finalTicks + " ticks, " + finalFrames + " frames per second", 10, 50);
+        g.drawString("X Position: " + String.format("%.3f", camera.xPos) + ", Y Position: " + String.format("%.3f", camera.yPos), 10, 70);
+        g.drawString("Facing X: " + String.format("%.3f", screen.rayX) + ", Facing y: " + String.format("%.3f", screen.rayY), 10, 90);
+        g.drawString("Distance to wall: " + String.format("%.3f", screen.distanceToWall) + ". Looking at texture ID: " + screen.lookingAtTextureId, 10, 110);
+        g.drawString("Can open something?", 10, 130);
+        g.drawString(actions.canOpen ? "Yes" : "No", 210, 130);
     }
     
     public void tick(){
-        
+        actions.CheckForActions();
     }
 
     /*
-     * Updates once every 1/60th of a second
+     * Updates every 1/60th of a second
      */  
     @Override
     public void run(){

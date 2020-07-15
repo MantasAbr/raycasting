@@ -11,6 +11,9 @@ public class Screen {
     public int[][] map;
     public int mapWidth, mapHeight, width, height;
     public ArrayList<Texture> textures;
+    public double distanceToWall;
+    public int lookingAtTextureId;
+    public double rayX, rayY;
     
     public Screen(int[][] map, int mapWidth, int mapHeight, ArrayList<Texture> textures, int width, int height){
         this.map = map;
@@ -25,7 +28,7 @@ public class Screen {
      * The update method recalculates how the screen should look to the user 
      * based on their position in the map. 
      * The method is called constantly, and returns the updated array of pixels 
-     * to the Game class. The method begins by "clearing" the screen. 
+     * to the Raycasting class. The method begins by "clearing" the screen. 
      * It does this by setting all of the pixels on the top half to one color 
      * and all of the pixels on the bottom to another.
      * @param camera
@@ -120,12 +123,20 @@ public class Screen {
                 if(map[mapX][mapY] > 0) hit = true;
             }
             
-            
+                      
             //Calculate distance to the point of impact
             if(side==0)
                 perpWallDist = Math.abs((mapX - camera.xPos + (1 - stepX) / 2) / rayDirX);
             else
                 perpWallDist = Math.abs((mapY - camera.yPos + (1 - stepY) / 2) / rayDirY);
+                                  
+            //Gets the ID of the block that is currently being viewed and the distance to it
+            if(x <= width / 2){
+                lookingAtTextureId = map[mapX][mapY];
+                distanceToWall = perpWallDist;
+                rayX = rayDirX;
+                rayY = rayDirY;
+            }
             
             //Now calculate the height of the wall based on the distance from the camera
             int lineHeight;
@@ -164,7 +175,7 @@ public class Screen {
                 else 
                     color = (textures.get(texNum).pixels[texX + (texY * textures.get(texNum).SIZE)]>>1) & 8355711;//Make y sides darker
                 pixels[x + y*(width)] = color;
-            }
+            }           
         }
         return pixels;
     }
