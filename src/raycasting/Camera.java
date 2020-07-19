@@ -1,6 +1,7 @@
 package raycasting;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 /**
  *
@@ -19,17 +20,20 @@ public class Camera implements KeyListener{
     
     public double xPos, yPos, xDir, yDir, xPlane, yPlane;
     public boolean left, right, forward, back, action, shift, debug;
+    public boolean soundAlreadyPlaying = false;
     public final double MOVE_SPEED = .08;
     public final double FASTER_MOVE_SPEED = .12;
     public final double ROTATION_SPEED = .045;
+    public ArrayList<Sounds> sounds;
     
-    public Camera(double x, double y, double xd, double yd, double xp, double yp){
+    public Camera(double x, double y, double xd, double yd, double xp, double yp, ArrayList<Sounds> sounds){
         xPos = x;
         yPos = y;
         xDir = xd;
         yDir = yd;
         xPlane = xp;
         yPlane = yp;
+        this.sounds = sounds;
     }
     
     @Override
@@ -40,7 +44,7 @@ public class Camera implements KeyListener{
     @Override
     public void keyPressed(KeyEvent key) {
         if((key.getKeyCode() == KeyEvent.VK_LEFT) || (key.getKeyCode() == KeyEvent.VK_A)){
-            left = true;
+            left = true;            
             //System.out.println("Left pressed");
         }		
 	if((key.getKeyCode() == KeyEvent.VK_RIGHT) || (key.getKeyCode() == KeyEvent.VK_D)){
@@ -50,11 +54,22 @@ public class Camera implements KeyListener{
 		
 	if((key.getKeyCode() == KeyEvent.VK_UP) || (key.getKeyCode() == KeyEvent.VK_W)){
             forward = true;
+            
+            //without this check, sometimes the sounds get stacked one on another
+            if(!soundAlreadyPlaying){
+                sounds.get(0).PlaySelectedSound("walkStone");
+                soundAlreadyPlaying = true;
+            }
+            
             //System.out.println("Up pressed");
         }
 		
 	if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
             back = true;
+            if(!soundAlreadyPlaying){
+                sounds.get(0).PlaySelectedSound("walkStone");
+                soundAlreadyPlaying = true;
+            }
             //System.out.println("Down pressed");
         }
 	
@@ -89,11 +104,15 @@ public class Camera implements KeyListener{
 		
 	if((key.getKeyCode() == KeyEvent.VK_UP) || (key.getKeyCode() == KeyEvent.VK_W)){
             forward = false;
+            sounds.get(0).clip.stop();
+            soundAlreadyPlaying = false;
             //System.out.println("Up released");
         }
 		
 	if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
             back = false;
+            sounds.get(0).clip.stop();
+            soundAlreadyPlaying = false;
             //System.out.println("Down released");
         }
         

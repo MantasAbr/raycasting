@@ -14,6 +14,9 @@ import javax.swing.JFrame;
  */
 public class Raycasting extends JFrame implements Runnable{
     private static final long serialVersionUID = 1L;
+    private static final int WINDOW_WIDTH = 800;
+    private static final int WINDOW_HEIGHT = 600;   
+    
     //The width and height of the map matrix
     public int mapWidth = 15;
     public int mapHeight = 15;
@@ -26,8 +29,9 @@ public class Raycasting extends JFrame implements Runnable{
     private BufferedImage image;
     public int[] pixels;
     
-    //ArrayList for all of the textures used
+    //ArrayList for objects
     public ArrayList<Texture> textures;
+    public ArrayList<Sounds> sounds;
     
     //Objects declarations
     public Camera camera;
@@ -39,30 +43,31 @@ public class Raycasting extends JFrame implements Runnable{
     private int finalFrames = 0;
     public static int[][] map =
         {
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,5,6,6,5,5,5,7,5,5,5,6,6,5,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,5,0,0,0,5,0,0,0,0,1},
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}   
+            {5,5,5,5,5,5,5,5,5,5,5,5,5,5,5},
+            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+            {5,5,6,6,5,5,5,7,5,5,5,6,6,5,5},
+            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+            {5,0,0,0,0,5,0,0,0,5,0,0,0,0,5},
+            {5,5,5,5,5,5,5,5,5,5,5,5,5,5,5}   
         }; 
     
     public Raycasting(){
         thread = new Thread(this);
-        image = new BufferedImage(640, 480, BufferedImage.TYPE_INT_RGB);
+        image = new BufferedImage(WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
         textureInit();
-        camera = new Camera(2, 6, 1.2, 0, 0, -.66);
-        screen = new Screen(map, mapWidth, mapHeight, textures, 640, 480);
+        audioInit();
+        camera = new Camera(2, 6, 1.2, 0, 0, -.66, sounds);
+        screen = new Screen(map, mapWidth, mapHeight, textures, WINDOW_WIDTH, WINDOW_HEIGHT);
         actions = new ActionHandling(camera, screen, map);
         addKeyListener(camera);
         
@@ -84,8 +89,14 @@ public class Raycasting extends JFrame implements Runnable{
         textures.add(Texture.door);
     }
     
+    private void audioInit(){
+        sounds = new ArrayList<Sounds>();
+        sounds.add(Sounds.stoneRun);
+        sounds.add(Sounds.stoneWalk);
+    }
+    
     private void jFrameInit(){
-        setSize(640, 480);
+        setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setResizable(false);
         setTitle("veri nice 3d engine yes");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
