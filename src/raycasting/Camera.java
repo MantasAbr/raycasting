@@ -19,14 +19,19 @@ public class Camera implements KeyListener{
     */
     
     public double xPos, yPos, xDir, yDir, xPlane, yPlane;
-    public boolean left, right, forward, back, action, shift, debug;
+    
+    public boolean  left, right, forward, back, 
+                    action, shift,
+                    debug;
+    
     public boolean soundAlreadyPlaying = false;
     public final double MOVE_SPEED = .08;
     public final double FASTER_MOVE_SPEED = .12;
     public final double ROTATION_SPEED = .045;
     public ArrayList<Sounds> sounds;
+    public Raycasting game;
     
-    public Camera(double x, double y, double xd, double yd, double xp, double yp, ArrayList<Sounds> sounds){
+    public Camera(double x, double y, double xd, double yd, double xp, double yp, ArrayList<Sounds> sounds, Raycasting game){
         xPos = x;
         yPos = y;
         xDir = xd;
@@ -34,6 +39,7 @@ public class Camera implements KeyListener{
         xPlane = xp;
         yPlane = yp;
         this.sounds = sounds;
+        this.game = game;
     }
     
     @Override
@@ -80,14 +86,14 @@ public class Camera implements KeyListener{
         
         if((key.getKeyCode() == KeyEvent.VK_SHIFT)){
             shift = true;
-            
+        }
+        
+        if((key.getKeyCode() == KeyEvent.VK_X)){
+            game.stop();
         }
         
         if((key.getKeyCode() == KeyEvent.VK_F3)){
-            if(debug)
-                debug = false;
-            else
-                debug = true;        
+            debug = !debug;        
         }
     }
 
@@ -104,14 +110,15 @@ public class Camera implements KeyListener{
 		
 	if((key.getKeyCode() == KeyEvent.VK_UP) || (key.getKeyCode() == KeyEvent.VK_W)){
             forward = false;
-            sounds.get(0).clip.stop();
+            //close() because we don't want innactive clips hogging up memory
+            sounds.get(0).clip.close();
             soundAlreadyPlaying = false;
             //System.out.println("Up released");
         }
 		
 	if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
             back = false;
-            sounds.get(0).clip.stop();
+            sounds.get(0).clip.close();
             soundAlreadyPlaying = false;
             //System.out.println("Down released");
         }
@@ -123,7 +130,6 @@ public class Camera implements KeyListener{
         
         if((key.getKeyCode() == KeyEvent.VK_SHIFT)){
             shift = false;
-            
         }
     }
     

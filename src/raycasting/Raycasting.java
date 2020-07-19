@@ -48,13 +48,13 @@ public class Raycasting extends JFrame implements Runnable{
             {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
             {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
             {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+            {5,0,0,0,0,0,0,7,0,0,0,0,0,0,5},
             {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
             {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+            {5,0,0,0,7,0,0,0,0,0,7,0,0,0,5},
             {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
             {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
-            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
-            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
-            {5,5,6,6,5,5,5,7,5,5,5,6,6,5,5},
+            {5,5,5,5,5,5,5,7,5,5,5,5,5,5,5},
             {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
             {5,0,0,0,0,5,0,0,0,5,0,0,0,0,5},
             {5,5,5,5,5,5,5,5,5,5,5,5,5,5,5}   
@@ -66,9 +66,9 @@ public class Raycasting extends JFrame implements Runnable{
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
         textureInit();
         audioInit();
-        camera = new Camera(2, 6, 1.2, 0, 0, -.66, sounds);
+        camera = new Camera(2, 6, 1.2, 0, 0, -.66, sounds, this);
         screen = new Screen(map, mapWidth, mapHeight, textures, WINDOW_WIDTH, WINDOW_HEIGHT);
-        actions = new ActionHandling(camera, screen, map);
+        actions = new ActionHandling(camera, screen);
         addKeyListener(camera);
         
         jFrameInit();             
@@ -146,12 +146,15 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("X Position: " + String.format("%.3f", camera.xPos) + ", Y Position: " + String.format("%.3f", camera.yPos), 10, 70);
         g.drawString("Facing X: " + String.format("%.3f", screen.rayX) + ", Facing y: " + String.format("%.3f", screen.rayY), 10, 90);
         g.drawString("Distance to wall: " + String.format("%.3f", screen.distanceToWall) + ". Looking at texture ID: " + screen.lookingAtTextureId, 10, 110);
-        g.drawString("Can open something?", 10, 130);
-        g.drawString(actions.canOpen ? "Yes" : "No", 210, 130);
+        g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
+//        g.drawString("Can open something?", 10, 130);
+//        g.drawString(actions.canOpen ? "Yes" : "No", 210, 130);
     }
     
     public void tick(){
+        actions.GetNextBlock();
         actions.CheckForActions();
+        actions.ApplyBlockChanges(map);
     }
 
     /*

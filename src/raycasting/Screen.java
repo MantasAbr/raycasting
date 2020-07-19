@@ -28,9 +28,7 @@ public class Screen {
      * The update method recalculates how the screen should look to the user 
      * based on their position in the map. 
      * The method is called constantly, and returns the updated array of pixels 
-     * to the Raycasting class. The method begins by "clearing" the screen. 
-     * It does this by setting all of the pixels on the top half to one color 
-     * and all of the pixels on the bottom to another.
+     * to the Raycasting class. The method begins by "clearing" the screen.
      * @param camera
      * @param pixels
      * @return 
