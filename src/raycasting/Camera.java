@@ -63,7 +63,7 @@ public class Camera implements KeyListener{
             
             //without this check, sometimes the sounds get stacked one on another
             if(!soundAlreadyPlaying){
-                sounds.get(0).PlaySelectedSound("walkStone");
+                sounds.get(0).PlaySound();
                 soundAlreadyPlaying = true;
             }
             
@@ -73,7 +73,7 @@ public class Camera implements KeyListener{
 	if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
             back = true;
             if(!soundAlreadyPlaying){
-                sounds.get(0).PlaySelectedSound("walkStone");
+                sounds.get(0).PlaySound();
                 soundAlreadyPlaying = true;
             }
             //System.out.println("Down pressed");

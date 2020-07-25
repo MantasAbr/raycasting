@@ -216,8 +216,8 @@ public class Screen {
                 double currentFloorY = weight * floorYWall + (1.0 - weight) * camera.yPos;
                 
                 int floorTexX, floorTexY;
-                floorTexX = (int)(currentFloorX * textureSize) % textureSize;
-                floorTexY = (int)(currentFloorY * textureSize) % textureSize;
+                floorTexX = (int)(currentFloorX * textureSize / 2) % textureSize;
+                floorTexY = (int)(currentFloorY * textureSize / 2) % textureSize;
                 
                 pixels[x + y*(width)] = (textures.get(2).pixels[textureSize * floorTexY + floorTexX] >> 1) & 8355711;
                 pixels[(height-y)*width+x] = (textures.get(0).pixels[textureSize * floorTexY + floorTexX]);

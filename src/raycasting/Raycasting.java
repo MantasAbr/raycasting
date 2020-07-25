@@ -91,8 +91,8 @@ public class Raycasting extends JFrame implements Runnable{
     
     private void audioInit(){
         sounds = new ArrayList<Sounds>();
-        sounds.add(Sounds.stoneRun);
         sounds.add(Sounds.stoneWalk);
+        sounds.add(Sounds.stoneRun);       
     }
     
     private void jFrameInit(){

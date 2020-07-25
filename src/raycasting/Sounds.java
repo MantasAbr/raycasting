@@ -21,22 +21,9 @@ public class Sounds {
     public static Sounds stoneWalk = new Sounds("src/sounds/walking_stone.wav");
     public static Sounds stoneRun = new Sounds("src/sounds/running_stone.wav");
     
-    public void PlaySelectedSound(String type){
-        switch(type){
-            case "walkStone":
-                PlaySound(stoneWalk.source);
-                break;
-            case "runStone":
-                PlaySound(stoneRun.source);
-                break;
-            default:
-                
-        }
-    }
-    
-    public void PlaySound(String path){
+    public void PlaySound(){
         try{
-            File sound = new File(path);
+            File sound = new File(source);
             AudioInputStream audioInput = AudioSystem.getAudioInputStream(sound);
             clip = AudioSystem.getClip();
             
