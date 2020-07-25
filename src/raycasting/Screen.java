@@ -177,6 +177,8 @@ public class Screen {
             //FLOOR AND CEILING CASTING
             
             double floorXWall, floorYWall;
+            int floorTexture = 0;
+            int ceilingTexture = 2;
             
             //4 different wall directions possible
             if(side == 0 && rayDirX > 0)
@@ -218,9 +220,9 @@ public class Screen {
                 int floorTexX, floorTexY;
                 floorTexX = (int)(currentFloorX * textureSize / 2) % textureSize;
                 floorTexY = (int)(currentFloorY * textureSize / 2) % textureSize;
-                
-                pixels[x + y*(width)] = (textures.get(2).pixels[textureSize * floorTexY + floorTexX] >> 1) & 8355711;
-                pixels[(height-y)*width+x] = (textures.get(0).pixels[textureSize * floorTexY + floorTexX]);
+                                             
+                pixels[x + y*(width)] = (textures.get(ceilingTexture).pixels[textureSize * floorTexY + floorTexX] >> 1) & 8355711;
+                pixels[(height-y)*width+x] = (textures.get(floorTexture).pixels[textureSize * floorTexY + floorTexX]);
             }
         }
         return pixels;

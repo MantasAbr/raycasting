@@ -16,6 +16,7 @@ public class Texture {
     private String location;
     //How big the texture is on one side
     public final int SIZE;
+    public String name;
     
     /**
      * The constructor will initialize the loc and SIZE variables and call
@@ -23,8 +24,9 @@ public class Texture {
      * @param location
      * @param size 
      */
-    public Texture(String location, int size){
+    public Texture(String location, int size, String name){
         this.location = location;
+        this.name = name;
         SIZE = size;
         pixels = new int[SIZE * SIZE];
         load();
@@ -45,12 +47,10 @@ public class Texture {
         }
     }
     
-    public static Texture wood = new Texture("src/textures/wood.png", 64);
-    public static Texture brick = new Texture("src/textures/brick.png", 64);
-    public static Texture leaves = new Texture("src/textures/leaves.png", 64);
-    public static Texture stone = new Texture("src/textures/stone.png", 64);
-    public static Texture woodBricks = new Texture("src/textures/wood_brick.png", 64);
-    public static Texture glass = new Texture("src/textures/glass.png", 64);
-    public static Texture door = new Texture("src/textures/door.png", 64);
+    public static Texture wood = new Texture("src/textures/wood.png", 64, "wood");
+    public static Texture brick = new Texture("src/textures/brick.png", 64, "brick");
+    public static Texture stone = new Texture("src/textures/stone.png", 64, "stone");
+    public static Texture woodBricks = new Texture("src/textures/wood_brick.png", 64, "woodbrick");
+    public static Texture door = new Texture("src/textures/door.png", 64, "door");
 }
 

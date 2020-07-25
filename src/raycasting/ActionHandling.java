@@ -63,6 +63,6 @@ public class ActionHandling {
     }
     
     private boolean canOpenDoor(){
-        return screen.lookingAtTextureId == 7 && screen.distanceToWall <= 1;
+        return screen.lookingAtTextureId == 5 && screen.distanceToWall <= 1;
     }
 }

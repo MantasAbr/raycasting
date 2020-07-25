@@ -43,21 +43,21 @@ public class Raycasting extends JFrame implements Runnable{
     private int finalFrames = 0;
     public static int[][] map =
         {
-            {5,5,5,5,5,5,5,5,5,5,5,5,5,5,5},
-            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
-            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
-            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
-            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
-            {5,0,0,0,0,0,0,7,0,0,0,0,0,0,5},
-            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
-            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
-            {5,0,0,0,7,0,0,0,0,0,7,0,0,0,5},
-            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
-            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
-            {5,5,5,5,5,5,5,7,5,5,5,5,5,5,5},
-            {5,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
-            {5,0,0,0,0,5,0,0,0,5,0,0,0,0,5},
-            {5,5,5,5,5,5,5,5,5,5,5,5,5,5,5}   
+            {4,4,4,4,4,4,4,4,4,4,4,4,4,4,4},
+            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
+            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
+            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
+            {4,0,0,0,0,5,0,0,0,5,0,0,0,0,4},
+            {4,4,4,4,4,4,0,0,0,4,4,4,4,4,4},
+            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
+            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
+            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
+            {4,0,0,0,0,5,0,0,0,5,0,0,0,0,4},
+            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
+            {4,4,4,4,4,4,4,5,4,4,4,4,4,4,4},
+            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
+            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
+            {4,4,4,4,4,4,4,4,4,4,4,4,4,4,4}   
         }; 
     
     public Raycasting(){
@@ -66,7 +66,7 @@ public class Raycasting extends JFrame implements Runnable{
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
         textureInit();
         audioInit();
-        camera = new Camera(2, 6, 1.2, 0, 0, -.66, sounds, this);
+        camera = new Camera(2, 7.5, 1.2, 0, 0, -.66, sounds, this);
         screen = new Screen(map, mapWidth, mapHeight, textures, WINDOW_WIDTH, WINDOW_HEIGHT);
         actions = new ActionHandling(camera, screen);
         addKeyListener(camera);
@@ -83,9 +83,7 @@ public class Raycasting extends JFrame implements Runnable{
         textures.add(Texture.wood);
         textures.add(Texture.brick);
         textures.add(Texture.stone);
-        textures.add(Texture.leaves);
         textures.add(Texture.woodBricks);
-        textures.add(Texture.glass);
         textures.add(Texture.door);
     }
     
