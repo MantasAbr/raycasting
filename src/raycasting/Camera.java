@@ -1,13 +1,17 @@
 package raycasting;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
 /**
  *
  * @author Mantas Abramavičius
  */
-public class Camera implements KeyListener{
+public class Camera implements KeyListener, MouseListener, MouseMotionListener{
 
     /*  
         xPos and yPos are the location of the player on the 2D map.
@@ -23,6 +27,9 @@ public class Camera implements KeyListener{
     public boolean  left, right, forward, back, 
                     action, shift,
                     debug;
+    
+    public static int mouseX;
+    public Point pointer = new Point();
     
     public boolean soundAlreadyPlaying = false;
     public final double MOVE_SPEED = .08;
@@ -51,11 +58,9 @@ public class Camera implements KeyListener{
     public void keyPressed(KeyEvent key) {
         if((key.getKeyCode() == KeyEvent.VK_LEFT) || (key.getKeyCode() == KeyEvent.VK_A)){
             left = true;            
-            //System.out.println("Left pressed");
         }		
 	if((key.getKeyCode() == KeyEvent.VK_RIGHT) || (key.getKeyCode() == KeyEvent.VK_D)){
             right = true;
-            //System.out.println("Right pressed");
         }
 		
 	if((key.getKeyCode() == KeyEvent.VK_UP) || (key.getKeyCode() == KeyEvent.VK_W)){
@@ -63,20 +68,17 @@ public class Camera implements KeyListener{
             
             //without this check, sometimes the sounds get stacked one on another
             if(!soundAlreadyPlaying){
-                sounds.get(0).PlaySound();
+                sounds.get(1).PlaySound();
                 soundAlreadyPlaying = true;
-            }
-            
-            //System.out.println("Up pressed");
+            }           
         }
 		
 	if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
             back = true;
             if(!soundAlreadyPlaying){
-                sounds.get(0).PlaySound();
+                sounds.get(1).PlaySound();
                 soundAlreadyPlaying = true;
             }
-            //System.out.println("Down pressed");
         }
 	
         if((key.getKeyCode() == KeyEvent.VK_E)){
@@ -101,26 +103,22 @@ public class Camera implements KeyListener{
     public void keyReleased(KeyEvent key) {
         if((key.getKeyCode() == KeyEvent.VK_LEFT) || (key.getKeyCode() == KeyEvent.VK_A)){
             left = false;
-            //System.out.println("Left released");
         }		
 	if((key.getKeyCode() == KeyEvent.VK_RIGHT) || (key.getKeyCode() == KeyEvent.VK_D)){
             right = false;
-            //System.out.println("Right released");
         }
 		
 	if((key.getKeyCode() == KeyEvent.VK_UP) || (key.getKeyCode() == KeyEvent.VK_W)){
             forward = false;
             //close() because we don't want innactive clips hogging up memory
-            sounds.get(0).clip.close();
+            sounds.get(1).clip.close();
             soundAlreadyPlaying = false;
-            //System.out.println("Up released");
         }
 		
 	if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
             back = false;
-            sounds.get(0).clip.close();
+            sounds.get(1).clip.close();
             soundAlreadyPlaying = false;
-            //System.out.println("Down released");
         }
         
         if((key.getKeyCode() == KeyEvent.VK_E)){
@@ -172,5 +170,44 @@ public class Camera implements KeyListener{
                 xPlane=xPlane*Math.cos(ROTATION_SPEED) - yPlane*Math.sin(ROTATION_SPEED);
                 yPlane=oldxPlane*Math.sin(ROTATION_SPEED) + yPlane*Math.cos(ROTATION_SPEED);
         }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+       
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+       
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        pointer.setLocation(e.getPoint());
+        if(pointer.x == 5)
+            pointer.setLocation(Raycasting.WINDOW_WIDTH, pointer.y);
+        if(pointer.x == Raycasting.WINDOW_WIDTH - 5)
+           pointer.setLocation(0, pointer.y); 
     }
 }

@@ -1,7 +1,10 @@
 package raycasting;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -14,8 +17,8 @@ import javax.swing.JFrame;
  */
 public class Raycasting extends JFrame implements Runnable{
     private static final long serialVersionUID = 1L;
-    private static final int WINDOW_WIDTH = 800;
-    private static final int WINDOW_HEIGHT = 600;   
+    public static final int WINDOW_WIDTH = 800;
+    public static final int WINDOW_HEIGHT = 600;   
     
     //The width and height of the map matrix
     public int mapWidth = 15;
@@ -66,11 +69,13 @@ public class Raycasting extends JFrame implements Runnable{
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
         textureInit();
         audioInit();
+        mouseInit();
         camera = new Camera(2, 7.5, 1.2, 0, 0, -.66, sounds, this);
         screen = new Screen(map, mapWidth, mapHeight, textures, WINDOW_WIDTH, WINDOW_HEIGHT);
         actions = new ActionHandling(camera, screen);
         addKeyListener(camera);
-        
+        addMouseListener(camera);
+        addMouseMotionListener(camera);
         jFrameInit();             
         start();
     }
@@ -91,6 +96,12 @@ public class Raycasting extends JFrame implements Runnable{
         sounds = new ArrayList<Sounds>();
         sounds.add(Sounds.stoneWalk);
         sounds.add(Sounds.stoneRun);       
+    }
+    
+    private void mouseInit(){
+        BufferedImage cursor = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursor, new Point(0, 0), "blank");
+        getContentPane().setCursor(blankCursor);
     }
     
     private void jFrameInit(){
@@ -145,8 +156,7 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Facing X: " + String.format("%.3f", screen.rayX) + ", Facing y: " + String.format("%.3f", screen.rayY), 10, 90);
         g.drawString("Distance to wall: " + String.format("%.3f", screen.distanceToWall) + ". Looking at texture ID: " + screen.lookingAtTextureId, 10, 110);
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
-//        g.drawString("Can open something?", 10, 130);
-//        g.drawString(actions.canOpen ? "Yes" : "No", 210, 130);
+        g.drawString("Pointer X: " + camera.pointer.x + ", Pointer Y: " + camera.pointer.y, 10, 150);
     }
     
     public void tick(){
