@@ -1,10 +1,5 @@
 package raycasting;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -18,7 +13,10 @@ import javax.swing.JFrame;
 public class Raycasting extends JFrame implements Runnable{
     private static final long serialVersionUID = 1L;
     public static final int WINDOW_WIDTH = 800;
-    public static final int WINDOW_HEIGHT = 600;   
+    public static final int WINDOW_HEIGHT = 600;
+    public static int SCREEN_WIDTH;
+    public static int SCREEN_HEIGHT;
+    public static final double MOUSE_SENSITIVITY = 125.5;
     
     //The width and height of the map matrix
     public int mapWidth = 15;
@@ -40,6 +38,8 @@ public class Raycasting extends JFrame implements Runnable{
     public Camera camera;
     public Screen screen;
     public ActionHandling actions;
+    public Robot robot;
+    public GraphicsDevice gd;
     
     //used for showing the ticks and frames each second on the screen
     private int finalTicks = 0;
@@ -77,7 +77,7 @@ public class Raycasting extends JFrame implements Runnable{
         mouseInit();
         camera = new Camera(2, 7.5, 1.2, 0, 0, -.66, sounds, this);
         screen = new Screen(map, mapWidth, mapHeight, textures, WINDOW_WIDTH, WINDOW_HEIGHT, 8);
-        actions = new ActionHandling(camera, screen);
+        actions = new ActionHandling(camera, screen, this);
         addKeyListener(camera);
         addMouseListener(camera);
         addMouseMotionListener(camera);
@@ -107,6 +107,16 @@ public class Raycasting extends JFrame implements Runnable{
         BufferedImage cursor = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
         Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursor, new Point(0, 0), "blank");
         getContentPane().setCursor(blankCursor);
+        try{
+            robot = new Robot();
+            gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+            SCREEN_WIDTH = gd.getDisplayMode().getWidth();
+            SCREEN_HEIGHT = gd.getDisplayMode().getHeight();
+            robot.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+        }
+        catch (AWTException e){
+            System.exit(1);
+        }
     }
     
     private void jFrameInit(){
@@ -161,13 +171,13 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Facing X: " + String.format("%.3f", screen.rayX) + ", Facing y: " + String.format("%.3f", screen.rayY), 10, 90);
         g.drawString("Distance to wall: " + String.format("%.3f", screen.distanceToWall) + ". Looking at texture ID: " + screen.lookingAtTextureId, 10, 110);
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
-        g.drawString("Pointer X: " + camera.pointer.x + ", Pointer Y: " + camera.pointer.y, 10, 150);
     }
     
     public void tick(){
         actions.GetNextBlock();
         actions.CheckForActions();
         actions.ApplyBlockChanges(map);
+        actions.mouseMovementHandling(MOUSE_SENSITIVITY);
     }
 
     /*

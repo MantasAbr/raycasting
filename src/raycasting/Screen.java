@@ -257,11 +257,15 @@ public class Screen {
         return pixels;
     }
 
+    /**
+     * The method to be used for creating a smooth transition to black pixels. Not called - doesn't work as of yet
+     * @param pixels
+     * @param buffer
+     */
     private void renderDistanceLimiter(int pixels[], double buffer[]){
         for(int i = 0; i < width * height; i++){
             int color = pixels[i];
             int brightness = (int) (5 / (buffer[i]));
-            System.out.println(brightness);
 
             if(brightness < 0)
                 brightness = 0;

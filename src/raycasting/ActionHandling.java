@@ -8,13 +8,20 @@ public class ActionHandling {
     
     public Camera camera;
     public Screen screen;
+    public Raycasting raycasting;
     public int forwardBlockX;
     public int forwardBlockY;
     public boolean canOpen;
+
+    private int oldX, newX = 0;
+    private int oldY, newY = 0;
+    public static double rotationValue = 0;
+    public static boolean turningLeft, turningRight = false;
     
-    public ActionHandling(Camera camera, Screen screen){
+    public ActionHandling(Camera camera, Screen screen, Raycasting raycasting){
         this.camera = camera;
         this.screen = screen;
+        this.raycasting = raycasting;
         
         forwardBlockX = 0;
         forwardBlockY = 0;
@@ -60,6 +67,30 @@ public class ActionHandling {
         if(canOpen && camera.action){
             gameMap[forwardBlockX][forwardBlockY] = 0;
         }
+    }
+
+    public void mouseMovementHandling(double sensitivity){
+        newX = camera.mouseX;
+        newY = camera.mouseY;
+
+        rotationValue = (Math.abs(newX - oldX) / sensitivity);
+
+        if(newX > oldX)
+            turningRight = true;
+        if(newX < oldX)
+            turningLeft = true;
+        if(newX == oldX){
+            turningRight = false;
+            turningLeft = false;
+        }
+
+        if(newX <= 10 || newY <= 10)
+            raycasting.robot.mouseMove(Raycasting.SCREEN_WIDTH / 2, Raycasting.SCREEN_HEIGHT / 2);
+        if(newX >= Raycasting.WINDOW_WIDTH - 10 || newY >= Raycasting.WINDOW_HEIGHT - 10)
+            raycasting.robot.mouseMove(Raycasting.SCREEN_WIDTH / 2, Raycasting.SCREEN_HEIGHT / 2);
+
+        oldX = newX;
+        oldY = newY;
     }
     
     private boolean canOpenDoor(){

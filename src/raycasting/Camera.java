@@ -1,4 +1,5 @@
 package raycasting;
+import javax.swing.*;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -28,13 +29,13 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
                     action, shift,
                     debug;
     
-    public static int mouseX;
-    public Point pointer = new Point();
-    
+    public int mouseX;
+    public int mouseY;
+
     public boolean soundAlreadyPlaying = false;
     public final double MOVE_SPEED = .08;
     public final double FASTER_MOVE_SPEED = .12;
-    public final double ROTATION_SPEED = .045;
+    public double ROTATION_SPEED = .045;
     public ArrayList<Sounds> sounds;
     public Raycasting game;
     
@@ -59,11 +60,11 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
         if((key.getKeyCode() == KeyEvent.VK_LEFT) || (key.getKeyCode() == KeyEvent.VK_A)){
             left = true;            
         }		
-	if((key.getKeyCode() == KeyEvent.VK_RIGHT) || (key.getKeyCode() == KeyEvent.VK_D)){
+	    if((key.getKeyCode() == KeyEvent.VK_RIGHT) || (key.getKeyCode() == KeyEvent.VK_D)){
             right = true;
         }
 		
-	if((key.getKeyCode() == KeyEvent.VK_UP) || (key.getKeyCode() == KeyEvent.VK_W)){
+	    if((key.getKeyCode() == KeyEvent.VK_UP) || (key.getKeyCode() == KeyEvent.VK_W)){
             forward = true;
             
             //without this check, sometimes the sounds get stacked one on another
@@ -73,7 +74,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
             }           
         }
 		
-	if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
+	    if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
             back = true;
             if(!soundAlreadyPlaying){
                 sounds.get(1).PlaySound();
@@ -104,18 +105,18 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
         if((key.getKeyCode() == KeyEvent.VK_LEFT) || (key.getKeyCode() == KeyEvent.VK_A)){
             left = false;
         }		
-	if((key.getKeyCode() == KeyEvent.VK_RIGHT) || (key.getKeyCode() == KeyEvent.VK_D)){
+	    if((key.getKeyCode() == KeyEvent.VK_RIGHT) || (key.getKeyCode() == KeyEvent.VK_D)){
             right = false;
         }
 		
-	if((key.getKeyCode() == KeyEvent.VK_UP) || (key.getKeyCode() == KeyEvent.VK_W)){
+	    if((key.getKeyCode() == KeyEvent.VK_UP) || (key.getKeyCode() == KeyEvent.VK_W)){
             forward = false;
             //close() because we don't want innactive clips hogging up memory
             sounds.get(1).clip.close();
             soundAlreadyPlaying = false;
         }
 		
-	if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
+	    if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
             back = false;
             sounds.get(1).clip.close();
             soundAlreadyPlaying = false;
@@ -132,6 +133,14 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
     }
     
     public void update(int[][] map) {
+
+        if(ActionHandling.turningLeft || ActionHandling.turningRight){
+            ROTATION_SPEED = ActionHandling.rotationValue;
+        }
+        else{
+            ROTATION_SPEED = .045;
+        }
+
         if(forward) {
             if(shift){
                 if(map[(int)(xPos + xDir * MOVE_SPEED)][(int)yPos] == 0) {
@@ -154,7 +163,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
             if(map[(int)xPos][(int)(yPos - yDir * MOVE_SPEED)]==0)
                     yPos-=yDir*MOVE_SPEED;
         }
-        if(right) {
+        if(ActionHandling.turningRight ||  right) {
                 double oldxDir=xDir;
                 xDir=xDir*Math.cos(-ROTATION_SPEED) - yDir*Math.sin(-ROTATION_SPEED);
                 yDir=oldxDir*Math.sin(-ROTATION_SPEED) + yDir*Math.cos(-ROTATION_SPEED);
@@ -162,7 +171,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
                 xPlane=xPlane*Math.cos(-ROTATION_SPEED) - yPlane*Math.sin(-ROTATION_SPEED);
                 yPlane=oldxPlane*Math.sin(-ROTATION_SPEED) + yPlane*Math.cos(-ROTATION_SPEED);
         }
-        if(left) {
+        if(ActionHandling.turningLeft || left) {
                 double oldxDir=xDir;
                 xDir=xDir*Math.cos(ROTATION_SPEED) - yDir*Math.sin(ROTATION_SPEED);
                 yDir=oldxDir*Math.sin(ROTATION_SPEED) + yDir*Math.cos(ROTATION_SPEED);
@@ -204,10 +213,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        pointer.setLocation(e.getPoint());
-        if(pointer.x == 5)
-            pointer.setLocation(Raycasting.WINDOW_WIDTH, pointer.y);
-        if(pointer.x == Raycasting.WINDOW_WIDTH - 5)
-           pointer.setLocation(0, pointer.y); 
+        mouseX = e.getX();
+        mouseY = e.getY();
     }
 }
