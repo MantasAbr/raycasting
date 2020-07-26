@@ -14,14 +14,25 @@ public class Screen {
     public double distanceToWall;
     public int lookingAtTextureId;
     public double rayX, rayY;
+    public int renderDistance;
+
+    private int ceilingTexture = 2;
+    private int floorTexture = 0;
+
+    private double wallBuffer[];
+    private double floorBuffer[];
     
-    public Screen(int[][] map, int mapWidth, int mapHeight, ArrayList<Texture> textures, int width, int height){
+    public Screen(int[][] map, int mapWidth, int mapHeight, ArrayList<Texture> textures, int width, int height, int renderDistance){
         this.map = map;
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
         this.textures = textures;
         this.width = width;
         this.height = height;
+        this.renderDistance = renderDistance;
+
+        wallBuffer = new double[width * height];
+        floorBuffer = new double[width * height];
     }
     
     /**
@@ -136,9 +147,11 @@ public class Screen {
             
             //Now calculate the height of the wall based on the distance from the camera
             int lineHeight;
-            if(perpWallDist > 0) lineHeight = Math.abs((int)(height / perpWallDist));
-            else lineHeight = height;
-            
+            if(perpWallDist > 0) 
+                lineHeight = Math.abs((int)(height / perpWallDist));
+            else 
+                lineHeight = height;
+                                  
             //calculate lowest and highest pixel to fill in current stripe
             int drawStart = -lineHeight / 2 + height / 2;
             if(drawStart < 0)
@@ -171,14 +184,18 @@ public class Screen {
                     color = textures.get(texNum).pixels[texX + (texY * textureSize)];
                 else 
                     color = (textures.get(texNum).pixels[texX + (texY * textureSize)]>>1) & 8355711;//Make y sides darker
-                pixels[x + y*(width)] = color;
+
+                wallBuffer[x + y*(width)] = perpWallDist;
+
+                if(perpWallDist > renderDistance)
+                    pixels[x + y*(width)] = 0;
+                else
+                    pixels[x + y*(width)] = color;
             }
-            
+                                   
             //FLOOR AND CEILING CASTING
             
             double floorXWall, floorYWall;
-            int floorTexture = 0;
-            int ceilingTexture = 2;
             
             //4 different wall directions possible
             if(side == 0 && rayDirX > 0)
@@ -209,6 +226,8 @@ public class Screen {
             
             if (drawEnd < 0) drawEnd = height;
             
+
+            
             for(int y = drawEnd + 1; y < height; y++){
                 currentDist = height / (2.0 * y - height);
                 
@@ -220,11 +239,44 @@ public class Screen {
                 int floorTexX, floorTexY;
                 floorTexX = (int)(currentFloorX * textureSize / 2) % textureSize;
                 floorTexY = (int)(currentFloorY * textureSize / 2) % textureSize;
-                                             
-                pixels[x + y*(width)] = (textures.get(ceilingTexture).pixels[textureSize * floorTexY + floorTexX] >> 1) & 8355711;
-                pixels[(height-y)*width+x] = (textures.get(floorTexture).pixels[textureSize * floorTexY + floorTexX]);
+
+                floorBuffer[x + y*(width)] = currentDist;
+
+                if(currentDist > renderDistance){
+                    //renderDistanceLimiter(pixels, floorBuffer);
+                    pixels[x + y*(width)] = 0;
+                    pixels[(height-y)*width+x] = 0;
+
+                }
+                else{
+                    pixels[x + y*(width)] = (textures.get(ceilingTexture).pixels[textureSize * floorTexY + floorTexX] >> 1) & 8355711;
+                    pixels[(height-y)*width+x] = (textures.get(floorTexture).pixels[textureSize * floorTexY + floorTexX]);
+                }
             }
         }
         return pixels;
+    }
+
+    private void renderDistanceLimiter(int pixels[], double buffer[]){
+        for(int i = 0; i < width * height; i++){
+            int color = pixels[i];
+            int brightness = (int) (5 / (buffer[i]));
+            System.out.println(brightness);
+
+            if(brightness < 0)
+                brightness = 0;
+            if(brightness > 255)
+                brightness = 255;
+
+            int r = (color >> 16) & 0xff;
+            int g = (color >> 8) & 0xff;
+            int b = (color) & 0xff;
+
+            r = r * brightness / 255;
+            g = g * brightness / 255;
+            b = b * brightness / 255;
+
+            pixels[i] = r << 16 | g << 8 | b;
+        }
     }
 }

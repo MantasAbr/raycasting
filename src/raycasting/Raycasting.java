@@ -22,7 +22,7 @@ public class Raycasting extends JFrame implements Runnable{
     
     //The width and height of the map matrix
     public int mapWidth = 15;
-    public int mapHeight = 15;
+    public int mapHeight = 20;
     
     //Used for the run() method
     private Thread thread;
@@ -60,6 +60,11 @@ public class Raycasting extends JFrame implements Runnable{
             {4,4,4,4,4,4,4,5,4,4,4,4,4,4,4},
             {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
             {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
+            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
+            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
+            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
+            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
+            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
             {4,4,4,4,4,4,4,4,4,4,4,4,4,4,4}   
         }; 
     
@@ -71,7 +76,7 @@ public class Raycasting extends JFrame implements Runnable{
         audioInit();
         mouseInit();
         camera = new Camera(2, 7.5, 1.2, 0, 0, -.66, sounds, this);
-        screen = new Screen(map, mapWidth, mapHeight, textures, WINDOW_WIDTH, WINDOW_HEIGHT);
+        screen = new Screen(map, mapWidth, mapHeight, textures, WINDOW_WIDTH, WINDOW_HEIGHT, 8);
         actions = new ActionHandling(camera, screen);
         addKeyListener(camera);
         addMouseListener(camera);
@@ -194,7 +199,7 @@ public class Raycasting extends JFrame implements Runnable{
                                 
             try {
                 //can increase the sleep rate to lower the fps
-                Thread.sleep(5);
+                Thread.sleep(8);
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }

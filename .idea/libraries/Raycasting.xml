@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Raycasting">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/Raycasting.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
