@@ -5,5 +5,7 @@ This project has been created as a way to familiarize myself with the concepts o
 * [Wikipedia article on Raycasting](https://en.wikipedia.org/wiki/Ray_casting)
 * [The Cherno Youtube tutorials](https://www.youtube.com/playlist?list=PL656DADE0DA25ADBB)
 * And a bunch of StackOverflow articles...
+# Progress updates
+You can track my progress on this [Trello board](https://trello.com/b/WJw6PoRG/raycasting)
 # Future plans
 Build up the engine to a state that I am comfortable with and start the development of a game (still not sure what it will be).
