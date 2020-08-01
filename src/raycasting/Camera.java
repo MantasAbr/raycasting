@@ -26,7 +26,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
     public double xPos, yPos, xDir, yDir, xPlane, yPlane;
     
     public boolean  left, right, forward, back, 
-                    action, shift,
+                    action, sprint,
                     debug;
     
     public int mouseX;
@@ -88,15 +88,16 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
         }
         
         if((key.getKeyCode() == KeyEvent.VK_SHIFT)){
-            shift = true;
+            if(forward || back)
+                sprint = true;
         }
         
         if((key.getKeyCode() == KeyEvent.VK_X)){
             game.stop();
         }
         
-        if((key.getKeyCode() == KeyEvent.VK_F3)){
-            debug = !debug;        
+        if((key.getKeyCode() == KeyEvent.VK_F3)) {
+            debug = !debug;
         }
     }
 
@@ -128,7 +129,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
         }
         
         if((key.getKeyCode() == KeyEvent.VK_SHIFT)){
-            shift = false;
+            sprint = false;
         }
     }
     
@@ -142,7 +143,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
         }
 
         if(forward) {
-            if(shift){
+            if(sprint){
                 if(map[(int)(xPos + xDir * MOVE_SPEED)][(int)yPos] == 0) {
                     xPos+=xDir*FASTER_MOVE_SPEED;
                 }

@@ -40,6 +40,8 @@ public class Raycasting extends JFrame implements Runnable{
     public ActionHandling actions;
     public Robot robot;
     public GraphicsDevice gd;
+    public UserInterface userInterface;
+    public Player player;
     
     //used for showing the ticks and frames each second on the screen
     private int finalTicks = 0;
@@ -75,9 +77,11 @@ public class Raycasting extends JFrame implements Runnable{
         textureInit();
         audioInit();
         mouseInit();
-        camera = new Camera(2, 7.5, 1.2, 0, 0, -.66, sounds, this);
+        player = new Player(2, 7.5, 100, 100, .8);
+        camera = new Camera(player.getXLocation(), player.getYLocation(), 1.2, 0, 0, -.66, sounds, this);
         screen = new Screen(map, mapWidth, mapHeight, textures, WINDOW_WIDTH, WINDOW_HEIGHT, 8);
         actions = new ActionHandling(camera, screen, this);
+        userInterface = new UserInterface(player);
         addKeyListener(camera);
         addMouseListener(camera);
         addMouseMotionListener(camera);
@@ -157,8 +161,12 @@ public class Raycasting extends JFrame implements Runnable{
         }
         Graphics g = bs.getDrawGraphics();
         g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
+
+        userInterface.DrawInterface(g);
+
         if(camera.debug)
             debugInfo(g);
+
         bs.show();
     }
     
@@ -171,6 +179,7 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Facing X: " + String.format("%.3f", screen.rayX) + ", Facing y: " + String.format("%.3f", screen.rayY), 10, 90);
         g.drawString("Distance to wall: " + String.format("%.3f", screen.distanceToWall) + ". Looking at texture ID: " + screen.lookingAtTextureId, 10, 110);
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
+        g.drawString("Sprint value: " + player.getSprintValue(), 10, 150);
     }
     
     public void tick(){
@@ -178,6 +187,7 @@ public class Raycasting extends JFrame implements Runnable{
         actions.CheckForActions();
         actions.ApplyBlockChanges(map);
         actions.mouseMovementHandling(MOUSE_SENSITIVITY);
+        player.ApplyUpdates(camera);
     }
 
     /*
@@ -186,7 +196,7 @@ public class Raycasting extends JFrame implements Runnable{
     @Override
     public void run(){
         long lastTime = System.nanoTime();
-        double NanosPerTick = 1000000000D / 60D;              
+        double NanosPerTick = 1000000000D / 60D;
         int ticks = 0;
         int frames = 0;        
         long lastTimer = System.currentTimeMillis();
@@ -196,7 +206,7 @@ public class Raycasting extends JFrame implements Runnable{
             long now = System.nanoTime();
             delta += (now - lastTime) / NanosPerTick;
             lastTime = now;
-            boolean shouldRender = true;            
+            boolean shouldRender = false;
                 
             while(delta >= 1){
                 ticks++;
@@ -208,7 +218,7 @@ public class Raycasting extends JFrame implements Runnable{
             }
                                 
             try {
-                //can increase the sleep rate to lower the fps
+                //can increase the sleep rate to lower the fps and processing power
                 Thread.sleep(8);
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
