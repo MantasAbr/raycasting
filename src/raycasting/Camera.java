@@ -26,7 +26,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
     public double xPos, yPos, xDir, yDir, xPlane, yPlane;
     
     public boolean  left, right, forward, back, 
-                    action, sprint,
+                    action, sprint, options,
                     debug;
     
     public int mouseX;
@@ -99,6 +99,9 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
         if((key.getKeyCode() == KeyEvent.VK_F3)) {
             debug = !debug;
         }
+
+        if((key.getKeyCode() == KeyEvent.VK_ESCAPE))
+            options = !options;
     }
 
     @Override

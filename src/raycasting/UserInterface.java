@@ -1,24 +1,37 @@
 package raycasting;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 public class UserInterface {
 
-    Player player;
-    Point SprintBarPoint = new Point(120, Raycasting.WINDOW_HEIGHT - 50);
-    Point HealthBarPoint = new Point(120, Raycasting.WINDOW_HEIGHT - 100);
+    private Player player;
+    private Camera camera;
+
+    private Point SprintBarPoint = new Point(120, Raycasting.WINDOW_HEIGHT - 50);
+    private Point HealthBarPoint = new Point(120, Raycasting.WINDOW_HEIGHT - 100);
     private int barHeight = 20;
 
-    Font font = new Font("Courier new", Font.BOLD ,16);
+    private Font font = new Font("Courier new", Font.BOLD ,16);
+    private Font header = new Font("Courier new", Font.BOLD, 22);
 
-    public UserInterface(Player player){
+    private Color optionsColor = new Color(102, 102, 102, 200);
+    private int optionsBoxOffset = 50;
+    private Rectangle optionsBox = new Rectangle(optionsBoxOffset, optionsBoxOffset,
+                             Raycasting.WINDOW_WIDTH - (optionsBoxOffset * 2),
+                            Raycasting.WINDOW_HEIGHT - (optionsBoxOffset * 2));
+
+    public UserInterface(Player player, Camera camera){
         this.player = player;
+        this.camera = camera;
     }
 
     public void DrawInterface(Graphics g){
         g.setFont(font);
         drawSprintInfo(g, player);
         drawHealthInfo(g, player);
+        if(camera.options)
+            drawOptionsScreen(g, player);
     }
 
     private void drawHealthInfo(Graphics g, Player player){
@@ -33,5 +46,30 @@ public class UserInterface {
         g.drawString("Spirtn", SprintBarPoint.x - 90, (int)(SprintBarPoint.y + barHeight / 1.4));
         g.setColor(Color.BLUE);
         g.fillRect(SprintBarPoint.x, SprintBarPoint.y, (int)(player.getSprintValue() * 1.5), barHeight);
+    }
+
+    private void drawOptionsScreen(Graphics g, Player player){
+        g.setColor(optionsColor);
+        g.fillRect(optionsBox.x, optionsBox.y, optionsBox.width, optionsBox.height);
+        g.setFont(header);
+        drawButton(g, 200, 200, 40, Color.red, "Test", font, Color.white);
+        drawButton(g, 200, 280, 40, Color.black, "Longer test!", font, Color.white);
+        drawButton(g, 200, 360, 40, Color.orange, "Parametrai", font, Color.white);
+    }
+
+    private void drawButton(Graphics g, int x, int y, int height,
+                            Color buttonColor, String text, Font font, Color fontColor){
+        FontMetrics fm = g.getFontMetrics();
+        Rectangle2D bounds = fm.getStringBounds(text, g);
+        int offset = 30;
+
+        g.setColor(buttonColor);
+        g.fillRect(x, y, (int) bounds.getWidth() + offset, height);
+
+        g.setColor(fontColor);
+        g.setFont(font);
+        int stringX = x + (int)(offset / 2);
+        int stringY = y + (int)((height / 2) + (int)(bounds.getHeight() / 3));
+        g.drawString(text, stringX, stringY);
     }
 }

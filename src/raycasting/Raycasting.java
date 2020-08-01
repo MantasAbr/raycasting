@@ -12,8 +12,8 @@ import javax.swing.JFrame;
  */
 public class Raycasting extends JFrame implements Runnable{
     private static final long serialVersionUID = 1L;
-    public static final int WINDOW_WIDTH = 800;
-    public static final int WINDOW_HEIGHT = 600;
+    public static int WINDOW_WIDTH = 800;
+    public static int WINDOW_HEIGHT = 600;
     public static int SCREEN_WIDTH;
     public static int SCREEN_HEIGHT;
     public static final double MOUSE_SENSITIVITY = 125.5;
@@ -81,7 +81,7 @@ public class Raycasting extends JFrame implements Runnable{
         camera = new Camera(player.getXLocation(), player.getYLocation(), 1.2, 0, 0, -.66, sounds, this);
         screen = new Screen(map, mapWidth, mapHeight, textures, WINDOW_WIDTH, WINDOW_HEIGHT, 8);
         actions = new ActionHandling(camera, screen, this);
-        userInterface = new UserInterface(player);
+        userInterface = new UserInterface(player, camera);
         addKeyListener(camera);
         addMouseListener(camera);
         addMouseMotionListener(camera);
@@ -211,10 +211,10 @@ public class Raycasting extends JFrame implements Runnable{
             while(delta >= 1){
                 ticks++;
                 tick();
-                screen.update(camera, pixels);
-                camera.update(map);    
                 delta -= 1;
                 shouldRender = true;
+                screen.update(camera, pixels);
+                camera.update(map);
             }
                                 
             try {
