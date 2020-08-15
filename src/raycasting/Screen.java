@@ -11,6 +11,7 @@ public class Screen {
     public int[][] map;
     public int mapWidth, mapHeight, width, height;
     public ArrayList<Texture> textures;
+    public ArrayList<Sprite> sprites;
     public double distanceToWall;
     public int lookingAtTextureId;
     public double rayX, rayY;
@@ -21,18 +22,29 @@ public class Screen {
 
     private double wallBuffer[];
     private double floorBuffer[];
+
+    private int numberOfSprites;
+    private double ZBuffer[];
+    private int spriteOrder[];
+    private double spriteDistance[];
     
-    public Screen(int[][] map, int mapWidth, int mapHeight, ArrayList<Texture> textures, int width, int height, int renderDistance){
+    public Screen(int[][] map, int mapWidth, int mapHeight, ArrayList<Texture> textures, ArrayList<Sprite> sprites, int width, int height, int renderDistance){
         this.map = map;
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
         this.textures = textures;
+        this.sprites = sprites;
         this.width = width;
         this.height = height;
         this.renderDistance = renderDistance;
 
         wallBuffer = new double[width * height];
         floorBuffer = new double[width * height];
+
+        ZBuffer = new double[width];
+        numberOfSprites = sprites.size();
+        spriteOrder = new int[numberOfSprites];
+        spriteDistance = new double[numberOfSprites];
     }
     
     /**
@@ -47,6 +59,8 @@ public class Screen {
     public int[] update(Camera camera, int[] pixels){
         
         int textureSize = textures.get(0).SIZE;
+
+
         
         for(int x = 0; x < width; x++){            
             /**
@@ -192,6 +206,8 @@ public class Screen {
                 else
                     pixels[x + y*(width)] = color;
             }
+
+            ZBuffer[x] = perpWallDist;
                                    
             //FLOOR AND CEILING CASTING
             
@@ -253,8 +269,44 @@ public class Screen {
                     pixels[(height-y)*width+x] = (textures.get(floorTexture).pixels[textureSize * floorTexY + floorTexX]);
                 }
             }
+
+            //SPRITE CASTING
+
+            //sort sprites from far to close
+            for(int i = 0; i < numberOfSprites; i++){
+                spriteOrder[i] = i;
+                spriteDistance[i] = ((camera.xPos - sprites.get(i).getXLoc()) * (camera.xPos - sprites.get(i).getXLoc()) +
+                                     (camera.yPos - sprites.get(i).getYLoc()) * (camera.yPos - sprites.get(i).getYLoc()));
+            }
+
+            sortSprites(spriteOrder, spriteDistance, numberOfSprites);
+
+            //after sorting the sprites, do the projection and draw them
+            for(int i = 0; i < numberOfSprites; i++){
+
+                double spriteX = sprites.get(spriteOrder[i]).getXLoc() - camera.xPos;
+                double spriteY = sprites.get(spriteOrder[i]).getYLoc() - camera.yPos;
+
+                //transform sprite with the inverse camera matrix
+                // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
+                // [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
+                // [ planeY   dirY ]                                          [ -planeY  planeX ]
+
+                double invDet = 1.0 / (camera.xPlane * camera.yDir - camera.xDir * camera.yPlane);
+
+                double transformX = invDet * (camera.yDir * spriteX - camera.xDir * spriteY);
+                double transformY = invDet * (-camera.yPlane * spriteX + camera.xPlane * spriteY); //this is actually the depth inside the screen, that what Z is in 3D
+
+                int spriteScreenX = (int)((width / 2) * (1 + transformX / transformY));
+
+
+            }
         }
         return pixels;
+    }
+
+    private void sortSprites(int[] order, double[] dist, int amount){
+
     }
 
     /**

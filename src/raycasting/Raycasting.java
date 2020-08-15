@@ -32,6 +32,7 @@ public class Raycasting extends JFrame implements Runnable{
     
     //ArrayList for objects
     public ArrayList<Texture> textures;
+    public ArrayList<Sprite> sprites;
     public ArrayList<Sounds> sounds;
     
     //Objects declarations
@@ -75,11 +76,12 @@ public class Raycasting extends JFrame implements Runnable{
         image = new BufferedImage(WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
         textureInit();
+        spriteInit();
         audioInit();
         mouseInit();
         player = new Player(2, 7.5, 100, 100, .8);
         camera = new Camera(player.getXLocation(), player.getYLocation(), 1.2, 0, 0, -.66, sounds, this);
-        screen = new Screen(map, mapWidth, mapHeight, textures, WINDOW_WIDTH, WINDOW_HEIGHT, 8);
+        screen = new Screen(map, mapWidth, mapHeight, textures, sprites, WINDOW_WIDTH, WINDOW_HEIGHT, 8);
         actions = new ActionHandling(camera, screen, this);
         userInterface = new UserInterface(player, camera);
         addKeyListener(camera);
@@ -99,6 +101,11 @@ public class Raycasting extends JFrame implements Runnable{
         textures.add(Texture.stone);
         textures.add(Texture.woodBricks);
         textures.add(Texture.door);
+    }
+
+    private void spriteInit(){
+        sprites = new ArrayList<Sprite>();
+        sprites.add(Sprite.test);
     }
     
     private void audioInit(){
