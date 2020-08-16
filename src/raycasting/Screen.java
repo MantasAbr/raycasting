@@ -326,7 +326,7 @@ public class Screen {
 
                 //loop through every vertical stripe of the sprite on screen
                 for(int stripe = drawStartX; stripe < drawEndX; stripe++){
-                    int spriteTexX = (int)(256 * (stripe - (spriteWidth / 2 + spriteScreenX)) * textureSize / spriteWidth);
+                    int spriteTexX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * sprites.get(i).getSpriteWidth() / spriteWidth) / 256;
                     //the conditions in the if are:
                     //1) it's in front of camera plane so you don't see things behind you
                     //2) it's on the screen (left)
@@ -335,11 +335,10 @@ public class Screen {
                     if(transformY > 0 && stripe > 0 && stripe < width && transformY < ZBuffer[stripe]){
                         for(int y  = drawStartY; y < drawEndY; y++){//for every pixel of the current stripe
                             int d = (y) * 256 - height * 128 + spriteHeight * 128;
-                            int spriteTexY =((d * textureSize) / spriteHeight) / 256;
-                            //color = textures.get(texNum).pixels[texX + (texY * textureSize)];
-                            //color = textures.get(sprites.get(spriteOrder[i]).getTexture()).pixels[textureSize * spriteTexY + spriteTexX]
-                            int color = sprites.get(0).pixels[sprites.get(0).getSpriteWidth()/** * spriteTexY + spriteTexX**/];
-                            if((color & 0x00FFFFFF) != 0) pixels[stripe + y * (width)] = color;
+                            int spriteTexY =((d * sprites.get(i).getSpriteHeight()) / spriteHeight) / 256;
+                            int color = sprites.get(spriteOrder[i]).pixels[sprites.get(spriteOrder[i]).getSpriteWidth() * spriteTexY + spriteTexX];
+                            if((color & 0x00FFFFFF) != 0);
+                                pixels[stripe + y * (width)] = color;
                         }
                     }
                 }
