@@ -1,27 +1,45 @@
 package raycasting;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
 /**
  *
  * @author Mantas Abramavičius
  */
-public class Sprite extends Texture{
+public class Sprite{
 
     private double xLoc;
     private double yLoc;
+    public int[] pixels;
+    private String location;
+    private String name;
+    private int spriteWidth;
+    private int spriteHeight;
+    private int texture;
 
-    /**
-     * The constructor will initialize the loc and SIZE variables and call
-     * the method to load the image data into pixels
-     *
-     * @param location
-     * @param size
-     * @param name
-     */
-    public Sprite(double xLoc, double yLoc, String location, int size, String name) {
-        super(location, size, name);
+    public Sprite(double xLoc, double yLoc, String location, String name, int texture){
         this.xLoc = xLoc;
         this.yLoc = yLoc;
-        super.load();
+        this.location = location;
+        this.name = name;
+        this.texture = texture;
+        load();
+    }
+
+    private void load(){
+        try {
+            BufferedImage image = ImageIO.read(new File(location));
+            spriteWidth = image.getWidth();
+            spriteHeight = image.getHeight();
+            pixels = new int[spriteWidth * spriteHeight];
+            image.getRGB(0, 0, spriteWidth, spriteHeight, pixels, 0, spriteWidth);
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     public double getXLoc(){
@@ -32,5 +50,11 @@ public class Sprite extends Texture{
         return yLoc;
     }
 
-    public static Sprite test = new Sprite(7.5, 7.5, "src/textures/wood.png", 64, "test");
+    public int getSpriteWidth(){return spriteWidth;}
+
+    public int getSpriteHeight(){return spriteHeight;}
+
+    public int getTexture(){return texture;}
+
+    public static Sprite test = new Sprite(7.5, 7.5, "src/sprites/lamp.png", "test", 0);
 }

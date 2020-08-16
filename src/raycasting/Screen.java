@@ -59,8 +59,6 @@ public class Screen {
     public int[] update(Camera camera, int[] pixels){
         
         int textureSize = textures.get(0).SIZE;
-
-
         
         for(int x = 0; x < width; x++){            
             /**
@@ -173,6 +171,8 @@ public class Screen {
             int drawEnd = lineHeight / 2 + height / 2;
             if(drawEnd >= height) 
                 drawEnd = height - 1;
+
+            ZBuffer[x] = perpWallDist;
             
             
             //add a texture
@@ -199,15 +199,17 @@ public class Screen {
                 else 
                     color = (textures.get(texNum).pixels[texX + (texY * textureSize)]>>1) & 8355711;//Make y sides darker
 
-                wallBuffer[x + y*(width)] = perpWallDist;
+                //wallBuffer[x + y*(width)] = perpWallDist;
 
-                if(perpWallDist > renderDistance)
+                if(perpWallDist > renderDistance){
+                    //renderDistanceLimiter(pixels, ZBuffer);
                     pixels[x + y*(width)] = 0;
+                }
                 else
                     pixels[x + y*(width)] = color;
             }
 
-            ZBuffer[x] = perpWallDist;
+
                                    
             //FLOOR AND CEILING CASTING
             
@@ -256,7 +258,7 @@ public class Screen {
                 floorTexX = (int)(currentFloorX * textureSize / 2) % textureSize;
                 floorTexY = (int)(currentFloorY * textureSize / 2) % textureSize;
 
-                floorBuffer[x + y*(width)] = currentDist;
+                //floorBuffer[x + y*(width)] = currentDist;
 
                 if(currentDist > renderDistance){
                     //renderDistanceLimiter(pixels, floorBuffer);
@@ -299,7 +301,48 @@ public class Screen {
 
                 int spriteScreenX = (int)((width / 2) * (1 + transformX / transformY));
 
+                //calculate height of the sprite on screen
+                int spriteHeight = Math.abs((int)(height / (transformY)));
 
+                //calculate lowest and highest pixel to fill in current sprite
+                int drawStartY = -spriteHeight / 2 + height / 2;
+                if(drawStartY < 0 )
+                    drawStartY = 0;
+
+                int drawEndY = spriteHeight / 2 + height / 2;
+                if(drawEndY >= height)
+                    drawEndY = height - 1;
+
+                //calculate width of the sprite
+                int spriteWidth = Math.abs((int)(height / (transformY)));
+
+                int drawStartX = -spriteWidth / 2 + spriteScreenX;
+                if(drawStartX < 0)
+                    drawStart = 0;
+
+                int drawEndX = spriteWidth / 2 + spriteScreenX;
+                if(drawEndX >= width)
+                    drawEndX = width - 1;
+
+                //loop through every vertical stripe of the sprite on screen
+                for(int stripe = drawStartX; stripe < drawEndX; stripe++){
+                    int spriteTexX = (int)(256 * (stripe - (spriteWidth / 2 + spriteScreenX)) * textureSize / spriteWidth);
+                    //the conditions in the if are:
+                    //1) it's in front of camera plane so you don't see things behind you
+                    //2) it's on the screen (left)
+                    //3) it's on the screen (right)
+                    //4) ZBuffer, with perpendicular distance
+                    if(transformY > 0 && stripe > 0 && stripe < width && transformY < ZBuffer[stripe]){
+                        for(int y  = drawStartY; y < drawEndY; y++){//for every pixel of the current stripe
+                            int d = (y) * 256 - height * 128 + spriteHeight * 128;
+                            int spriteTexY =((d * textureSize) / spriteHeight) / 256;
+                            //color = textures.get(texNum).pixels[texX + (texY * textureSize)];
+                            //color = textures.get(sprites.get(spriteOrder[i]).getTexture()).pixels[textureSize * spriteTexY + spriteTexX]
+                            int color = sprites.get(0).pixels[sprites.get(0).getSpriteWidth()/** * spriteTexY + spriteTexX**/];
+                            if((color & 0x00FFFFFF) != 0) pixels[stripe + y * (width)] = color;
+                        }
+                    }
+                }
             }
         }
         return pixels;

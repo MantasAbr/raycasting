@@ -35,7 +35,7 @@ public class Texture {
     /**
      * Used to get data from images and store them in an array of pixel data
      */
-    protected void load(){
+    private void load(){
         try {
             BufferedImage image = ImageIO.read(new File(location));
             int width = image.getWidth();
