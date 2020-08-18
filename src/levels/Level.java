@@ -57,7 +57,9 @@ public class Level {
         return map;
     }
 
-    public int getMapWidth(){ return mapWidth; }
+    public int getMapWidth(){
+        return mapWidth;
+    }
 
     public int getMapHeight(){
         return mapHeight;

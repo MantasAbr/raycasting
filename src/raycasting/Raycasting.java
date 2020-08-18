@@ -19,6 +19,7 @@ public class Raycasting extends JFrame implements Runnable{
     public static int SCREEN_WIDTH;
     public static int SCREEN_HEIGHT;
     public static final double MOUSE_SENSITIVITY = 125.5;
+    public static int CURRENT_LEVEL;
     
     //The width and height of the map matrix
     public int mapWidth = 15;
@@ -83,9 +84,10 @@ public class Raycasting extends JFrame implements Runnable{
         audioInit();
         mouseInit();
         levelsInit();
-        player = new Player(levels.get(0).getPlayerLocX(), levels.get(0).getPlayerLocY(), 100, 100, .8);
+        player = new Player(levels.get(CURRENT_LEVEL).getPlayerLocX(), levels.get(CURRENT_LEVEL).getPlayerLocY(), 100, 100, .8);
         camera = new Camera(player.getXLocation(), player.getYLocation(), 1.2, 0, 0, -.66, sounds, this);
-        screen = new Screen(levels.get(0).getMap(), levels.get(0).getMapWidth(), levels.get(0).getMapHeight(), textures, sprites, WINDOW_WIDTH, WINDOW_HEIGHT, 8);
+        screen = new Screen(levels.get(CURRENT_LEVEL).getMap(), levels.get(CURRENT_LEVEL).getMapWidth(), levels.get(CURRENT_LEVEL).getMapHeight(),
+                            textures, sprites, WINDOW_WIDTH, WINDOW_HEIGHT, 8);
         actions = new ActionHandling(camera, screen, this);
         userInterface = new UserInterface(player, camera);
         addKeyListener(camera);
@@ -119,6 +121,7 @@ public class Raycasting extends JFrame implements Runnable{
     }
 
     private void levelsInit(){
+        CURRENT_LEVEL = 0;
         levels = new ArrayList<Level>();
         levels.add(Level.firstLevel);
     }
@@ -201,7 +204,7 @@ public class Raycasting extends JFrame implements Runnable{
     public void tick(){
         actions.GetNextBlock();
         actions.CheckForActions();
-        actions.ApplyBlockChanges(levels.get(0).getMap());
+        actions.ApplyBlockChanges(levels.get(CURRENT_LEVEL).getMap());
         actions.mouseMovementHandling(MOUSE_SENSITIVITY);
         player.ApplyUpdates(camera);
     }
@@ -230,7 +233,7 @@ public class Raycasting extends JFrame implements Runnable{
                 delta -= 1;
                 shouldRender = true;
                 screen.update(camera, pixels);
-                camera.update(levels.get(0).getMap());
+                camera.update(levels.get(CURRENT_LEVEL).getMap());
             }
                                 
             try {
