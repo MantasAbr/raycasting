@@ -17,4 +17,12 @@ public class Entity {
     public double getYLoc(){
         return yLoc;
     }
+
+    public void setXLoc(double location){
+        this.xLoc = location;
+    }
+
+    public void setYLoc(double location){
+        this.yLoc = location;
+    }
 }

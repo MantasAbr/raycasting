@@ -46,6 +46,10 @@ public class Screen {
         spriteOrder = new int[numberOfSprites];
         spriteDistance = new double[numberOfSprites];
     }
+
+    public void setMap(int[][] newMap){
+        this.map = newMap;
+    }
     
     /**
      * The update method recalculates how the screen should look to the user 

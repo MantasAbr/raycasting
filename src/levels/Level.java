@@ -65,6 +65,7 @@ public class Level {
         return mapHeight;
     }
 
-    public static Level firstLevel = new Level(3, 3, "src/levels/source/01.txt");
+    public static Level firstLevel = new Level(4.5, 4.5, "src/levels/source/01.txt");
+    public static Level secondLevel = new Level(2, 4.5, "src/levels/source/02.txt");
 
 }

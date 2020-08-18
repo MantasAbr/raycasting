@@ -49,6 +49,14 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
         this.sounds = sounds;
         this.game = game;
     }
+
+    public void setXPos(double x){
+        this.xPos = x;
+    }
+
+    public void setYPos(double y){
+        this.yPos = y;
+    }
     
     @Override
     public void keyTyped(KeyEvent key) {

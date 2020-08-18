@@ -1,4 +1,7 @@
 package raycasting;
+import levels.Level;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -11,7 +14,9 @@ public class ActionHandling {
     public Raycasting raycasting;
     public int forwardBlockX;
     public int forwardBlockY;
+
     public boolean canOpen;
+    public boolean canEnterNewLevel;
 
     private int oldX, newX = 0;
     private int oldY, newY = 0;
@@ -25,7 +30,6 @@ public class ActionHandling {
         
         forwardBlockX = 0;
         forwardBlockY = 0;
-        canOpen = false;
     }
     
     /**
@@ -56,9 +60,14 @@ public class ActionHandling {
     
     public void CheckForActions(){
         canOpen = false;
+        canEnterNewLevel = false;
         
         if(canOpenDoor()){
             canOpen = true;
+        }
+
+        if(canOpenNewLevelDoor()){
+            canEnterNewLevel = true;
         }
     }
     
@@ -67,6 +76,20 @@ public class ActionHandling {
         if(canOpen && camera.action){
             gameMap[forwardBlockX][forwardBlockY] = 0;
         }
+    }
+
+    public void ChangeLevel(ArrayList<Level> levels){
+        if(canEnterNewLevel && camera.action){
+            Raycasting.CURRENT_LEVEL = 1;
+
+            //Sets the player's (cameras) location
+            camera.setXPos(levels.get(Raycasting.CURRENT_LEVEL).getPlayerLocX());
+            camera.setYPos(levels.get(Raycasting.CURRENT_LEVEL).getPlayerLocY());
+
+            //Set the level
+            screen.setMap(levels.get(Raycasting.CURRENT_LEVEL).getMap());
+        }
+
     }
 
     public void mouseMovementHandling(double sensitivity){
@@ -96,4 +119,6 @@ public class ActionHandling {
     private boolean canOpenDoor(){
         return screen.lookingAtTextureId == 5 && screen.distanceToWall <= 1;
     }
+
+    private boolean canOpenNewLevelDoor(){return screen.lookingAtTextureId == 6 && screen.distanceToWall <= 1;}
 }

@@ -18,7 +18,7 @@ public class Raycasting extends JFrame implements Runnable{
     public static int WINDOW_HEIGHT = 600;
     public static int SCREEN_WIDTH;
     public static int SCREEN_HEIGHT;
-    public static final double MOUSE_SENSITIVITY = 125.5;
+    public static final double MOUSE_SENSITIVITY = 150.5;
     public static int CURRENT_LEVEL;
     
     //The width and height of the map matrix
@@ -51,29 +51,6 @@ public class Raycasting extends JFrame implements Runnable{
     //used for showing the ticks and frames each second on the screen
     private int finalTicks = 0;
     private int finalFrames = 0;
-    public static int[][] map =
-        {
-            {4,4,4,4,4,4,4,4,4,4,4,4,4,4,4},
-            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
-            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
-            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
-            {4,0,0,0,0,5,0,0,0,5,0,0,0,0,4},
-            {4,4,4,4,4,4,0,0,0,4,4,4,4,4,4},
-            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
-            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
-            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
-            {4,0,0,0,0,5,0,0,0,5,0,0,0,0,4},
-            {4,0,0,0,0,4,0,0,0,4,0,0,0,0,4},
-            {4,4,4,4,4,4,4,5,4,4,4,4,4,4,4},
-            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
-            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
-            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
-            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
-            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
-            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
-            {4,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
-            {4,4,4,4,4,4,4,4,4,4,4,4,4,4,4}   
-        }; 
     
     public Raycasting(){
         thread = new Thread(this);
@@ -84,8 +61,8 @@ public class Raycasting extends JFrame implements Runnable{
         audioInit();
         mouseInit();
         levelsInit();
-        player = new Player(levels.get(CURRENT_LEVEL).getPlayerLocX(), levels.get(CURRENT_LEVEL).getPlayerLocY(), 100, 100, .8);
-        camera = new Camera(player.getXLocation(), player.getYLocation(), 1.2, 0, 0, -.66, sounds, this);
+        player = new Player(100, 100, .8);
+        camera = new Camera(levels.get(CURRENT_LEVEL).getPlayerLocX(), levels.get(CURRENT_LEVEL).getPlayerLocY(), 1.2, 0, 0, -.66, sounds, this);
         screen = new Screen(levels.get(CURRENT_LEVEL).getMap(), levels.get(CURRENT_LEVEL).getMapWidth(), levels.get(CURRENT_LEVEL).getMapHeight(),
                             textures, sprites, WINDOW_WIDTH, WINDOW_HEIGHT, 8);
         actions = new ActionHandling(camera, screen, this);
@@ -102,11 +79,12 @@ public class Raycasting extends JFrame implements Runnable{
      */
     private void textureInit(){
         textures = new ArrayList<Texture>();
-        textures.add(Texture.wood);
-        textures.add(Texture.brick);
-        textures.add(Texture.stone);
-        textures.add(Texture.woodBricks);
-        textures.add(Texture.door);
+        textures.add(Texture.wood);         // ID 1
+        textures.add(Texture.brick);        // ID 2
+        textures.add(Texture.stone);        // ID 3
+        textures.add(Texture.woodBricks);   // ID 4
+        textures.add(Texture.door);         // ID 5
+        textures.add(Texture.levelDoor);    // ID 6
     }
 
     private void spriteInit(){
@@ -124,6 +102,7 @@ public class Raycasting extends JFrame implements Runnable{
         CURRENT_LEVEL = 0;
         levels = new ArrayList<Level>();
         levels.add(Level.firstLevel);
+        levels.add(Level.secondLevel);
     }
     
     private void mouseInit(){
@@ -199,11 +178,14 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Distance to wall: " + String.format("%.3f", screen.distanceToWall) + ". Looking at texture ID: " + screen.lookingAtTextureId, 10, 110);
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
         g.drawString("Sprint value: " + player.getSprintValue(), 10, 150);
+        g.drawString("Current level: " + CURRENT_LEVEL, 10, 170);
+        g.drawString(actions.canEnterNewLevel ? "Can enter new level? Yes" : "Can enter new level? No", 10, 190);
     }
     
     public void tick(){
         actions.GetNextBlock();
         actions.CheckForActions();
+        actions.ChangeLevel(levels);
         actions.ApplyBlockChanges(levels.get(CURRENT_LEVEL).getMap());
         actions.mouseMovementHandling(MOUSE_SENSITIVITY);
         player.ApplyUpdates(camera);

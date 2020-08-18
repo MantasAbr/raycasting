@@ -1,13 +1,12 @@
 package raycasting;
 
-public class Player extends Entity {
+public class Player{
 
     private double healthValue;
     private double sprintValue;
     private double speedValue;
 
-    public Player(double xLoc, double yLoc, double health, double sprint, double speed) {
-        super(xLoc, yLoc);
+    public Player(double health, double sprint, double speed) {
         healthValue = health;
         sprintValue = sprint;
         speedValue = speed;
@@ -21,14 +20,6 @@ public class Player extends Entity {
 
         if(sprintValue >= 100)
             sprintValue = 100;
-    }
-
-    public double getXLocation(){
-        return super.getXLoc();
-    }
-
-    public double getYLocation(){
-        return super.getYLoc();
     }
 
     public double getSprintValue(){
