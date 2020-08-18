@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 
@@ -211,7 +210,7 @@ public class Raycasting extends JFrame implements Runnable{
             long now = System.nanoTime();
             delta += (now - lastTime) / NanosPerTick;
             lastTime = now;
-            boolean shouldRender = true;
+            boolean shouldRender = true; //if false, frame rate locks to the tick count, if not - vice versa
                 
             while(delta >= 1){
                 ticks++;

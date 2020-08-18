@@ -1,8 +1,6 @@
 package levels;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -63,6 +61,15 @@ public class Level {
 
     public int getMapHeight(){
         return mapHeight;
+    }
+
+
+    public void setPlayerLocX(double location){
+        this.playerLocX = location;
+    }
+
+    public void setPlayerLocY(double location){
+        this.playerLocY = location;
     }
 
     public static Level firstLevel = new Level(4.5, 4.5, "src/levels/source/01.txt");

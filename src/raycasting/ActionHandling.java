@@ -82,6 +82,10 @@ public class ActionHandling {
     public void ChangeLevel(ArrayList<Level> levels, ArrayList<LevelDoorMesh> doorMeshes){
         if(canEnterNewLevel && camera.action){
 
+            //Get the latest player position before level change
+            levels.get(Raycasting.CURRENT_LEVEL).setPlayerLocX(camera.xPos);
+            levels.get(Raycasting.CURRENT_LEVEL).setPlayerLocY(camera.yPos);
+
             Raycasting.CURRENT_LEVEL = screen.lookingAtMeshId;
 
 
