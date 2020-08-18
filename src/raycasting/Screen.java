@@ -9,11 +9,13 @@ import java.awt.Color;
 public class Screen {
     
     public int[][] map;
+    public int[][] doorMap;
     public int mapWidth, mapHeight, width, height;
     public ArrayList<Texture> textures;
     public ArrayList<Sprite> sprites;
     public double distanceToWall;
     public int lookingAtTextureId;
+    public int lookingAtMeshId;
     public double rayX, rayY;
     public int renderDistance;
 
@@ -28,8 +30,9 @@ public class Screen {
     private int spriteOrder[];
     private double spriteDistance[];
     
-    public Screen(int[][] map, int mapWidth, int mapHeight, ArrayList<Texture> textures, ArrayList<Sprite> sprites, int width, int height, int renderDistance){
+    public Screen(int[][] map, int[][] doorMap, int mapWidth, int mapHeight, ArrayList<Texture> textures, ArrayList<Sprite> sprites, int width, int height, int renderDistance){
         this.map = map;
+        this.doorMap = doorMap;
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
         this.textures = textures;
@@ -49,6 +52,10 @@ public class Screen {
 
     public void setMap(int[][] newMap){
         this.map = newMap;
+    }
+
+    public void setDoorMap(int[][] newMap){
+        this.doorMap = newMap;
     }
     
     /**
@@ -156,6 +163,7 @@ public class Screen {
             //Gets the ID of the block that is currently being viewed and the distance to it
             if(x <= width / 2){
                 lookingAtTextureId = map[mapX][mapY];
+                lookingAtMeshId = doorMap[mapX][mapY];
                 distanceToWall = perpWallDist;
                 rayX = rayDirX;
                 rayY = rayDirY;

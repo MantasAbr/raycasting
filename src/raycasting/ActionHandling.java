@@ -1,5 +1,6 @@
 package raycasting;
 import levels.Level;
+import levels.LevelDoorMesh;
 
 import java.util.ArrayList;
 
@@ -78,16 +79,21 @@ public class ActionHandling {
         }
     }
 
-    public void ChangeLevel(ArrayList<Level> levels){
+    public void ChangeLevel(ArrayList<Level> levels, ArrayList<LevelDoorMesh> doorMeshes){
         if(canEnterNewLevel && camera.action){
-            Raycasting.CURRENT_LEVEL = 1;
+
+            Raycasting.CURRENT_LEVEL = screen.lookingAtMeshId;
+
 
             //Sets the player's (cameras) location
             camera.setXPos(levels.get(Raycasting.CURRENT_LEVEL).getPlayerLocX());
             camera.setYPos(levels.get(Raycasting.CURRENT_LEVEL).getPlayerLocY());
 
+
             //Set the level
             screen.setMap(levels.get(Raycasting.CURRENT_LEVEL).getMap());
+            //Set the door mesh for the new level
+            screen.setDoorMap(doorMeshes.get(Raycasting.CURRENT_LEVEL).getMap());
         }
 
     }

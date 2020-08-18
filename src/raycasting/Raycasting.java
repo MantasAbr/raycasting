@@ -1,10 +1,12 @@
 package raycasting;
 import levels.Level;
+import levels.LevelDoorMesh;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 
@@ -21,10 +23,6 @@ public class Raycasting extends JFrame implements Runnable{
     public static final double MOUSE_SENSITIVITY = 150.5;
     public static int CURRENT_LEVEL;
     
-    //The width and height of the map matrix
-    public int mapWidth = 15;
-    public int mapHeight = 20;
-    
     //Used for the run() method
     private Thread thread;
     private boolean running;
@@ -38,6 +36,7 @@ public class Raycasting extends JFrame implements Runnable{
     public ArrayList<Sprite> sprites;
     public ArrayList<Sounds> sounds;
     public ArrayList<Level> levels;
+    public ArrayList<LevelDoorMesh> doorMeshes;
     
     //Objects declarations
     public Camera camera;
@@ -63,7 +62,8 @@ public class Raycasting extends JFrame implements Runnable{
         levelsInit();
         player = new Player(100, 100, .8);
         camera = new Camera(levels.get(CURRENT_LEVEL).getPlayerLocX(), levels.get(CURRENT_LEVEL).getPlayerLocY(), 1.2, 0, 0, -.66, sounds, this);
-        screen = new Screen(levels.get(CURRENT_LEVEL).getMap(), levels.get(CURRENT_LEVEL).getMapWidth(), levels.get(CURRENT_LEVEL).getMapHeight(),
+        screen = new Screen(levels.get(CURRENT_LEVEL).getMap(), doorMeshes.get(CURRENT_LEVEL).getMap(),
+                            levels.get(CURRENT_LEVEL).getMapWidth(), levels.get(CURRENT_LEVEL).getMapHeight(),
                             textures, sprites, WINDOW_WIDTH, WINDOW_HEIGHT, 8);
         actions = new ActionHandling(camera, screen, this);
         userInterface = new UserInterface(player, camera);
@@ -103,6 +103,10 @@ public class Raycasting extends JFrame implements Runnable{
         levels = new ArrayList<Level>();
         levels.add(Level.firstLevel);
         levels.add(Level.secondLevel);
+
+        doorMeshes = new ArrayList<LevelDoorMesh>();
+        doorMeshes.add(LevelDoorMesh.firstLevelMesh);
+        doorMeshes.add(LevelDoorMesh.secondLevelMesh);
     }
     
     private void mouseInit(){
@@ -179,13 +183,13 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
         g.drawString("Sprint value: " + player.getSprintValue(), 10, 150);
         g.drawString("Current level: " + CURRENT_LEVEL, 10, 170);
-        g.drawString(actions.canEnterNewLevel ? "Can enter new level? Yes" : "Can enter new level? No", 10, 190);
+        g.drawString("Looking at texture ID: " + screen.lookingAtMeshId, 10, 190);
     }
     
     public void tick(){
         actions.GetNextBlock();
         actions.CheckForActions();
-        actions.ChangeLevel(levels);
+        actions.ChangeLevel(levels, doorMeshes);
         actions.ApplyBlockChanges(levels.get(CURRENT_LEVEL).getMap());
         actions.mouseMovementHandling(MOUSE_SENSITIVITY);
         player.ApplyUpdates(camera);
