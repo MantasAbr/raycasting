@@ -1,4 +1,6 @@
 package raycasting;
+import levels.Level;
+
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -34,6 +36,7 @@ public class Raycasting extends JFrame implements Runnable{
     public ArrayList<Texture> textures;
     public ArrayList<Sprite> sprites;
     public ArrayList<Sounds> sounds;
+    public ArrayList<Level> levels;
     
     //Objects declarations
     public Camera camera;
@@ -79,9 +82,10 @@ public class Raycasting extends JFrame implements Runnable{
         spriteInit();
         audioInit();
         mouseInit();
-        player = new Player(2, 7.5, 100, 100, .8);
+        levelsInit();
+        player = new Player(levels.get(0).getPlayerLocX(), levels.get(0).getPlayerLocY(), 100, 100, .8);
         camera = new Camera(player.getXLocation(), player.getYLocation(), 1.2, 0, 0, -.66, sounds, this);
-        screen = new Screen(map, mapWidth, mapHeight, textures, sprites, WINDOW_WIDTH, WINDOW_HEIGHT, 8);
+        screen = new Screen(levels.get(0).getMap(), levels.get(0).getMapWidth(), levels.get(0).getMapHeight(), textures, sprites, WINDOW_WIDTH, WINDOW_HEIGHT, 8);
         actions = new ActionHandling(camera, screen, this);
         userInterface = new UserInterface(player, camera);
         addKeyListener(camera);
@@ -105,13 +109,18 @@ public class Raycasting extends JFrame implements Runnable{
 
     private void spriteInit(){
         sprites = new ArrayList<Sprite>();
-        sprites.add(Sprite.test);
+        //sprites.add(Sprite.test);
     }
     
     private void audioInit(){
         sounds = new ArrayList<Sounds>();
         sounds.add(Sounds.stoneWalk);
         sounds.add(Sounds.stoneRun);       
+    }
+
+    private void levelsInit(){
+        levels = new ArrayList<Level>();
+        levels.add(Level.firstLevel);
     }
     
     private void mouseInit(){
@@ -192,7 +201,7 @@ public class Raycasting extends JFrame implements Runnable{
     public void tick(){
         actions.GetNextBlock();
         actions.CheckForActions();
-        actions.ApplyBlockChanges(map);
+        actions.ApplyBlockChanges(levels.get(0).getMap());
         actions.mouseMovementHandling(MOUSE_SENSITIVITY);
         player.ApplyUpdates(camera);
     }
@@ -221,7 +230,7 @@ public class Raycasting extends JFrame implements Runnable{
                 delta -= 1;
                 shouldRender = true;
                 screen.update(camera, pixels);
-                camera.update(map);
+                camera.update(levels.get(0).getMap());
             }
                                 
             try {

@@ -56,5 +56,5 @@ public class Sprite{
 
     public int getTexture(){return texture;}
 
-    public static Sprite test = new Sprite(7.5, 7.5, "src/sprites/lamp.png", "test", 0);
+    //public static Sprite test = new Sprite(7.5, 7.5, "src/sprites/lamp.png", "test", 0);
 }
