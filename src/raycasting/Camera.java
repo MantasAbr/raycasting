@@ -77,7 +77,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
             
             //without this check, sometimes the sounds get stacked one on another
             if(!soundAlreadyPlaying){
-                sounds.get(1).PlaySound();
+                sounds.get(1).PlaySound(true);
                 soundAlreadyPlaying = true;
             }           
         }
@@ -85,7 +85,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
 	    if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
             back = true;
             if(!soundAlreadyPlaying){
-                sounds.get(1).PlaySound();
+                sounds.get(1).PlaySound(true);
                 soundAlreadyPlaying = true;
             }
         }

@@ -65,7 +65,7 @@ public class Raycasting extends JFrame implements Runnable{
         screen = new Screen(levels.get(CURRENT_LEVEL).getMap(), doorMeshes.get(CURRENT_LEVEL).getMap(),
                             levels.get(CURRENT_LEVEL).getMapWidth(), levels.get(CURRENT_LEVEL).getMapHeight(),
                             textures, sprites, WINDOW_WIDTH, WINDOW_HEIGHT, RENDER_DISTANCE);
-        actions = new ActionHandling(camera, screen, this);
+        actions = new ActionHandling(camera, screen, sounds,this);
         userInterface = new UserInterface(player, camera);
         addKeyListener(camera);
         addMouseListener(camera);
@@ -95,7 +95,8 @@ public class Raycasting extends JFrame implements Runnable{
     private void audioInit(){
         sounds = new ArrayList<Sounds>();
         sounds.add(Sounds.stoneWalk);
-        sounds.add(Sounds.stoneRun);       
+        sounds.add(Sounds.stoneRun);
+        sounds.add(Sounds.doorOpen);
     }
 
     private void levelsInit(){
@@ -168,6 +169,9 @@ public class Raycasting extends JFrame implements Runnable{
 
         if(camera.debug)
             debugInfo(g);
+        if(actions.levelChange){
+            drawLoadScreen(g);
+        }
 
         bs.show();
     }
@@ -183,6 +187,12 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
         g.drawString("Sprint value: " + player.getSprintValue(), 10, 150);
         g.drawString("Current level: " + CURRENT_LEVEL, 10, 170);
+        g.drawString(actions.levelChange ? "changing level" : "not changing level", 10, 190);
+    }
+
+    public void drawLoadScreen(Graphics g){
+        g.setColor(Color.black);
+        g.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
     }
     
     public void tick(){

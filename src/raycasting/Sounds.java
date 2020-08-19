@@ -13,6 +13,7 @@ public class Sounds {
     
     public String source;
     public Clip clip;
+    public int frameLength;
     
     public Sounds(String source){
         this.source = source;
@@ -20,17 +21,20 @@ public class Sounds {
     
     public static Sounds stoneWalk = new Sounds("src/sounds/walking_stone.wav");
     public static Sounds stoneRun = new Sounds("src/sounds/running_stone.wav");
+    public static Sounds doorOpen = new Sounds("src/sounds/door_open.wav");
     
-    public void PlaySound(){
+    public void PlaySound(boolean looping){
         try{
             File sound = new File(source);
             AudioInputStream audioInput = AudioSystem.getAudioInputStream(sound);
             clip = AudioSystem.getClip();
             
-            if(sound.exists()){                
+            if(sound.exists()){
                 clip.open(audioInput);
+                frameLength = clip.getFrameLength();
                 clip.start();
-                clip.loop(Clip.LOOP_CONTINUOUSLY);
+                if(looping)
+                    clip.loop(Clip.LOOP_CONTINUOUSLY);
             }
             else{
                 System.out.println("Sound file doesn't exist!");

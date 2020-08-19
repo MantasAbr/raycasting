@@ -1,6 +1,7 @@
 package raycasting;
 import levels.Level;
 import levels.LevelDoorMesh;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.util.ArrayList;
 
@@ -13,20 +14,25 @@ public class ActionHandling {
     public Camera camera;
     public Screen screen;
     public Raycasting raycasting;
+    private ArrayList<Sounds> sounds;
     public int forwardBlockX;
     public int forwardBlockY;
 
+    public int runningSoundFrames;
+
     public boolean canOpen;
     public boolean canEnterNewLevel;
+    public boolean levelChange;
 
     private int oldX, newX = 0;
     private int oldY, newY = 0;
     public static double rotationValue = 0;
     public static boolean turningLeft, turningRight = false;
     
-    public ActionHandling(Camera camera, Screen screen, Raycasting raycasting){
+    public ActionHandling(Camera camera, Screen screen, ArrayList<Sounds> sounds, Raycasting raycasting){
         this.camera = camera;
         this.screen = screen;
+        this.sounds = sounds;
         this.raycasting = raycasting;
         
         forwardBlockX = 0;
@@ -80,7 +86,14 @@ public class ActionHandling {
     }
 
     public void ChangeLevel(ArrayList<Level> levels, ArrayList<LevelDoorMesh> doorMeshes){
+
+        levelChange = false;
+
         if(canEnterNewLevel && camera.action){
+
+            sounds.get(2).PlaySound(false);
+            runningSoundFrames = sounds.get(2).clip.getFrameLength();
+            levelChange = true;
 
             //Get the latest player position before level change
             levels.get(Raycasting.CURRENT_LEVEL).setPlayerLocX(camera.xPos);
@@ -88,11 +101,9 @@ public class ActionHandling {
 
             Raycasting.CURRENT_LEVEL = screen.lookingAtMeshId;
 
-
             //Sets the player's (cameras) location
             camera.setXPos(levels.get(Raycasting.CURRENT_LEVEL).getPlayerLocX());
             camera.setYPos(levels.get(Raycasting.CURRENT_LEVEL).getPlayerLocY());
-
 
             //Set the level
             screen.setMap(levels.get(Raycasting.CURRENT_LEVEL).getMap());
