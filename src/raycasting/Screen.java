@@ -70,6 +70,62 @@ public class Screen {
     public int[] update(Camera camera, int[] pixels){
         
         int textureSize = textures.get(0).SIZE;
+
+        //FLOOR CASTING
+        for(int y = 0; y < height; y++)
+        {
+            // rayDir for leftmost ray (x = 0) and rightmost ray (x = w)
+            float rayDirX0 = (float)(camera.xDir - camera.xPlane);
+            float rayDirY0 = (float)(camera.yDir - camera.yPlane);
+            float rayDirX1 = (float)(camera.xDir + camera.xPlane);
+            float rayDirY1 = (float)(camera.yDir + camera.yPlane);
+
+            // Current y position compared to the center of the screen (the horizon)
+            int p = y - height / 2;
+
+            // Vertical position of the camera.
+            float posZ = (float)(0.5 * height);
+
+            // Horizontal distance from the camera to the floor for the current row.
+            // 0.5 is the z position exactly in the middle between floor and ceiling.
+            float rowDistance = posZ / p;
+
+            // calculate the real world step vector we have to add for each x (parallel to camera plane)
+            // adding step by step avoids multiplications with a weight in the inner loop
+            float floorStepX = rowDistance * (rayDirX1 - rayDirX0) / width;
+            float floorStepY = rowDistance * (rayDirY1 - rayDirY0) / width;
+
+            // real world coordinates of the leftmost column. This will be updated as we step to the right.
+            float floorX = (float)(camera.xPos + rowDistance * rayDirX0);
+            float floorY = (float)(camera.yPos + rowDistance * rayDirY0);
+
+            for(int x = 0; x < width; ++x)
+            {
+                // the cell coord is simply got from the integer parts of floorX and floorY
+                int cellX = (int)(floorX);
+                int cellY = (int)(floorY);
+
+                // get the texture coordinate from the fractional part
+                int tx = (int)(textureSize * (floorX - cellX)) & (textureSize - 1);
+                int ty = (int)(textureSize * (floorY - cellY)) & (textureSize - 1);
+
+                floorX += floorStepX;
+                floorY += floorStepY;
+
+                int color;
+
+                // ceiling
+                color = textures.get(ceilingTexture).pixels[textureSize * ty + tx];
+                color = (color >> 1) & 8355711; // make a bit darker
+                pixels[y * width + x] = color;
+
+                //floor (symmetrical, at screenHeight - y - 1 instead of y)
+                color = textures.get(floorTexture).pixels[textureSize * ty + tx];
+                color = (color >> 1) & 8355711; // make a bit darker
+                pixels[(height-y - 1)*width+x] = color;
+            }
+        }
+
         
         for(int x = 0; x < width; x++){            
             /**
@@ -89,28 +145,28 @@ public class Screen {
             double cameraX = 2 * x / (double)(width) - 1;
             double rayDirX = camera.xDir + camera.xPlane * cameraX;
             double rayDirY = camera.yDir + camera.yPlane * cameraX;
-            
+
             //Map position
             int mapX = (int)camera.xPos;
             int mapY = (int)camera.yPos;
-            
+
             //length of ray from current position to next x or y-side
             double sideDistX;
             double sideDistY;
-            
+
             //Length of ray from one side to next in map
             double deltaDistX = Math.sqrt(1 + (rayDirY*rayDirY) / (rayDirX*rayDirX));
             double deltaDistY = Math.sqrt(1 + (rayDirX*rayDirX) / (rayDirY*rayDirY));
             double perpWallDist;
-            
+
             //Direction to go in x and y
             int stepX, stepY;
             //was a wall hit
             boolean hit = false;
             //was the wall vertical or horizontal
             int side = 0;
-            
-            
+
+
             //Figure out the step direction and initial distance to a side
             if (rayDirX < 0)
             {
@@ -132,8 +188,8 @@ public class Screen {
                 stepY = 1;
                 sideDistY = (mapY + 1.0 - camera.yPos) * deltaDistY;
             }
-            
-            
+
+
             //Loop to find where the ray hits a wall
             while(!hit) {
                 //Jump to next square
@@ -152,14 +208,16 @@ public class Screen {
                 //Check if ray has hit a wall
                 if(map[mapX][mapY] > 0) hit = true;
             }
-            
-                      
+
+
             //Calculate distance to the point of impact
             if(side==0)
                 perpWallDist = Math.abs((mapX - camera.xPos + (1 - stepX) / 2) / rayDirX);
             else
                 perpWallDist = Math.abs((mapY - camera.yPos + (1 - stepY) / 2) / rayDirY);
-                                  
+
+            ZBuffer[x] = perpWallDist;
+
             //Gets the ID of the block that is currently being viewed and the distance to it
             if(x <= width / 2){
                 lookingAtTextureId = map[mapX][mapY];
@@ -168,31 +226,29 @@ public class Screen {
                 rayX = rayDirX;
                 rayY = rayDirY;
             }
-            
+
             //Now calculate the height of the wall based on the distance from the camera
             int lineHeight;
-            if(perpWallDist > 0) 
+            if(perpWallDist > 0)
                 lineHeight = Math.abs((int)(height / perpWallDist));
-            else 
+            else
                 lineHeight = height;
-                                  
+
             //calculate lowest and highest pixel to fill in current stripe
             int drawStart = -lineHeight / 2 + height / 2;
             if(drawStart < 0)
                 drawStart = 0;
             int drawEnd = lineHeight / 2 + height / 2;
-            if(drawEnd >= height) 
+            if(drawEnd >= height)
                 drawEnd = height - 1;
 
-            ZBuffer[x] = perpWallDist;
-            
-            
+
             //add a texture
             int texNum = map[mapX][mapY] - 1;
             double wallX;//Exact position of where wall was hit
             if(side == 1) {//If its a y-axis wall
                 wallX = (camera.xPos + ((mapY - camera.yPos + (1 - stepY) / 2) / rayDirY) * rayDirX);
-            } 
+            }
             else {//X-axis wall
                 wallX = (camera.yPos + ((mapX - camera.xPos + (1 - stepX) / 2) / rayDirX) * rayDirY);
             }
@@ -201,88 +257,27 @@ public class Screen {
             int texX = (int)(wallX * (textureSize));
             if(side == 0 && rayDirX > 0) texX = textureSize - texX - 1;
             if(side == 1 && rayDirY < 0) texX = textureSize - texX - 1;
-                       
+
             //calculate y coordinate on texture
+
             for(int y = drawStart; y < drawEnd; y++) {
                 int texY = (((y * 2 - height + lineHeight) << 6) / lineHeight) / 2;
                 int color;
-                if(side == 0) 
+                if(side == 0)
                     color = textures.get(texNum).pixels[texX + (texY * textureSize)];
-                else 
+                else
                     color = (textures.get(texNum).pixels[texX + (texY * textureSize)]>>1) & 8355711;//Make y sides darker
 
-                //wallBuffer[x + y*(width)] = perpWallDist;
+                wallBuffer[x + y*(width)] = perpWallDist;
 
-                if(perpWallDist > renderDistance){
-                    //renderDistanceLimiter(pixels, ZBuffer);
-                    pixels[x + y*(width)] = 0;
-                }
-                else
-                    pixels[x + y*(width)] = color;
+//                    if(perpWallDist > renderDistance){
+//                        //renderDistanceLimiterNew(pixels, ZBuffer);
+//                        pixels[x + y*(width)] = 0;
+//                    }
+//                    else
+                        pixels[x + y*(width)] = color;
             }
 
-
-                                   
-            //FLOOR AND CEILING CASTING
-            
-            double floorXWall, floorYWall;
-            
-            //4 different wall directions possible
-            if(side == 0 && rayDirX > 0)
-            {
-              floorXWall = mapX;
-              floorYWall = mapY + wallX;
-            }
-            else if(side == 0 && rayDirX < 0)
-            {
-              floorXWall = mapX + 1.0;
-              floorYWall = mapY + wallX;
-            }
-            else if(side == 1 && rayDirY > 0)
-            {
-              floorXWall = mapX + wallX;
-              floorYWall = mapY;
-            }
-            else
-            {
-              floorXWall = mapX + wallX;
-              floorYWall = mapY + 1.0;
-            }
-            
-            double distWall, distPlayer, currentDist;
-
-            distWall = perpWallDist;
-            distPlayer = 0.0;
-            
-            if (drawEnd < 0) drawEnd = height;
-            
-
-            
-            for(int y = drawEnd + 1; y < height; y++){
-                currentDist = height / (2.0 * y - height);
-                
-                double weight = (currentDist - distPlayer) / (distWall - distPlayer);
-                
-                double currentFloorX = weight * floorXWall + (1.0 - weight) * camera.xPos;
-                double currentFloorY = weight * floorYWall + (1.0 - weight) * camera.yPos;
-                
-                int floorTexX, floorTexY;
-                floorTexX = (int)(currentFloorX * textureSize / 2) % textureSize;
-                floorTexY = (int)(currentFloorY * textureSize / 2) % textureSize;
-
-                //floorBuffer[x + y*(width)] = currentDist;
-
-                if(currentDist > renderDistance){
-                    //renderDistanceLimiter(pixels, floorBuffer);
-                    pixels[x + y*(width)] = 0;
-                    pixels[(height-y)*width+x] = 0;
-
-                }
-                else{
-                    pixels[x + y*(width)] = (textures.get(ceilingTexture).pixels[textureSize * floorTexY + floorTexX] >> 1) & 8355711;
-                    pixels[(height-y)*width+x] = (textures.get(floorTexture).pixels[textureSize * floorTexY + floorTexX]);
-                }
-            }
 
             //SPRITE CASTING
 
@@ -369,9 +364,9 @@ public class Screen {
      * @param buffer
      */
     private void renderDistanceLimiter(int pixels[], double buffer[]){
-        for(int i = 0; i < width * height; i++){
+        for(int i = 0; i < width; i++){
             int color = pixels[i];
-            int brightness = (int) (5 / (buffer[i]));
+            int brightness = (int) (Raycasting.RENDER_DISTANCE / (buffer[i]));
 
             if(brightness < 0)
                 brightness = 0;
@@ -382,11 +377,26 @@ public class Screen {
             int g = (color >> 8) & 0xff;
             int b = (color) & 0xff;
 
-            r = r * brightness / 255;
-            g = g * brightness / 255;
-            b = b * brightness / 255;
+            r = r * brightness >>> 8;
+            g = g * brightness >>> 8;
+            b = b * brightness >>> 8;
 
-            pixels[i] = r << 16 | g << 8 | b;
+            color = r << 16 | g << 8 | b;
+        }
+    }
+
+    private void renderDistanceLimiterNew(int pixels[], double[] buffer){
+        for(int i = 0; i < width; i++){
+            int color = pixels[i];
+
+            int r = (color >> 16) & 0xff;
+            int g = (color >> 8) & 0xff;
+            int b = (color) & 0xff;
+
+            Color darker = new Color(r, g, b);
+            darker.darker();
+
+            pixels[i] = darker.getRGB();
         }
     }
 }
