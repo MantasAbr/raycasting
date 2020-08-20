@@ -65,14 +65,14 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
 
     @Override
     public void keyPressed(KeyEvent key) {
-        if((key.getKeyCode() == KeyEvent.VK_LEFT) || (key.getKeyCode() == KeyEvent.VK_A)){
+        if((key.getKeyCode() == KeyEvent.VK_A)){
             left = true;            
         }		
-	    if((key.getKeyCode() == KeyEvent.VK_RIGHT) || (key.getKeyCode() == KeyEvent.VK_D)){
+	    if((key.getKeyCode() == KeyEvent.VK_D)){
             right = true;
         }
 		
-	    if((key.getKeyCode() == KeyEvent.VK_UP) || (key.getKeyCode() == KeyEvent.VK_W)){
+	    if((key.getKeyCode() == KeyEvent.VK_W)){
             forward = true;
             
             //without this check, sometimes the sounds get stacked one on another
@@ -82,7 +82,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
             }           
         }
 		
-	    if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
+	    if((key.getKeyCode() == KeyEvent.VK_S)){
             back = true;
             if(!soundAlreadyPlaying){
                 sounds.get(1).PlaySound(true);
@@ -114,21 +114,21 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
 
     @Override
     public void keyReleased(KeyEvent key) {
-        if((key.getKeyCode() == KeyEvent.VK_LEFT) || (key.getKeyCode() == KeyEvent.VK_A)){
+        if((key.getKeyCode() == KeyEvent.VK_A)){
             left = false;
         }		
-	    if((key.getKeyCode() == KeyEvent.VK_RIGHT) || (key.getKeyCode() == KeyEvent.VK_D)){
+	    if((key.getKeyCode() == KeyEvent.VK_D)){
             right = false;
         }
 		
-	    if((key.getKeyCode() == KeyEvent.VK_UP) || (key.getKeyCode() == KeyEvent.VK_W)){
+	    if((key.getKeyCode() == KeyEvent.VK_W)){
             forward = false;
-            //close() because we don't want innactive clips hogging up memory
+            //close() because we don't want inactive clips hogging up memory
             sounds.get(1).clip.close();
             soundAlreadyPlaying = false;
         }
 		
-	    if((key.getKeyCode() == KeyEvent.VK_DOWN) || (key.getKeyCode() == KeyEvent.VK_S)){
+	    if((key.getKeyCode() == KeyEvent.VK_S)){
             back = false;
             sounds.get(1).clip.close();
             soundAlreadyPlaying = false;
