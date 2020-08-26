@@ -132,8 +132,9 @@ public class Raycasting extends JFrame implements Runnable{
     private void jFrameInit(){
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setResizable(false);
-        setTitle("veri nice 3d engine yes");
+        setTitle("Puzzled v0.1");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setIconImage(textures.get(1).getTexImage());
         setBackground(Color.black);
         setLocationRelativeTo(null);
         setVisible(true);
