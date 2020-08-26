@@ -37,12 +37,12 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
     public double CROUCH_SPEED = .04;
     public double FASTER_MOVE_SPEED = .12;
     public double ROTATION_SPEED = .045;
+    public int jumpTimer = 10;
 
     public ArrayList<Sounds> sounds;
     public Raycasting game;
     public Screen screen;
 
-    public int jumpTimer = 100000;
     
     public Camera(double x, double y, double xd, double yd, double xp, double yp, ArrayList<Sounds> sounds, Raycasting game, Screen screen){
         xPos = x;
@@ -227,11 +227,11 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
                 yPlane=oldxPlane*Math.sin(ROTATION_SPEED) + yPlane*Math.cos(ROTATION_SPEED);
         }
         if(up){
-            screen.pitch += 400 * PITCH_SPEED;
+            screen.pitch += 200 * PITCH_SPEED;
             if(screen.pitch > 200) screen.pitch = 200;
         }
         if(down){
-            screen.pitch -= 400 * PITCH_SPEED;
+            screen.pitch -= 200 * PITCH_SPEED;
             if(screen.pitch < -200) screen.pitch = -200;
         }
         if(crouch){
@@ -242,9 +242,13 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
         if(!crouch)
             MOVE_SPEED = .08;
         if(jump){
-            screen.posZ += 400 * PITCH_SPEED;
-            if(screen.posZ > 190) screen.posZ = 190;
+            jumpTimer--;
+            if(jumpTimer > 0){
+                screen.posZ += 500 * PITCH_SPEED;
+                if(screen.posZ > 190) screen.posZ = 190;
+            }
         }
+        if(!jump) jumpTimer = 10;
 
         //jumping and crouching smoothing
         if(screen.pitch > 0) screen.pitch = Math.max(0, screen.pitch - 100 * PITCH_SPEED);
