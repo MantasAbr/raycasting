@@ -53,4 +53,5 @@ public class LevelDoorMesh {
 
     public static LevelDoorMesh firstLevelMesh = new LevelDoorMesh("src/levels/source/01_doors.txt");
     public static LevelDoorMesh secondLevelMesh = new LevelDoorMesh("src/levels/source/02_doors.txt");
+    public static LevelDoorMesh thirdLevelMesh = new LevelDoorMesh("src/levels/source/03_doors.txt");
 }

@@ -22,7 +22,7 @@ public class Raycasting extends JFrame implements Runnable{
     public static final double MOUSE_SENSITIVITY = 150.5;
     public static int CURRENT_LEVEL;
     public static int RENDER_DISTANCE = 5;
-    public static double FIELD_OF_VIEW = 1;
+    public static double FIELD_OF_VIEW = -1;
 
     //Used for the run() method
     private Thread thread;
@@ -62,10 +62,10 @@ public class Raycasting extends JFrame implements Runnable{
         mouseInit();
         levelsInit();
         player = new Player(100, 100, .8);
-        camera = new Camera(levels.get(CURRENT_LEVEL).getPlayerLocX(), levels.get(CURRENT_LEVEL).getPlayerLocY(), FIELD_OF_VIEW, 0, 0, -.66, sounds, this);
         screen = new Screen(levels.get(CURRENT_LEVEL).getMap(), doorMeshes.get(CURRENT_LEVEL).getMap(),
                             levels.get(CURRENT_LEVEL).getMapWidth(), levels.get(CURRENT_LEVEL).getMapHeight(),
                             textures, sprites, WINDOW_WIDTH, WINDOW_HEIGHT, RENDER_DISTANCE);
+        camera = new Camera(levels.get(CURRENT_LEVEL).getPlayerLocX(), levels.get(CURRENT_LEVEL).getPlayerLocY(), FIELD_OF_VIEW, 0, 0, .66, sounds, this, screen);
         actions = new ActionHandling(camera, screen, sounds,this);
         userInterface = new UserInterface(player, camera);
         addKeyListener(camera);
@@ -79,7 +79,7 @@ public class Raycasting extends JFrame implements Runnable{
      * Used to load all the textures
      */
     private void textureInit(){
-        textures = new ArrayList<Texture>();
+        textures = new ArrayList<Texture>();// ID's to use in txt files
         textures.add(Texture.wood);         // ID 1
         textures.add(Texture.brick);        // ID 2
         textures.add(Texture.stone);        // ID 3
@@ -105,10 +105,12 @@ public class Raycasting extends JFrame implements Runnable{
         levels = new ArrayList<Level>();
         levels.add(Level.firstLevel);
         levels.add(Level.secondLevel);
+        levels.add(Level.thirdLevel);
 
         doorMeshes = new ArrayList<LevelDoorMesh>();
         doorMeshes.add(LevelDoorMesh.firstLevelMesh);
         doorMeshes.add(LevelDoorMesh.secondLevelMesh);
+        doorMeshes.add(LevelDoorMesh.thirdLevelMesh);
     }
     
     private void mouseInit(){
@@ -183,6 +185,7 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
         g.drawString("Sprint value: " + player.getSprintValue(), 10, 150);
         g.drawString("Current level: " + CURRENT_LEVEL, 10, 170);
+        g.drawString(camera.crouch ? "Crouching" : "Not crouching", 10, 190);
     }
 
     public void drawLoadScreen(Graphics g){

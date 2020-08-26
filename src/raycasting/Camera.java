@@ -1,6 +1,4 @@
 package raycasting;
-import javax.swing.*;
-import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -25,7 +23,8 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
     
     public double xPos, yPos, xDir, yDir, xPlane, yPlane;
     
-    public boolean  left, right, forward, back, 
+    public boolean  left, right, forward, back,
+                    crouch,
                     action, sprint, options,
                     debug;
     
@@ -33,13 +32,16 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
     public int mouseY;
 
     public boolean soundAlreadyPlaying = false;
-    public final double MOVE_SPEED = .08;
-    public final double FASTER_MOVE_SPEED = .12;
+    public double MOVE_SPEED = .08;
+    public double CROUCH_SPEED = .04;
+    public double FASTER_MOVE_SPEED = .12;
     public double ROTATION_SPEED = .045;
+
     public ArrayList<Sounds> sounds;
     public Raycasting game;
+    public Screen screen;
     
-    public Camera(double x, double y, double xd, double yd, double xp, double yp, ArrayList<Sounds> sounds, Raycasting game){
+    public Camera(double x, double y, double xd, double yd, double xp, double yp, ArrayList<Sounds> sounds, Raycasting game, Screen screen){
         xPos = x;
         yPos = y;
         xDir = xd;
@@ -48,6 +50,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
         yPlane = yp;
         this.sounds = sounds;
         this.game = game;
+        this.screen = screen;
     }
 
     public void setXPos(double x){
@@ -110,6 +113,10 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
 
         if((key.getKeyCode() == KeyEvent.VK_ESCAPE))
             options = !options;
+
+        if((key.getKeyCode() == KeyEvent.VK_C)){
+            crouch = true;
+        }
     }
 
     @Override
@@ -141,6 +148,10 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
         
         if((key.getKeyCode() == KeyEvent.VK_SHIFT)){
             sprint = false;
+        }
+
+        if((key.getKeyCode() == KeyEvent.VK_C)){
+            crouch = false;
         }
     }
     
@@ -190,6 +201,14 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
                 double oldxPlane = xPlane;
                 xPlane=xPlane*Math.cos(ROTATION_SPEED) - yPlane*Math.sin(ROTATION_SPEED);
                 yPlane=oldxPlane*Math.sin(ROTATION_SPEED) + yPlane*Math.cos(ROTATION_SPEED);
+        }
+        if(crouch){
+            screen.posZ = -100;
+            MOVE_SPEED = CROUCH_SPEED;
+        }
+        if(!crouch){
+            screen.posZ = 100;
+            MOVE_SPEED = .08;
         }
     }
 
