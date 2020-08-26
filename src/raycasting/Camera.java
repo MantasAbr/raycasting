@@ -24,7 +24,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
     public double xPos, yPos, xDir, yDir, xPlane, yPlane;
     
     public boolean  left, right, forward, back,
-                    crouch,
+                    crouch, jump, up, down,
                     action, sprint, options,
                     debug;
     
@@ -33,6 +33,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
 
     public boolean soundAlreadyPlaying = false;
     public double MOVE_SPEED = .08;
+    public final double PITCH_SPEED = .1;
     public double CROUCH_SPEED = .04;
     public double FASTER_MOVE_SPEED = .12;
     public double ROTATION_SPEED = .045;
@@ -40,6 +41,8 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
     public ArrayList<Sounds> sounds;
     public Raycasting game;
     public Screen screen;
+
+    public int jumpTimer = 100000;
     
     public Camera(double x, double y, double xd, double yd, double xp, double yp, ArrayList<Sounds> sounds, Raycasting game, Screen screen){
         xPos = x;
@@ -117,6 +120,15 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
         if((key.getKeyCode() == KeyEvent.VK_C)){
             crouch = true;
         }
+        if((key.getKeyCode() == KeyEvent.VK_UP)){
+            up = true;
+        }
+        if((key.getKeyCode() == KeyEvent.VK_DOWN)){
+            down = true;
+        }
+        if((key.getKeyCode() == KeyEvent.VK_SPACE)){
+            jump = true;
+        }
     }
 
     @Override
@@ -152,6 +164,18 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
 
         if((key.getKeyCode() == KeyEvent.VK_C)){
             crouch = false;
+        }
+
+        if((key.getKeyCode() == KeyEvent.VK_UP)){
+            up = false;
+        }
+
+        if((key.getKeyCode() == KeyEvent.VK_DOWN)){
+            down = false;
+        }
+
+        if((key.getKeyCode() == KeyEvent.VK_SPACE)){
+            jump = false;
         }
     }
     
@@ -202,14 +226,31 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
                 xPlane=xPlane*Math.cos(ROTATION_SPEED) - yPlane*Math.sin(ROTATION_SPEED);
                 yPlane=oldxPlane*Math.sin(ROTATION_SPEED) + yPlane*Math.cos(ROTATION_SPEED);
         }
+        if(up){
+            screen.pitch += 400 * PITCH_SPEED;
+            if(screen.pitch > 200) screen.pitch = 200;
+        }
+        if(down){
+            screen.pitch -= 400 * PITCH_SPEED;
+            if(screen.pitch < -200) screen.pitch = -200;
+        }
         if(crouch){
-            screen.posZ = -100;
+            screen.posZ -= 400 * PITCH_SPEED;
+            if(screen.posZ < -170 ) screen.posZ = -170;
             MOVE_SPEED = CROUCH_SPEED;
         }
-        if(!crouch){
-            screen.posZ = 100;
+        if(!crouch)
             MOVE_SPEED = .08;
+        if(jump){
+            screen.posZ += 400 * PITCH_SPEED;
+            if(screen.posZ > 190) screen.posZ = 190;
         }
+
+        //jumping and crouching smoothing
+        if(screen.pitch > 0) screen.pitch = Math.max(0, screen.pitch - 100 * PITCH_SPEED);
+        if(screen.pitch < 0) screen.pitch = Math.min(0, screen.pitch + 100 * PITCH_SPEED);
+        if(screen.posZ > 0) screen.posZ = Math.max(0, screen.posZ - 100 * PITCH_SPEED);
+        if(screen.posZ < 0) screen.posZ = Math.min(0, screen.posZ + 100 * PITCH_SPEED);
     }
 
     @Override

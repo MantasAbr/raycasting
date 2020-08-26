@@ -183,9 +183,9 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Facing X: " + String.format("%.3f", screen.rayX) + ", Facing y: " + String.format("%.3f", screen.rayY), 10, 90);
         g.drawString("Distance to wall: " + String.format("%.3f", screen.distanceToWall) + ". Looking at texture ID: " + screen.lookingAtTextureId, 10, 110);
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
-        g.drawString("Sprint value: " + player.getSprintValue(), 10, 150);
-        g.drawString("Current level: " + CURRENT_LEVEL, 10, 170);
-        g.drawString(camera.crouch ? "Crouching" : "Not crouching", 10, 190);
+        g.drawString("Current level: " + CURRENT_LEVEL, 10, 150);
+        g.drawString("Screen pitch: " + screen.pitch + ", posZ: " + screen.posZ, 10, 170);
+        g.drawString("Jump Timer: " + camera.jumpTimer, 10, 190);
     }
 
     public void drawLoadScreen(Graphics g){
