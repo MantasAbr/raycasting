@@ -30,8 +30,10 @@ public class UserInterface {
         g.setFont(font);
         drawSprintInfo(g, player);
         drawHealthInfo(g, player);
-        if(camera.options)
-            drawOptionsScreen(g, player);
+    }
+
+    public void drawOptions(Graphics g){
+        drawOptionsScreen(g, player);
     }
 
     private void drawHealthInfo(Graphics g, Player player){

@@ -37,11 +37,15 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
     public double CROUCH_SPEED = .04;
     public double FASTER_MOVE_SPEED = .12;
     public double ROTATION_SPEED = .045;
+    public double BOBBING_SPEED = 0.3;
     public int jumpTimer = 10;
 
     public ArrayList<Sounds> sounds;
     public Raycasting game;
     public Screen screen;
+
+    boolean maxBobbingAmplitudeReached = false;
+    boolean minBobbingAmplitudeReached = true;
 
     
     public Camera(double x, double y, double xd, double yd, double xp, double yp, ArrayList<Sounds> sounds, Raycasting game, Screen screen){
@@ -73,7 +77,8 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
     public void keyPressed(KeyEvent key) {
         if((key.getKeyCode() == KeyEvent.VK_A)){
             left = true;            
-        }		
+        }
+
 	    if((key.getKeyCode() == KeyEvent.VK_D)){
             right = true;
         }
@@ -114,21 +119,26 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
             debug = !debug;
         }
 
-        if((key.getKeyCode() == KeyEvent.VK_ESCAPE))
+        if((key.getKeyCode() == KeyEvent.VK_ESCAPE)){
             options = !options;
+        }
 
         if((key.getKeyCode() == KeyEvent.VK_C)){
             crouch = true;
         }
+
         if((key.getKeyCode() == KeyEvent.VK_UP)){
             up = true;
         }
+
         if((key.getKeyCode() == KeyEvent.VK_DOWN)){
             down = true;
         }
+
         if((key.getKeyCode() == KeyEvent.VK_SPACE)){
             jump = true;
         }
+
     }
 
     @Override
@@ -155,7 +165,6 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
         
         if((key.getKeyCode() == KeyEvent.VK_E)){
             action = false;
-            
         }
         
         if((key.getKeyCode() == KeyEvent.VK_SHIFT)){
@@ -189,12 +198,15 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
         }
 
         if(forward) {
+
             if(sprint){
                 if(map[(int)(xPos + xDir * MOVE_SPEED)][(int)yPos] == 0) {
                     xPos+=xDir*FASTER_MOVE_SPEED;
                 }
                 if(map[(int)xPos][(int)(yPos + yDir * MOVE_SPEED)] ==0)
                     yPos+=yDir*FASTER_MOVE_SPEED;
+
+                viewBobbing(2, -20, 20);
             }
             else{
                 if(map[(int)(xPos + xDir * MOVE_SPEED)][(int)yPos] == 0) {
@@ -202,6 +214,8 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
                 }
                 if(map[(int)xPos][(int)(yPos + yDir * MOVE_SPEED)] ==0)
                     yPos+=yDir*MOVE_SPEED;
+
+                viewBobbing(2, -20, 20);
             }
         }
         if(back) {
@@ -209,7 +223,19 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
                     xPos-=xDir*MOVE_SPEED;
             if(map[(int)xPos][(int)(yPos - yDir * MOVE_SPEED)]==0)
                     yPos-=yDir*MOVE_SPEED;
+
+            viewBobbing(2, -20, 20);
         }
+
+        //Just resets the perspective after walking
+        if(!forward && !back){
+            minBobbingAmplitudeReached = true;
+            maxBobbingAmplitudeReached = false;
+
+            if(screen.posZ > 0) screen.posZ = Math.max(0, screen.posZ - 100 * PITCH_SPEED);
+            if(screen.posZ < 0) screen.posZ = Math.min(0, screen.posZ + 100 * PITCH_SPEED);
+        }
+
         if(ActionHandling.turningRight ||  right) {
                 double oldxDir=xDir;
                 xDir=xDir*Math.cos(-ROTATION_SPEED) - yDir*Math.sin(-ROTATION_SPEED);
@@ -226,35 +252,81 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
                 xPlane=xPlane*Math.cos(ROTATION_SPEED) - yPlane*Math.sin(ROTATION_SPEED);
                 yPlane=oldxPlane*Math.sin(ROTATION_SPEED) + yPlane*Math.cos(ROTATION_SPEED);
         }
+
+        //If the player looks up, increase the pitch until a threshold
         if(up){
             screen.pitch += 200 * PITCH_SPEED;
             if(screen.pitch > 200) screen.pitch = 200;
         }
+
+        //If the player looks down, decrease the pitch until a threshold
         if(down){
             screen.pitch -= 200 * PITCH_SPEED;
             if(screen.pitch < -200) screen.pitch = -200;
         }
+
+        //If the player crouches, decrease the posZ until a certain threshold
+        //and slow down the player
         if(crouch){
             screen.posZ -= 400 * PITCH_SPEED;
-            if(screen.posZ < -170 ) screen.posZ = -170;
+            if(screen.posZ < -170 )
+                screen.posZ = -170;
             MOVE_SPEED = CROUCH_SPEED;
         }
-        if(!crouch)
+
+        //If the player stops crouching and isn't moving forwards or backwards, push them back up on their feet smoothly,
+        //and put the regular walking speed back
+        if(!crouch && !forward && !back){
             MOVE_SPEED = .08;
+            if(screen.posZ < 0)
+                screen.posZ = Math.min(0, screen.posZ + 100 * PITCH_SPEED);
+        }
+
+        //If the player holds the jump button, decrease the jumpTimer, so that the player won't levitate
+        //If the player reaches a certain threshold, stop the jump
         if(jump){
             jumpTimer--;
             if(jumpTimer > 0){
                 screen.posZ += 500 * PITCH_SPEED;
-                if(screen.posZ > 190) screen.posZ = 190;
+                if(screen.posZ > 190)
+                    screen.posZ = 190;
             }
         }
-        if(!jump) jumpTimer = 10;
+        //If the player stops the jump and isn't moving forwards or backwards, push them down smoothly,
+        //and reset the jumpTimer
+        if(!jump && !forward && !back){
+            jumpTimer = 10;
+            if(screen.posZ > 0)
+                screen.posZ = Math.max(0, screen.posZ - 100 * PITCH_SPEED);
+        }
 
-        //jumping and crouching smoothing
+        //pitch smoothing
         if(screen.pitch > 0) screen.pitch = Math.max(0, screen.pitch - 100 * PITCH_SPEED);
         if(screen.pitch < 0) screen.pitch = Math.min(0, screen.pitch + 100 * PITCH_SPEED);
-        if(screen.posZ > 0) screen.posZ = Math.max(0, screen.posZ - 100 * PITCH_SPEED);
-        if(screen.posZ < 0) screen.posZ = Math.min(0, screen.posZ + 100 * PITCH_SPEED);
+
+    }
+
+    /**
+     * View bobbing logic
+     * @param change How fast the camera should "bop"
+     * @param lowestPoint Lowest PosZ point
+     * @param highestPoint Highest PosZ point
+     */
+    public void viewBobbing(int change, int lowestPoint, int highestPoint){
+        if(!minBobbingAmplitudeReached && maxBobbingAmplitudeReached){
+            screen.posZ -= change;
+            if(screen.posZ == lowestPoint){
+                minBobbingAmplitudeReached = true;
+                maxBobbingAmplitudeReached = false;
+            }
+        }
+        if(!maxBobbingAmplitudeReached && minBobbingAmplitudeReached){
+            screen.posZ += change;
+            if(screen.posZ == highestPoint){
+                maxBobbingAmplitudeReached = true;
+                minBobbingAmplitudeReached = false;
+            }
+        }
     }
 
     @Override

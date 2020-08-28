@@ -98,6 +98,8 @@ public class Raycasting extends JFrame implements Runnable{
         sounds.add(Sounds.stoneWalk);
         sounds.add(Sounds.stoneRun);
         sounds.add(Sounds.doorOpen);
+        sounds.add(Sounds.stoneSneak);
+        sounds.add(Sounds.stoneFall);
     }
 
     private void levelsInit(){
@@ -228,6 +230,7 @@ public class Raycasting extends JFrame implements Runnable{
                 shouldRender = true;
                 screen.update(camera, pixels);
                 camera.update(levels.get(CURRENT_LEVEL).getMap());
+
             }
                                 
             try {

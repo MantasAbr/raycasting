@@ -22,6 +22,8 @@ public class Sounds {
     public static Sounds stoneWalk = new Sounds("src/sounds/walking_stone.wav");
     public static Sounds stoneRun = new Sounds("src/sounds/running_stone.wav");
     public static Sounds doorOpen = new Sounds("src/sounds/door_open.wav");
+    public static Sounds stoneSneak = new Sounds("src/sounds/sneak_stone.wav");
+    public static Sounds stoneFall = new Sounds("src/sounds/fall_stone.wav");
     
     public void PlaySound(boolean looping){
         try{

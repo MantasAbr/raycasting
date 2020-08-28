@@ -17,7 +17,7 @@ public class Texture {
     private String location;
     //How big the texture is on one side
     public final int SIZE;
-    private Image texImage;
+    private BufferedImage texImage;
     
     /**
      * The constructor will initialize the loc and SIZE variables and call
@@ -37,11 +37,10 @@ public class Texture {
      */
     private void load(){
         try {
-            BufferedImage image = ImageIO.read(new File(location));
-            texImage = image;
-            int width = image.getWidth();
-            int height = image.getHeight();
-            image.getRGB(0, 0, width, height, pixels, 0, width);
+            texImage = ImageIO.read(new File(location));
+            int width = texImage.getWidth();
+            int height = texImage.getHeight();
+            texImage.getRGB(0, 0, width, height, pixels, 0, width);
         }
         catch(IOException e){
             e.printStackTrace();
