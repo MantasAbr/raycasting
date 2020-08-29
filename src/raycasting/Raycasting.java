@@ -1,4 +1,5 @@
 package raycasting;
+import input.Input;
 import levels.Level;
 import levels.LevelDoorMesh;
 
@@ -47,6 +48,7 @@ public class Raycasting extends JFrame implements Runnable{
     public GraphicsDevice gd;
     public UserInterface userInterface;
     public Player player;
+    public Input input;
     
     //used for showing the ticks and frames each second on the screen
     private int finalTicks = 0;
@@ -56,21 +58,26 @@ public class Raycasting extends JFrame implements Runnable{
         thread = new Thread(this);
         image = new BufferedImage(WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+        input = new Input();
         textureInit();
         spriteInit();
         audioInit();
         mouseInit();
         levelsInit();
+        addKeyListener(input);
+        addMouseListener(input);
+        addMouseMotionListener(input);
+
         player = new Player(100, 100, .8);
         screen = new Screen(levels.get(CURRENT_LEVEL).getMap(), doorMeshes.get(CURRENT_LEVEL).getMap(),
                             levels.get(CURRENT_LEVEL).getMapWidth(), levels.get(CURRENT_LEVEL).getMapHeight(),
                             textures, sprites, WINDOW_WIDTH, WINDOW_HEIGHT, RENDER_DISTANCE);
-        camera = new Camera(levels.get(CURRENT_LEVEL).getPlayerLocX(), levels.get(CURRENT_LEVEL).getPlayerLocY(), FIELD_OF_VIEW, 0, 0, .66, sounds, this, screen);
-        actions = new ActionHandling(camera, screen, sounds,this);
+
+        camera = new Camera(levels.get(CURRENT_LEVEL).getPlayerLocX(), levels.get(CURRENT_LEVEL).getPlayerLocY(),
+                            FIELD_OF_VIEW, 0, 0, .66, sounds, this, screen, input);
+
+        actions = new ActionHandling(camera, screen, sounds, input,this);
         userInterface = new UserInterface(player, camera);
-        addKeyListener(camera);
-        addMouseListener(camera);
-        addMouseMotionListener(camera);
         jFrameInit();             
         start();
     }
@@ -168,7 +175,7 @@ public class Raycasting extends JFrame implements Runnable{
 
         userInterface.DrawInterface(g);
 
-        if(camera.debug)
+        if(input.debug.isPressed())
             debugInfo(g);
         if(actions.levelChange){
             drawLoadScreen(g);
@@ -187,8 +194,7 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Distance to wall: " + String.format("%.3f", screen.distanceToWall) + ". Looking at texture ID: " + screen.lookingAtTextureId, 10, 110);
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
         g.drawString("Current level: " + CURRENT_LEVEL, 10, 150);
-        g.drawString("Screen pitch: " + screen.pitch + ", posZ: " + screen.posZ, 10, 170);
-        g.drawString("Jump Timer: " + camera.jumpTimer, 10, 190);
+        g.drawString("Pitch: " + screen.pitch + ", posZ: " + screen.posZ, 10, 170);
     }
 
     public void drawLoadScreen(Graphics g){
@@ -201,8 +207,9 @@ public class Raycasting extends JFrame implements Runnable{
         actions.CheckForActions();
         actions.ChangeLevel(levels, doorMeshes);
         actions.ApplyBlockChanges(levels.get(CURRENT_LEVEL).getMap());
+        actions.HandleButtonCombos();
         actions.mouseMovementHandling(MOUSE_SENSITIVITY);
-        player.ApplyUpdates(camera);
+        player.ApplyUpdates(input);
     }
 
     /*

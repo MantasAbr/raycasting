@@ -1,4 +1,5 @@
 package raycasting;
+import input.Input;
 import levels.Level;
 import levels.LevelDoorMesh;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
@@ -13,6 +14,7 @@ public class ActionHandling {
     
     public Camera camera;
     public Screen screen;
+    public Input input;
     public Raycasting raycasting;
     private ArrayList<Sounds> sounds;
     public int forwardBlockX;
@@ -29,10 +31,11 @@ public class ActionHandling {
     public static double rotationValue = 0;
     public static boolean turningLeft, turningRight = false;
     
-    public ActionHandling(Camera camera, Screen screen, ArrayList<Sounds> sounds, Raycasting raycasting){
+    public ActionHandling(Camera camera, Screen screen, ArrayList<Sounds> sounds, Input input, Raycasting raycasting){
         this.camera = camera;
         this.screen = screen;
         this.sounds = sounds;
+        this.input = input;
         this.raycasting = raycasting;
         
         forwardBlockX = 0;
@@ -80,16 +83,28 @@ public class ActionHandling {
     
     public void ApplyBlockChanges(int[][] gameMap){
         
-        if(canOpen && camera.action){
+        if(canOpen && input.action.isPressed()){
             gameMap[forwardBlockX][forwardBlockY] = 0;
         }
+    }
+
+    public void HandleButtonCombos(){
+
+        input.isSprinting = false;
+        input.isWalking = false;
+
+        if(playerIsSprinting())
+            input.isSprinting = true;
+        if(playerIsWalking())
+            input.isWalking = true;
+
     }
 
     public void ChangeLevel(ArrayList<Level> levels, ArrayList<LevelDoorMesh> doorMeshes){
 
         levelChange = false;
 
-        if(canEnterNewLevel && camera.action){
+        if(canEnterNewLevel && input.action.isPressed()){
 
             sounds.get(2).PlaySound(false);
             runningSoundFrames = sounds.get(2).clip.getFrameLength();
@@ -142,4 +157,16 @@ public class ActionHandling {
     }
 
     private boolean canOpenNewLevelDoor(){return screen.lookingAtTextureId == 6 && screen.distanceToWall <= 1;}
+
+    private boolean playerIsSprinting(){
+        if(input.forward.isPressed() && input.shift.isPressed())
+            return true;
+        return false;
+    }
+
+    private boolean playerIsWalking(){
+        if(input.forward.isPressed() || input.back.isPressed())
+            return true;
+        return false;
+    }
 }

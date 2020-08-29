@@ -1,5 +1,7 @@
 package raycasting;
 
+import input.Input;
+
 public class Player{
 
     private double healthValue;
@@ -12,11 +14,11 @@ public class Player{
         speedValue = speed;
     }
 
-    public void ApplyUpdates(Camera camera){
-        if(camera.sprint && sprintValue <= 100 && sprintValue >= 0)
-            sprintValue--;
+    public void ApplyUpdates(Input input){
+        if(input.isSprinting && sprintValue <= 100 && sprintValue >= 0)
+            sprintValue -= 1.5;
         else
-            sprintValue++;
+            sprintValue += 1.5;
 
         if(sprintValue >= 100)
             sprintValue = 100;
