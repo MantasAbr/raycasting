@@ -12,7 +12,7 @@ import java.util.ArrayList;
  *
  * @author Mantas Abramavičius
  */
-public class Camera implements KeyListener{
+public class Camera{
 
     /*  
         xPos and yPos are the location of the player on the 2D map.
@@ -24,16 +24,7 @@ public class Camera implements KeyListener{
     */
     
     public double xPos, yPos, xDir, yDir, xPlane, yPlane;
-    
-    public boolean  left, right, forward, back,
-                    crouch, jump, up, down,
-                    action, sprint, options,
-                    debug;
-    
-    public int mouseX;
-    public int mouseY;
 
-    public boolean soundAlreadyPlaying = false;
     public double MOVE_SPEED = .08;
     public final double PITCH_SPEED = .1;
     public double CROUCH_SPEED = .04;
@@ -73,127 +64,8 @@ public class Camera implements KeyListener{
     public void setYPos(double y){
         this.yPos = y;
     }
-    
-    @Override
-    public void keyTyped(KeyEvent key) {
-        
-    }
 
-    @Override
-    public void keyPressed(KeyEvent key) {
-//        if((key.getKeyCode() == KeyEvent.VK_A)){
-//            left = true;
-//        }
-//
-//	    if((key.getKeyCode() == KeyEvent.VK_D)){
-//            right = true;
-//        }
-//
-//	    if((key.getKeyCode() == KeyEvent.VK_W)){
-//            forward = true;
-//
-//            //without this check, sometimes the sounds get stacked one on another
-//            if(!soundAlreadyPlaying){
-//                sounds.get(1).PlaySound(true);
-//                soundAlreadyPlaying = true;
-//            }
-//        }
-//
-//	    if((key.getKeyCode() == KeyEvent.VK_S)){
-//            back = true;
-//            if(!soundAlreadyPlaying){
-//                sounds.get(1).PlaySound(true);
-//                soundAlreadyPlaying = true;
-//            }
-//        }
-	
-        if((key.getKeyCode() == KeyEvent.VK_E)){
-            action = true;
-            
-        }
-        
-        if((key.getKeyCode() == KeyEvent.VK_SHIFT)){
-            if(forward || back)
-                sprint = true;
-        }
-        
-        if((key.getKeyCode() == KeyEvent.VK_X)){
-            game.stop();
-        }
-        
-        if((key.getKeyCode() == KeyEvent.VK_F3)) {
-            debug = !debug;
-        }
 
-        if((key.getKeyCode() == KeyEvent.VK_ESCAPE)){
-            options = !options;
-        }
-
-        if((key.getKeyCode() == KeyEvent.VK_C)){
-            crouch = true;
-        }
-
-        if((key.getKeyCode() == KeyEvent.VK_UP)){
-            up = true;
-        }
-
-        if((key.getKeyCode() == KeyEvent.VK_DOWN)){
-            down = true;
-        }
-
-        if((key.getKeyCode() == KeyEvent.VK_SPACE)){
-            jump = true;
-        }
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent key) {
-//        if((key.getKeyCode() == KeyEvent.VK_A)){
-//            left = false;
-//        }
-//	    if((key.getKeyCode() == KeyEvent.VK_D)){
-//            right = false;
-//        }
-//
-//	    if((key.getKeyCode() == KeyEvent.VK_W)){
-//            forward = false;
-//            //close() because we don't want inactive clips hogging up memory
-//            sounds.get(1).clip.close();
-//            soundAlreadyPlaying = false;
-//        }
-//
-//	    if((key.getKeyCode() == KeyEvent.VK_S)){
-//            back = false;
-//            sounds.get(1).clip.close();
-//            soundAlreadyPlaying = false;
-//        }
-        
-        if((key.getKeyCode() == KeyEvent.VK_E)){
-            action = false;
-        }
-        
-        if((key.getKeyCode() == KeyEvent.VK_SHIFT)){
-            sprint = false;
-        }
-
-        if((key.getKeyCode() == KeyEvent.VK_C)){
-            crouch = false;
-        }
-
-        if((key.getKeyCode() == KeyEvent.VK_UP)){
-            up = false;
-        }
-
-        if((key.getKeyCode() == KeyEvent.VK_DOWN)){
-            down = false;
-        }
-
-        if((key.getKeyCode() == KeyEvent.VK_SPACE)){
-            jump = false;
-        }
-    }
-    
     public void update(int[][] map) {
 
         if(input.turningLeft || input.turningRight){

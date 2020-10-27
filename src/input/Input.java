@@ -1,15 +1,19 @@
 package input;
 
 import raycasting.Raycasting;
+import raycasting.Sounds;
 
 import java.awt.event.*;
+import java.util.ArrayList;
 
 public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
     Raycasting raycasting;
+    ArrayList<Sounds> sounds;
 
     public boolean isSprinting = false;
     public boolean isWalking = false;
+    public boolean soundAlreadyPlaying = false;
 
     private int mouseX;
     private int mouseY;
@@ -19,8 +23,9 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public double rotationValue = 0;
     public boolean turningLeft, turningRight = false;
 
-    public Input(Raycasting raycasting){
+    public Input(Raycasting raycasting, ArrayList<Sounds> sounds){
         this.raycasting = raycasting;
+        this.sounds = sounds;
     }
 
     public Key left = new Key(true);
@@ -40,57 +45,60 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
     public void toggleKey(int keyCode, boolean isPressed){
 
-        if(keyCode == KeyEvent.VK_W){
+        if(keyCode == Controls.forward.getId()){
             forward.toggle(isPressed);
-            System.out.println("W pressed");
+            playSound(isPressed, 1);
         }
-        if(keyCode == KeyEvent.VK_A){
+        if(keyCode == Controls.left.getId()){
             left.toggle(isPressed);
-            System.out.println("A pressed");
         }
-        if(keyCode == KeyEvent.VK_S){
+        if(keyCode == Controls.back.getId()){
             back.toggle(isPressed);
-            System.out.println("S pressed");
+            playSound(isPressed, 1);
         }
-        if(keyCode == KeyEvent.VK_D){
+        if(keyCode == Controls.right.getId()){
             right.toggle(isPressed);
-            System.out.println("D pressed");
         }
 
 
-        if(keyCode == KeyEvent.VK_C){
+        if(keyCode == Controls.crouch.getId()){
             crouch.toggle(isPressed);
-            System.out.println("C pressed");
         }
-        if(keyCode == KeyEvent.VK_SPACE){
+        if(keyCode == Controls.jump.getId()){
             jump.toggle(isPressed);
-            System.out.println("Space pressed");
         }
-        if(keyCode == KeyEvent.VK_UP){
+        if(keyCode == Controls.up.getId()){
             up.toggle(isPressed);
-            System.out.println("Up pressed");
         }
-        if(keyCode == KeyEvent.VK_DOWN){
+        if(keyCode == Controls.down.getId()){
             down.toggle(isPressed);
-            System.out.println("Down pressed");
         }
 
 
-        if(keyCode == KeyEvent.VK_E){
+        if(keyCode == Controls.action.getId()){
             action.toggle(isPressed);
-            System.out.println("E pressed");
         }
-        if(keyCode == KeyEvent.VK_SHIFT){
+        if(keyCode == Controls.shift.getId()){
             shift.toggle(isPressed);
-            System.out.println("Shift pressed");
         }
-        if(keyCode == KeyEvent.VK_ESCAPE){
+        if(keyCode == Controls.escape.getId()){
             options.toggle(isPressed);
-            System.out.println("Escape pressed");
         }
-        if(keyCode == KeyEvent.VK_F3){
+        if(keyCode == Controls.debug.getId()){
             debug.toggle(isPressed);
-            System.out.println("F3 pressed");
+        }
+    }
+
+    private void playSound(boolean isToggled, int soundID){
+        if(isToggled){
+            if(!soundAlreadyPlaying){
+                sounds.get(soundID).PlaySound(true);
+                soundAlreadyPlaying = true;
+            }
+        }
+        else{
+            sounds.get(soundID).clip.close();
+            soundAlreadyPlaying = false;
         }
     }
 
@@ -167,7 +175,4 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public void mouseDragged(MouseEvent e) {
 
     }
-
-
-
 }

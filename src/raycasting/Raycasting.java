@@ -58,12 +58,12 @@ public class Raycasting extends JFrame implements Runnable{
         thread = new Thread(this);
         image = new BufferedImage(WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
-        input = new Input(this);
         textureInit();
         spriteInit();
         audioInit();
         mouseInit();
         levelsInit();
+        input = new Input(this, sounds);
         addKeyListener(input);
         addMouseListener(input);
         addMouseMotionListener(input);
