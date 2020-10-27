@@ -28,20 +28,20 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         this.sounds = sounds;
     }
 
-    public Key left = new Key(true);
-    public Key right = new Key(true);
-    public Key forward = new Key(true);
-    public Key back = new Key(true);
+    public Key left = new Key(true, false);
+    public Key right = new Key(true, false);
+    public Key forward = new Key(true, false);
+    public Key back = new Key(true, false);
 
-    public Key crouch = new Key(true);
-    public Key jump = new Key(true);
-    public Key up = new Key(true);
-    public Key down = new Key(true);
+    public Key crouch = new Key(true, false);
+    public Key jump = new Key(true, false);
+    public Key up = new Key(true, false);
+    public Key down = new Key(true, false);
 
-    public Key action = new Key(true);
-    public Key shift = new Key(true);
-    public Key options = new Key(false);
-    public Key debug = new Key(false);
+    public Key action = new Key(true, false);
+    public Key shift = new Key(true, false);
+    public Key options = new Key(false, false);
+    public Key debug = new Key(false, false);
 
     public void toggleKey(int keyCode, boolean isPressed){
 
