@@ -1,14 +1,26 @@
 package input;
 
+import raycasting.Raycasting;
+
 import java.awt.event.*;
 
 public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
+    Raycasting raycasting;
+
     public boolean isSprinting = false;
     public boolean isWalking = false;
 
-    public Input(){
+    private int mouseX;
+    private int mouseY;
 
+    private int oldX, newX = 0;
+    private int oldY, newY = 0;
+    public double rotationValue = 0;
+    public boolean turningLeft, turningRight = false;
+
+    public Input(Raycasting raycasting){
+        this.raycasting = raycasting;
     }
 
     public Key left = new Key(true);
@@ -28,32 +40,82 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
     public void toggleKey(int keyCode, boolean isPressed){
 
-        if(keyCode == KeyEvent.VK_W)
+        if(keyCode == KeyEvent.VK_W){
             forward.toggle(isPressed);
-        if(keyCode == KeyEvent.VK_A)
+            System.out.println("W pressed");
+        }
+        if(keyCode == KeyEvent.VK_A){
             left.toggle(isPressed);
-        if(keyCode == KeyEvent.VK_S)
+            System.out.println("A pressed");
+        }
+        if(keyCode == KeyEvent.VK_S){
             back.toggle(isPressed);
-        if(keyCode == KeyEvent.VK_D)
+            System.out.println("S pressed");
+        }
+        if(keyCode == KeyEvent.VK_D){
             right.toggle(isPressed);
+            System.out.println("D pressed");
+        }
 
-        if(keyCode == KeyEvent.VK_C)
+
+        if(keyCode == KeyEvent.VK_C){
             crouch.toggle(isPressed);
-        if(keyCode == KeyEvent.VK_SPACE)
+            System.out.println("C pressed");
+        }
+        if(keyCode == KeyEvent.VK_SPACE){
             jump.toggle(isPressed);
-        if(keyCode == KeyEvent.VK_UP)
+            System.out.println("Space pressed");
+        }
+        if(keyCode == KeyEvent.VK_UP){
             up.toggle(isPressed);
-        if(keyCode == KeyEvent.VK_DOWN)
+            System.out.println("Up pressed");
+        }
+        if(keyCode == KeyEvent.VK_DOWN){
             down.toggle(isPressed);
+            System.out.println("Down pressed");
+        }
 
-        if(keyCode == KeyEvent.VK_E)
+
+        if(keyCode == KeyEvent.VK_E){
             action.toggle(isPressed);
-        if(keyCode == KeyEvent.VK_SHIFT)
+            System.out.println("E pressed");
+        }
+        if(keyCode == KeyEvent.VK_SHIFT){
             shift.toggle(isPressed);
-        if(keyCode == KeyEvent.VK_ESCAPE)
+            System.out.println("Shift pressed");
+        }
+        if(keyCode == KeyEvent.VK_ESCAPE){
             options.toggle(isPressed);
-        if(keyCode == KeyEvent.VK_F3)
+            System.out.println("Escape pressed");
+        }
+        if(keyCode == KeyEvent.VK_F3){
             debug.toggle(isPressed);
+            System.out.println("F3 pressed");
+        }
+    }
+
+    public void mouseMovementHandling(double sensitivity){
+        newX = mouseX;
+        newY = mouseY;
+
+        rotationValue = (Math.abs(newX - oldX) / sensitivity);
+
+        if(newX > oldX)
+            turningRight = true;
+        if(newX < oldX)
+            turningLeft = true;
+        if(newX == oldX){
+            turningRight = false;
+            turningLeft = false;
+        }
+
+        if(newX <= 10 || newY <= 10)
+            raycasting.robot.mouseMove(Raycasting.SCREEN_WIDTH / 2, Raycasting.SCREEN_HEIGHT / 2);
+        if(newX >= Raycasting.WINDOW_WIDTH - 10 || newY >= Raycasting.WINDOW_HEIGHT - 10)
+            raycasting.robot.mouseMove(Raycasting.SCREEN_WIDTH / 2, Raycasting.SCREEN_HEIGHT / 2);
+
+        oldX = newX;
+        oldY = newY;
     }
 
     @Override
@@ -72,8 +134,10 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {}
-
+    public void mouseMoved(MouseEvent e) {
+        mouseX = e.getX();
+        mouseY = e.getY();
+    }
     @Override
     public void mouseClicked(MouseEvent e) {
 

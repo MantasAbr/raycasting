@@ -58,7 +58,7 @@ public class Raycasting extends JFrame implements Runnable{
         thread = new Thread(this);
         image = new BufferedImage(WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
-        input = new Input();
+        input = new Input(this);
         textureInit();
         spriteInit();
         audioInit();
@@ -205,10 +205,10 @@ public class Raycasting extends JFrame implements Runnable{
     public void tick(){
         actions.GetNextBlock();
         actions.CheckForActions();
-        actions.ChangeLevel(levels, doorMeshes);
         actions.ApplyBlockChanges(levels.get(CURRENT_LEVEL).getMap());
+        actions.ChangeLevel(levels, doorMeshes);
         actions.HandleButtonCombos();
-        actions.mouseMovementHandling(MOUSE_SENSITIVITY);
+        input.mouseMovementHandling(MOUSE_SENSITIVITY);
         player.ApplyUpdates(input);
     }
 

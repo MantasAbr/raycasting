@@ -14,9 +14,6 @@ public class Key {
     }
 
     public void toggle(boolean isPressed){
-        if(!pressToBeActive)
-            pressed = !isPressed;
-        else
-            pressed = isPressed;
+        pressed = isPressed;
     }
 }

@@ -12,7 +12,7 @@ import java.util.ArrayList;
  *
  * @author Mantas Abramavičius
  */
-public class Camera implements KeyListener, MouseListener, MouseMotionListener{
+public class Camera implements KeyListener{
 
     /*  
         xPos and yPos are the location of the player on the 2D map.
@@ -196,8 +196,8 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
     
     public void update(int[][] map) {
 
-        if(ActionHandling.turningLeft || ActionHandling.turningRight){
-            ROTATION_SPEED = ActionHandling.rotationValue;
+        if(input.turningLeft || input.turningRight){
+            ROTATION_SPEED = input.rotationValue;
         }
         else{
             ROTATION_SPEED = .045;
@@ -241,7 +241,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
             resetPerspective();
 
 
-        if(ActionHandling.turningRight ||  input.right.isPressed()) {
+        if(input.turningRight ||  input.right.isPressed()) {
                 double oldxDir=xDir;
                 xDir=xDir*Math.cos(-ROTATION_SPEED) - yDir*Math.sin(-ROTATION_SPEED);
                 yDir=oldxDir*Math.sin(-ROTATION_SPEED) + yDir*Math.cos(-ROTATION_SPEED);
@@ -249,7 +249,7 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
                 xPlane=xPlane*Math.cos(-ROTATION_SPEED) - yPlane*Math.sin(-ROTATION_SPEED);
                 yPlane=oldxPlane*Math.sin(-ROTATION_SPEED) + yPlane*Math.cos(-ROTATION_SPEED);
         }
-        if(ActionHandling.turningLeft || input.left.isPressed()) {
+        if(input.turningLeft || input.left.isPressed()) {
                 double oldxDir=xDir;
                 xDir=xDir*Math.cos(ROTATION_SPEED) - yDir*Math.sin(ROTATION_SPEED);
                 yDir=oldxDir*Math.sin(ROTATION_SPEED) + yDir*Math.cos(ROTATION_SPEED);
@@ -355,41 +355,5 @@ public class Camera implements KeyListener, MouseListener, MouseMotionListener{
             if(screen.posZ > 0) screen.posZ = Math.max(0, screen.posZ - 1 * PITCH_SPEED);
             if(screen.posZ < 0) screen.posZ = Math.min(0, screen.posZ + 1 * PITCH_SPEED);
         }
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-       
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-       
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
     }
 }
