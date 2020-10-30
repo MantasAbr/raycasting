@@ -1,4 +1,7 @@
 package raycasting;
+import sprites.GameSprite;
+import sprites.Sprite;
+
 import java.util.ArrayList;
 import java.awt.Color;
 
@@ -12,7 +15,7 @@ public class Screen {
     public int[][] doorMap;
     public int mapWidth, mapHeight, width, height;
     public ArrayList<Texture> textures;
-    public ArrayList<Sprite> sprites;
+    public ArrayList<GameSprite> sprites;
     public double distanceToWall;
     public int lookingAtTextureId;
     public int lookingAtMeshId;
@@ -33,7 +36,7 @@ public class Screen {
     private int spriteOrder[];
     private double spriteDistance[];
     
-    public Screen(int[][] map, int[][] doorMap, int mapWidth, int mapHeight, ArrayList<Texture> textures, ArrayList<Sprite> sprites, int width, int height, int renderDistance){
+    public Screen(int[][] map, int[][] doorMap, int mapWidth, int mapHeight, ArrayList<Texture> textures, ArrayList<GameSprite> sprites, int width, int height, int renderDistance){
         this.map = map;
         this.doorMap = doorMap;
         this.mapWidth = mapWidth;

@@ -2,6 +2,8 @@ package raycasting;
 import input.Input;
 import levels.Level;
 import levels.LevelDoorMesh;
+import sprites.GameSprite;
+import sprites.Sprite;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -36,7 +38,7 @@ public class Raycasting extends JFrame implements Runnable{
     
     //ArrayList for objects
     public ArrayList<Texture> textures;
-    public ArrayList<Sprite> sprites;
+    public ArrayList<GameSprite> sprites;
     public ArrayList<Sounds> sounds;
     public ArrayList<Level> levels;
     public ArrayList<LevelDoorMesh> doorMeshes;
@@ -48,7 +50,6 @@ public class Raycasting extends JFrame implements Runnable{
     public UserInterface userInterface;
     public Player player;
     public Input input;
-    public Pointer pointer;
     
     //used for showing the ticks and frames each second on the screen
     private int finalTicks = 0;
@@ -59,10 +60,10 @@ public class Raycasting extends JFrame implements Runnable{
         image = new BufferedImage(WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
         audioInit();
-        input = new Input(this, sounds);
+        mouseInit();
+        input = new Input(this, sounds, Pointer.blankPointer);
         textureInit();
         spriteInit();
-        mouseInit();
         levelsInit();
         addKeyListener(input);
         addMouseListener(input);
@@ -96,7 +97,7 @@ public class Raycasting extends JFrame implements Runnable{
     }
 
     private void spriteInit(){
-        sprites = new ArrayList<Sprite>();
+        sprites = new ArrayList<GameSprite>();
         //sprites.add(Sprite.test);
     }
     
@@ -123,8 +124,7 @@ public class Raycasting extends JFrame implements Runnable{
     }
     
     private void mouseInit(){
-        pointer = new Pointer(input);
-        getContentPane().setCursor(pointer.getPointer());
+        getContentPane().setCursor(Pointer.blankPointer.getPointer());
     }
     
     private void jFrameInit(){
@@ -172,6 +172,10 @@ public class Raycasting extends JFrame implements Runnable{
         }
         if(gameIsPaused){
             userInterface.drawOptions(g);
+            getContentPane().setCursor(Pointer.gamePointer.getPointer());
+        }
+        else if(!gameIsPaused){
+            getContentPane().setCursor(Pointer.blankPointer.getPointer());
         }
 
         bs.show();
@@ -202,7 +206,7 @@ public class Raycasting extends JFrame implements Runnable{
             actions.ApplyBlockChanges(levels.get(CURRENT_LEVEL).getMap());
             actions.ChangeLevel(levels, doorMeshes);
             actions.HandleButtonCombos();
-            pointer.mouseMovementHandling(MOUSE_SENSITIVITY);
+            input.mouseMovementHandling(MOUSE_SENSITIVITY);
             player.ApplyUpdates(input);
         }
     }

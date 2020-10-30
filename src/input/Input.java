@@ -1,5 +1,6 @@
 package input;
 
+import raycasting.Pointer;
 import raycasting.Raycasting;
 import raycasting.Sounds;
 
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 
 public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
+    Pointer pointer;
     Raycasting raycasting;
     ArrayList<Sounds> sounds;
 
@@ -23,9 +25,10 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public double rotationValue = 0;
     public boolean turningLeft, turningRight = false;
 
-    public Input(Raycasting raycasting, ArrayList<Sounds> sounds){
+    public Input(Raycasting raycasting, ArrayList<Sounds> sounds, Pointer pointer){
         this.raycasting = raycasting;
         this.sounds = sounds;
+        this.pointer = pointer;
     }
 
     public static Key forward = new Key("VK_W", 87, true, false);
@@ -106,6 +109,31 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
             options.toggle(isPressed);
             Raycasting.gameIsPaused = options.isPressed();
         }
+    }
+
+    public void mouseMovementHandling(double sensitivity){
+
+        if(newX <= 10 || newY <= 10)
+            pointer.robot.mouseMove(Raycasting.SCREEN_WIDTH / 2, Raycasting.SCREEN_HEIGHT / 2);
+        if(newX >= Raycasting.WINDOW_WIDTH - 10 || newY >= Raycasting.WINDOW_HEIGHT - 10)
+            pointer.robot.mouseMove(Raycasting.SCREEN_WIDTH / 2, Raycasting.SCREEN_HEIGHT / 2);
+
+        newX = mouseX;
+        newY = mouseY;
+
+        rotationValue = (Math.abs(newX - oldX) / sensitivity);
+
+        if(newX > oldX)
+            turningRight = true;
+        if(newX < oldX)
+            turningLeft = true;
+        if(newX == oldX){
+            turningRight = false;
+            turningLeft = false;
+        }
+
+        oldX = newX;
+        oldY = newY;
     }
 
     private void playSound(boolean isToggled, int soundID){
