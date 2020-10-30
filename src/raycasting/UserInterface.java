@@ -14,6 +14,7 @@ public class UserInterface {
 
     private Font font = new Font("Courier new", Font.BOLD ,16);
     private Font header = new Font("Courier new", Font.BOLD, 22);
+    private Font pauseSplashText = new Font("Courier new", Font.BOLD, 80);
 
     private Color optionsColor = new Color(102, 102, 102, 200);
     private int optionsBoxOffset = 50;
@@ -34,6 +35,11 @@ public class UserInterface {
 
     public void drawOptions(Graphics g){
         drawOptionsScreen(g, player);
+    }
+
+    public void drawPauseSplashText(Graphics g){
+        g.setColor(Color.WHITE);
+        drawCenteredString(g, "Paused", 0, 0, Raycasting.WINDOW_WIDTH, Raycasting.WINDOW_HEIGHT, pauseSplashText);
     }
 
     private void drawHealthInfo(Graphics g, Player player){
@@ -73,5 +79,18 @@ public class UserInterface {
         int stringX = x + (int)(offset / 2);
         int stringY = y + (int)((height / 2) + (int)(bounds.getHeight() / 3));
         g.drawString(text, stringX, stringY);
+    }
+
+    private void drawCenteredString(Graphics g, String text, int boundX, int boundY, int width, int height, Font font){
+        // Get the FontMetrics
+        FontMetrics metrics = g.getFontMetrics(font);
+        // Determine the X coordinate for the text
+        int x = boundX + (width - metrics.stringWidth(text)) / 2;
+        // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
+        int y = boundY + ((height - metrics.getHeight()) / 2) + metrics.getAscent();
+        // Set the font
+        g.setFont(font);
+        // Draw the String
+        g.drawString(text, x, y);
     }
 }

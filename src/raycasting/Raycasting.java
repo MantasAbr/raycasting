@@ -31,6 +31,7 @@ public class Raycasting extends JFrame implements Runnable{
     private Thread thread;
     private volatile boolean running;
     public static boolean gameIsPaused = false;
+    public static boolean gameIsInOptions = false;
     
     //Used for displaying the image
     private BufferedImage image;
@@ -170,12 +171,16 @@ public class Raycasting extends JFrame implements Runnable{
         if(actions.levelChange){
             drawLoadScreen(g);
         }
-        if(gameIsPaused){
+        if(gameIsInOptions){
             userInterface.drawOptions(g);
             getContentPane().setCursor(Pointer.gamePointer.getPointer());
         }
-        else if(!gameIsPaused){
+        else {
             getContentPane().setCursor(Pointer.blankPointer.getPointer());
+        }
+
+        if(gameIsPaused){
+            userInterface.drawPauseSplashText(g);
         }
 
         bs.show();
@@ -200,7 +205,7 @@ public class Raycasting extends JFrame implements Runnable{
     }
     
     public void tick(){
-        if(!gameIsPaused){
+        if(!(gameIsPaused || gameIsInOptions)){
             actions.GetNextBlock();
             actions.CheckForActions();
             actions.ApplyBlockChanges(levels.get(CURRENT_LEVEL).getMap());
