@@ -15,11 +15,11 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public boolean isWalking = false;
     public boolean soundAlreadyPlaying = false;
 
-    private int mouseX;
-    private int mouseY;
+    public int mouseX;
+    public int mouseY;
 
-    private int oldX, newX = 0;
-    private int oldY, newY = 0;
+    public int oldX, newX = 0;
+    public int oldY, newY = 0;
     public double rotationValue = 0;
     public boolean turningLeft, turningRight = false;
 
@@ -28,64 +28,83 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         this.sounds = sounds;
     }
 
-    public Key left = new Key(true, false);
-    public Key right = new Key(true, false);
-    public Key forward = new Key(true, false);
-    public Key back = new Key(true, false);
+    public static Key forward = new Key("VK_W", 87, true, false);
+    public static Key left = new Key("VK_A", 65, true, false);
+    public static Key right = new Key("VK_D", 68, true, false);
+    public static Key back = new Key("VK_S", 83, true, false);
 
-    public Key crouch = new Key(true, false);
-    public Key jump = new Key(true, false);
-    public Key up = new Key(true, false);
-    public Key down = new Key(true, false);
+    public static Key crouch = new Key("VK_C", 67, true, false);
+    public static Key jump = new Key("VK_SPACE", 32, true, false);
+    public static Key up = new Key("VK_UP", 38, true, false);
+    public static Key down = new Key("VK_DOWN", 40, true, false);
 
-    public Key action = new Key(true, false);
-    public Key shift = new Key(true, false);
-    public Key options = new Key(false, false);
-    public Key debug = new Key(false, false);
+    public static Key action = new Key("VK_E", 69, true, false);
+    public static Key shift = new Key("VK_SHIFT", 16, true, false);
+    public static Key options = new Key("VK_ESCAPE", 27, false, false);
+    public static Key debug = new Key("VK_F3", 114, false, false);
+    public static Key exit = new Key("VK_X", 88, true, false);
 
     public void toggleKey(int keyCode, boolean isPressed){
 
-        if(keyCode == Controls.forward.getId()){
-            forward.toggle(isPressed);
-            playSound(isPressed, 1);
-        }
-        if(keyCode == Controls.left.getId()){
-            left.toggle(isPressed);
-        }
-        if(keyCode == Controls.back.getId()){
-            back.toggle(isPressed);
-            playSound(isPressed, 1);
-        }
-        if(keyCode == Controls.right.getId()){
-            right.toggle(isPressed);
-        }
+        /**
+         * Keys that work when the game is not paused
+         */
+        if(!Raycasting.gameIsPaused) {
+
+            if (keyCode == forward.getId()) {
+                forward.toggle(isPressed);
+                playSound(isPressed, 1);
+            }
+            if (keyCode == left.getId()) {
+                left.toggle(isPressed);
+            }
+            if (keyCode == back.getId()) {
+                back.toggle(isPressed);
+                playSound(isPressed, 1);
+            }
+            if (keyCode == right.getId()) {
+                right.toggle(isPressed);
+            }
 
 
-        if(keyCode == Controls.crouch.getId()){
-            crouch.toggle(isPressed);
-        }
-        if(keyCode == Controls.jump.getId()){
-            jump.toggle(isPressed);
-        }
-        if(keyCode == Controls.up.getId()){
-            up.toggle(isPressed);
-        }
-        if(keyCode == Controls.down.getId()){
-            down.toggle(isPressed);
-        }
+            if (keyCode == crouch.getId()) {
+                crouch.toggle(isPressed);
+            }
+            if (keyCode == jump.getId()) {
+                jump.toggle(isPressed);
+            }
+            if (keyCode == up.getId()) {
+                up.toggle(isPressed);
+            }
+            if (keyCode == down.getId()) {
+                down.toggle(isPressed);
+            }
 
 
-        if(keyCode == Controls.action.getId()){
-            action.toggle(isPressed);
+            if (keyCode == action.getId()) {
+                action.toggle(isPressed);
+            }
+            if (keyCode == shift.getId()) {
+                shift.toggle(isPressed);
+            }
+            if (keyCode == debug.getId()) {
+                debug.toggle(isPressed);
+            }
+            if (keyCode == exit.getId()) {
+                exit.toggle(isPressed);
+            }
         }
-        if(keyCode == Controls.shift.getId()){
-            shift.toggle(isPressed);
+        /**
+         * Keys that work when the game is paused
+         */
+        else{
+
         }
-        if(keyCode == Controls.escape.getId()){
+
+        //Options key should work regardless
+        if (keyCode == options.getId()) {
             options.toggle(isPressed);
-        }
-        if(keyCode == Controls.debug.getId()){
-            debug.toggle(isPressed);
+            Raycasting.gameIsPaused = options.isPressed();
         }
     }
 
@@ -102,29 +121,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         }
     }
 
-    public void mouseMovementHandling(double sensitivity){
-        newX = mouseX;
-        newY = mouseY;
 
-        rotationValue = (Math.abs(newX - oldX) / sensitivity);
-
-        if(newX > oldX)
-            turningRight = true;
-        if(newX < oldX)
-            turningLeft = true;
-        if(newX == oldX){
-            turningRight = false;
-            turningLeft = false;
-        }
-
-        if(newX <= 10 || newY <= 10)
-            raycasting.robot.mouseMove(Raycasting.SCREEN_WIDTH / 2, Raycasting.SCREEN_HEIGHT / 2);
-        if(newX >= Raycasting.WINDOW_WIDTH - 10 || newY >= Raycasting.WINDOW_HEIGHT - 10)
-            raycasting.robot.mouseMove(Raycasting.SCREEN_WIDTH / 2, Raycasting.SCREEN_HEIGHT / 2);
-
-        oldX = newX;
-        oldY = newY;
-    }
 
     @Override
     public void keyPressed(KeyEvent e) {

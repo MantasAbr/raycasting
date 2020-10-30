@@ -28,6 +28,7 @@ public class Raycasting extends JFrame implements Runnable{
     //Used for the run() method
     private Thread thread;
     private volatile boolean running;
+    public static boolean gameIsPaused = false;
     
     //Used for displaying the image
     private BufferedImage image;
@@ -44,11 +45,10 @@ public class Raycasting extends JFrame implements Runnable{
     public Camera camera;
     public Screen screen;
     public ActionHandling actions;
-    public Robot robot;
-    public GraphicsDevice gd;
     public UserInterface userInterface;
     public Player player;
     public Input input;
+    public Pointer pointer;
     
     //used for showing the ticks and frames each second on the screen
     private int finalTicks = 0;
@@ -58,12 +58,12 @@ public class Raycasting extends JFrame implements Runnable{
         thread = new Thread(this);
         image = new BufferedImage(WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+        audioInit();
+        input = new Input(this, sounds);
         textureInit();
         spriteInit();
-        audioInit();
         mouseInit();
         levelsInit();
-        input = new Input(this, sounds);
         addKeyListener(input);
         addMouseListener(input);
         addMouseMotionListener(input);
@@ -123,19 +123,8 @@ public class Raycasting extends JFrame implements Runnable{
     }
     
     private void mouseInit(){
-        BufferedImage cursor = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-        Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursor, new Point(0, 0), "blank");
-        getContentPane().setCursor(blankCursor);
-        try{
-            robot = new Robot();
-            gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-            SCREEN_WIDTH = gd.getDisplayMode().getWidth();
-            SCREEN_HEIGHT = gd.getDisplayMode().getHeight();
-            robot.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-        }
-        catch (AWTException e){
-            System.exit(1);
-        }
+        pointer = new Pointer(input);
+        getContentPane().setCursor(pointer.getPointer());
     }
     
     private void jFrameInit(){
@@ -175,10 +164,14 @@ public class Raycasting extends JFrame implements Runnable{
 
         userInterface.DrawInterface(g);
 
-        if(input.debug.isPressed())
+        if(input.debug.isPressed()){
             debugInfo(g);
+        }
         if(actions.levelChange){
             drawLoadScreen(g);
+        }
+        if(gameIsPaused){
+            userInterface.drawOptions(g);
         }
 
         bs.show();
@@ -203,13 +196,15 @@ public class Raycasting extends JFrame implements Runnable{
     }
     
     public void tick(){
-        actions.GetNextBlock();
-        actions.CheckForActions();
-        actions.ApplyBlockChanges(levels.get(CURRENT_LEVEL).getMap());
-        actions.ChangeLevel(levels, doorMeshes);
-        actions.HandleButtonCombos();
-        input.mouseMovementHandling(MOUSE_SENSITIVITY);
-        player.ApplyUpdates(input);
+        if(!gameIsPaused){
+            actions.GetNextBlock();
+            actions.CheckForActions();
+            actions.ApplyBlockChanges(levels.get(CURRENT_LEVEL).getMap());
+            actions.ChangeLevel(levels, doorMeshes);
+            actions.HandleButtonCombos();
+            pointer.mouseMovementHandling(MOUSE_SENSITIVITY);
+            player.ApplyUpdates(input);
+        }
     }
 
     /*
@@ -237,7 +232,8 @@ public class Raycasting extends JFrame implements Runnable{
                 shouldRender = true;
                 screen.update(camera, pixels);
                 camera.update(levels.get(CURRENT_LEVEL).getMap());
-
+                if(input.exit.isPressed())
+                    stop();
             }
                                 
             try {

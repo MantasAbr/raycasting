@@ -68,129 +68,129 @@ public class Camera{
 
     public void update(int[][] map) {
 
-        if(input.turningLeft || input.turningRight){
-            ROTATION_SPEED = input.rotationValue;
-        }
-        else{
-            ROTATION_SPEED = .045;
-        }
+        if(!Raycasting.gameIsPaused) {
 
-        if(input.forward.isPressed()) {
 
-            if(input.isSprinting){
-
-                //resetPerspective();
-
-                if(map[(int)(xPos + xDir * MOVE_SPEED)][(int)yPos] == 0) {
-                    xPos+=xDir*FASTER_MOVE_SPEED;
-                }
-                if(map[(int)xPos][(int)(yPos + yDir * MOVE_SPEED)] ==0)
-                    yPos+=yDir*FASTER_MOVE_SPEED;
-
-                //view bobbing for sprinting is turned off, because it's buggy
-                //viewBobbing(5, -20, 20);
+            if (input.turningLeft || input.turningRight) {
+                ROTATION_SPEED = input.rotationValue;
+            } else {
+                ROTATION_SPEED = .045;
             }
-            else{
-                if(map[(int)(xPos + xDir * MOVE_SPEED)][(int)yPos] == 0) {
-                    xPos+=xDir*MOVE_SPEED;
+
+            if (input.forward.isPressed()) {
+
+                if (input.isSprinting) {
+
+                    //resetPerspective();
+
+                    if (map[(int) (xPos + xDir * MOVE_SPEED)][(int) yPos] == 0) {
+                        xPos += xDir * FASTER_MOVE_SPEED;
+                    }
+                    if (map[(int) xPos][(int) (yPos + yDir * MOVE_SPEED)] == 0)
+                        yPos += yDir * FASTER_MOVE_SPEED;
+
+                    //view bobbing for sprinting is turned off, because it's buggy
+                    //viewBobbing(5, -20, 20);
+                } else {
+                    if (map[(int) (xPos + xDir * MOVE_SPEED)][(int) yPos] == 0) {
+                        xPos += xDir * MOVE_SPEED;
+                    }
+                    if (map[(int) xPos][(int) (yPos + yDir * MOVE_SPEED)] == 0)
+                        yPos += yDir * MOVE_SPEED;
+
+                    viewBobbing(2, -20, 20);
                 }
-                if(map[(int)xPos][(int)(yPos + yDir * MOVE_SPEED)] ==0)
-                    yPos+=yDir*MOVE_SPEED;
+            }
+            if (input.back.isPressed()) {
+                if (map[(int) (xPos - xDir * MOVE_SPEED)][(int) yPos] == 0)
+                    xPos -= xDir * MOVE_SPEED;
+                if (map[(int) xPos][(int) (yPos - yDir * MOVE_SPEED)] == 0)
+                    yPos -= yDir * MOVE_SPEED;
 
                 viewBobbing(2, -20, 20);
             }
-        }
-        if(input.back.isPressed()) {
-            if(map[(int)(xPos - xDir * MOVE_SPEED)][(int)yPos] == 0)
-                    xPos-=xDir*MOVE_SPEED;
-            if(map[(int)xPos][(int)(yPos - yDir * MOVE_SPEED)]==0)
-                    yPos-=yDir*MOVE_SPEED;
 
-            viewBobbing(2, -20, 20);
-        }
-
-        if(!input.isWalking)
-            resetPerspective();
+            if (!input.isWalking)
+                resetPerspective();
 
 
-        if(input.turningRight ||  input.right.isPressed()) {
-                double oldxDir=xDir;
-                xDir=xDir*Math.cos(-ROTATION_SPEED) - yDir*Math.sin(-ROTATION_SPEED);
-                yDir=oldxDir*Math.sin(-ROTATION_SPEED) + yDir*Math.cos(-ROTATION_SPEED);
+            if (input.turningRight || input.right.isPressed()) {
+                double oldxDir = xDir;
+                xDir = xDir * Math.cos(-ROTATION_SPEED) - yDir * Math.sin(-ROTATION_SPEED);
+                yDir = oldxDir * Math.sin(-ROTATION_SPEED) + yDir * Math.cos(-ROTATION_SPEED);
                 double oldxPlane = xPlane;
-                xPlane=xPlane*Math.cos(-ROTATION_SPEED) - yPlane*Math.sin(-ROTATION_SPEED);
-                yPlane=oldxPlane*Math.sin(-ROTATION_SPEED) + yPlane*Math.cos(-ROTATION_SPEED);
-        }
-        if(input.turningLeft || input.left.isPressed()) {
-                double oldxDir=xDir;
-                xDir=xDir*Math.cos(ROTATION_SPEED) - yDir*Math.sin(ROTATION_SPEED);
-                yDir=oldxDir*Math.sin(ROTATION_SPEED) + yDir*Math.cos(ROTATION_SPEED);
-                double oldxPlane = xPlane;
-                xPlane=xPlane*Math.cos(ROTATION_SPEED) - yPlane*Math.sin(ROTATION_SPEED);
-                yPlane=oldxPlane*Math.sin(ROTATION_SPEED) + yPlane*Math.cos(ROTATION_SPEED);
-        }
-
-        //If the player looks up, increase the pitch until a threshold
-        if(input.up.isPressed()){
-            screen.pitch += 200 * PITCH_SPEED;
-            if(screen.pitch > 200) screen.pitch = 200;
-        }
-
-        //If the player looks down, decrease the pitch until a threshold
-        if(input.down.isPressed()){
-            screen.pitch -= 200 * PITCH_SPEED;
-            if(screen.pitch < -200) screen.pitch = -200;
-        }
-
-        //If the player crouches, decrease the posZ until a certain threshold
-        //and slow down the player
-        if(input.crouch.isPressed()){
-            screen.posZ -= 400 * PITCH_SPEED;
-            if(screen.posZ < -170 )
-                screen.posZ = -170;
-            MOVE_SPEED = CROUCH_SPEED;
-        }
-
-        //If the player stops crouching and isn't moving forwards or backwards, push them back up on their feet smoothly,
-        //and put the regular walking speed back
-        if(!input.crouch.isPressed() && !input.isWalking){
-            MOVE_SPEED = .08;
-            if(screen.posZ < 0)
-                screen.posZ = Math.min(0, screen.posZ + 100 * PITCH_SPEED);
-        }
-
-        //If the player holds the jump button, decrease the jumpTimer, so that the player won't levitate
-        //If the player reaches a certain threshold, stop the jump
-        if(input.jump.isPressed()){
-            jumpChargeTimer--;
-            if(jumpChargeTimer > 0){
-                screen.posZ -= 200 * PITCH_SPEED;
+                xPlane = xPlane * Math.cos(-ROTATION_SPEED) - yPlane * Math.sin(-ROTATION_SPEED);
+                yPlane = oldxPlane * Math.sin(-ROTATION_SPEED) + yPlane * Math.cos(-ROTATION_SPEED);
             }
-            else{
-                jumpTimer--;
-                if(jumpTimer > 0){
-                    screen.posZ += 500 * PITCH_SPEED;
-                    if(screen.posZ > 190)
-                        screen.posZ = 190;
+            if (input.turningLeft || input.left.isPressed()) {
+                double oldxDir = xDir;
+                xDir = xDir * Math.cos(ROTATION_SPEED) - yDir * Math.sin(ROTATION_SPEED);
+                yDir = oldxDir * Math.sin(ROTATION_SPEED) + yDir * Math.cos(ROTATION_SPEED);
+                double oldxPlane = xPlane;
+                xPlane = xPlane * Math.cos(ROTATION_SPEED) - yPlane * Math.sin(ROTATION_SPEED);
+                yPlane = oldxPlane * Math.sin(ROTATION_SPEED) + yPlane * Math.cos(ROTATION_SPEED);
+            }
+
+            //If the player looks up, increase the pitch until a threshold
+            if (input.up.isPressed()) {
+                screen.pitch += 200 * PITCH_SPEED;
+                if (screen.pitch > 200) screen.pitch = 200;
+            }
+
+            //If the player looks down, decrease the pitch until a threshold
+            if (input.down.isPressed()) {
+                screen.pitch -= 200 * PITCH_SPEED;
+                if (screen.pitch < -200) screen.pitch = -200;
+            }
+
+            //If the player crouches, decrease the posZ until a certain threshold
+            //and slow down the player
+            if (input.crouch.isPressed()) {
+                screen.posZ -= 400 * PITCH_SPEED;
+                if (screen.posZ < -170)
+                    screen.posZ = -170;
+                MOVE_SPEED = CROUCH_SPEED;
+            }
+
+            //If the player stops crouching and isn't moving forwards or backwards, push them back up on their feet smoothly,
+            //and put the regular walking speed back
+            if (!input.crouch.isPressed() && !input.isWalking) {
+                MOVE_SPEED = .08;
+                if (screen.posZ < 0)
+                    screen.posZ = Math.min(0, screen.posZ + 100 * PITCH_SPEED);
+            }
+
+            //If the player holds the jump button, decrease the jumpTimer, so that the player won't levitate
+            //If the player reaches a certain threshold, stop the jump
+            if (input.jump.isPressed()) {
+                jumpChargeTimer--;
+                if (jumpChargeTimer > 0) {
+                    screen.posZ -= 200 * PITCH_SPEED;
+                } else {
+                    jumpTimer--;
+                    if (jumpTimer > 0) {
+                        screen.posZ += 500 * PITCH_SPEED;
+                        if (screen.posZ > 190)
+                            screen.posZ = 190;
+                    } else
+                        screen.posZ = Math.max(0, screen.posZ - 100 * PITCH_SPEED);
                 }
-                else
-                screen.posZ = Math.max(0, screen.posZ - 100 * PITCH_SPEED);
             }
+
+            //If the player stops the jump and isn't moving forwards or backwards, push them down smoothly,
+            //and reset the jumpTimer
+            if (!input.jump.isPressed() && !input.isWalking) {
+                jumpTimer = 10;
+                jumpChargeTimer = 3;
+                if (screen.posZ > 0)
+                    screen.posZ = Math.max(0, screen.posZ - 100 * PITCH_SPEED);
+            }
+
+            //pitch smoothing
+            if (screen.pitch > 0) screen.pitch = Math.max(0, screen.pitch - 100 * PITCH_SPEED);
+            if (screen.pitch < 0) screen.pitch = Math.min(0, screen.pitch + 100 * PITCH_SPEED);
+
         }
-
-        //If the player stops the jump and isn't moving forwards or backwards, push them down smoothly,
-        //and reset the jumpTimer
-        if(!input.jump.isPressed() && !input.isWalking){
-            jumpTimer = 10;
-            jumpChargeTimer = 3;
-            if(screen.posZ > 0)
-                screen.posZ = Math.max(0, screen.posZ - 100 * PITCH_SPEED);
-        }
-
-        //pitch smoothing
-        if(screen.pitch > 0) screen.pitch = Math.max(0, screen.pitch - 100 * PITCH_SPEED);
-        if(screen.pitch < 0) screen.pitch = Math.min(0, screen.pitch + 100 * PITCH_SPEED);
-
     }
 
     /**
