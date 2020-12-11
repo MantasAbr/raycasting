@@ -4,6 +4,7 @@ import sprites.Sprite;
 
 import java.util.ArrayList;
 import java.awt.Color;
+import java.util.Collections;
 
 /**
  *
@@ -323,7 +324,7 @@ public class Screen {
                                      (camera.yPos - sprites.get(i).getYLoc()) * (camera.yPos - sprites.get(i).getYLoc()));
             }
 
-            //sortSprites(spriteOrder, spriteDistance, numberOfSprites);
+            sortSprites(spriteOrder, spriteDistance, numberOfSprites);
 
             //after sorting the sprites, do the projection and draw them
             for(int i = 0; i < numberOfSprites; i++){
@@ -397,7 +398,13 @@ public class Screen {
 
     private void sortSprites(int[] order, double[] dist, int amount){
         for(int i = 0; i < amount; i++){
-
+            sprites.get(i).setDistance(dist[i]);
+            sprites.get(i).setOrder(order[i]);
+        }
+        Collections.sort(sprites, GameSprite.renderOrder);
+        for(int i = 0; i < amount; i++){
+            dist[i] = sprites.get(amount - i - 1 ).getDistance();
+            order[i] = sprites.get(amount - i - 1).getOrder();
         }
     }
 

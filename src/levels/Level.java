@@ -72,7 +72,7 @@ public class Level {
         this.playerLocY = location;
     }
 
-    public static Level firstLevel = new Level(4.5, 4.5, "src/levels/source/01.txt");
+    public static Level firstLevel = new Level(1.5, 1.5, "src/levels/source/01.txt");
     public static Level secondLevel = new Level(2, 4.5, "src/levels/source/02.txt");
     public static Level thirdLevel = new Level(8.5, 1.5, "src/levels/source/03.txt");
 

@@ -99,7 +99,8 @@ public class Raycasting extends JFrame implements Runnable{
 
     private void spriteInit(){
         sprites = new ArrayList<GameSprite>();
-        //sprites.add(Sprite.test);
+        sprites.add(GameSprite.lamp);
+        sprites.add(GameSprite.redlamp);
     }
     
     private void audioInit(){
