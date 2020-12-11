@@ -25,6 +25,8 @@ public class Screen {
     public double pitch = 0;
     public double posZ = 0;
 
+    public int ceilingColor;
+
     private int ceilingTexture = 2;
     private int floorTexture = 0;
 
@@ -148,7 +150,11 @@ public class Screen {
                 }
 
                 color = (color >> 1) & 8355711;
-                pixels[y * width + x] = color;
+
+
+                    color = setPixelColorForFloorRenderLimiter(color, rowDistance);
+
+                    pixels[y * width + x] = color;
 
             }
         }
@@ -286,6 +292,7 @@ public class Screen {
             double step = 1.0 * textureSize / lineHeight;
             double texPos = (drawStart - pitch - (posZ / perpWallDist) - height / 2 + lineHeight / 2) * step;
 
+            ZBuffer[x] = perpWallDist;
             //calculate y coordinate on texture
 
             for(int y = drawStart; y < drawEnd; y++) {
@@ -300,15 +307,11 @@ public class Screen {
 
                 wallBuffer[x + y*(width)] = perpWallDist;
 
-//                    if(perpWallDist > renderDistance){
-//                        //renderDistanceLimiterNew(pixels, ZBuffer);
-//                        pixels[x + y*(width)] = 0;
-//                    }
-//                    else
-                        pixels[x + y*(width)] = color;
+                color = setPixelColorForWallRenderLimiter(color, perpWallDist);
+                pixels[x + y*(width)] = color;
             }
 
-            ZBuffer[x] = perpWallDist;
+
 
 
             //SPRITE CASTING
@@ -398,45 +401,44 @@ public class Screen {
         }
     }
 
-    /**
-     * The method to be used for creating a smooth transition to black pixels. Not called - doesn't work as of yet
-     * @param pixels
-     * @param buffer
-     */
-    private void renderDistanceLimiter(int pixels[], double buffer[]){
-        for(int i = 0; i < width; i++){
-            int color = pixels[i];
-            int brightness = (int) (Raycasting.RENDER_DISTANCE / (buffer[i]));
+    private int setPixelColorForWallRenderLimiter(int color, double distance){
 
-            if(brightness < 0)
-                brightness = 0;
-            if(brightness > 255)
-                brightness = 255;
+        int r = (color >> 16) & 0xff;
+        int g = (color >> 8) & 0xff;
+        int b = (color) & 0xff;
 
-            int r = (color >> 16) & 0xff;
-            int g = (color >> 8) & 0xff;
-            int b = (color) & 0xff;
 
-            r = r * brightness >>> 8;
-            g = g * brightness >>> 8;
-            b = b * brightness >>> 8;
-
-            color = r << 16 | g << 8 | b;
+        if(distance > Raycasting.RENDER_DISTANCE){
+            for(int i = 0; i < (int)distance - Raycasting.RENDER_DISTANCE; i++){
+                r = r >>> i;
+                g = g >>> i;
+                b = b >>> i;
+            }
         }
+
+        color = r << 16 | g << 8 | b;
+        return color;
     }
 
-    private void renderDistanceLimiterNew(int pixels[], double[] buffer){
-        for(int i = 0; i < width; i++){
-            int color = pixels[i];
+    private int setPixelColorForFloorRenderLimiter(int color, double distance){
+        int r = (color >> 16) & 0xff;
+        int g = (color >> 8) & 0xff;
+        int b = (color) & 0xff;
 
-            int r = (color >> 16) & 0xff;
-            int g = (color >> 8) & 0xff;
-            int b = (color) & 0xff;
+        //Making a check so that distance wouldn't equal infinity, because rowDistance could get that value
+        if(distance > 10)
+            distance = 10;
 
-            Color darker = new Color(r, g, b);
-            darker.darker();
-
-            pixels[i] = darker.getRGB();
+        if(distance > Raycasting.RENDER_DISTANCE) {
+            for (int i = 0; i < (int) distance - Raycasting.RENDER_DISTANCE; i++) {
+                r = r >>> i;
+                g = g >>> i;
+                b = b >>> i;
+            }
         }
+
+        color = r << 16 | g << 8 | b;
+        return color;
     }
+
 }

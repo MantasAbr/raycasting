@@ -24,7 +24,7 @@ public class Raycasting extends JFrame implements Runnable{
     public static int SCREEN_HEIGHT;
     public static final double MOUSE_SENSITIVITY = 150.5;
     public static int CURRENT_LEVEL;
-    public static int RENDER_DISTANCE = 5;
+    public static int RENDER_DISTANCE = 3;
     public static double FIELD_OF_VIEW = -1;
 
     //Used for the run() method
@@ -157,7 +157,7 @@ public class Raycasting extends JFrame implements Runnable{
     public void render() {
         BufferStrategy bs = getBufferStrategy();
         if(bs == null){
-            createBufferStrategy(2);
+            createBufferStrategy(3);
             return;
         }
         Graphics g = bs.getDrawGraphics();
