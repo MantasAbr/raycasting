@@ -1,30 +1,34 @@
 package raycasting;
 
+import gui.GUIElement;
+import gui.StyleColors;
+import input.Input;
+
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 
 public class UserInterface {
 
     private Player player;
-    private Camera camera;
+    private Input input;
+    private ArrayList<GUIElement> gui;
 
     private Point SprintBarPoint = new Point(120, Raycasting.WINDOW_HEIGHT - 50);
     private Point HealthBarPoint = new Point(120, Raycasting.WINDOW_HEIGHT - 100);
     private int barHeight = 20;
 
-    private Font font = new Font("Courier new", Font.BOLD ,16);
-    private Font header = new Font("Courier new", Font.BOLD, 22);
-    private Font pauseSplashText = new Font("Courier new", Font.BOLD, 80);
+    private Font font = new Font("Yoster Island", Font.BOLD ,20);
+    private Font pauseSplashText = new Font("Yoster Island", Font.BOLD, 80);
 
-    private Color optionsColor = new Color(102, 102, 102, 200);
-    private int optionsBoxOffset = 50;
-    private Rectangle optionsBox = new Rectangle(optionsBoxOffset, optionsBoxOffset,
-                             Raycasting.WINDOW_WIDTH - (optionsBoxOffset * 2),
-                            Raycasting.WINDOW_HEIGHT - (optionsBoxOffset * 2));
+    private Rectangle exitButton;
+    private Rectangle saveGameButton;
+    private Rectangle loadGameButton;
 
-    public UserInterface(Player player, Camera camera){
+    public UserInterface(Player player, Input input, ArrayList<GUIElement> gui){
         this.player = player;
-        this.camera = camera;
+        this.input = input;
+        this.gui = gui;
     }
 
     public void DrawInterface(Graphics g){
@@ -38,7 +42,7 @@ public class UserInterface {
     }
 
     public void drawPauseSplashText(Graphics g){
-        g.setColor(Color.WHITE);
+        g.setColor(StyleColors.white.getColor());
         drawCenteredString(g, "Paused", 0, 0, Raycasting.WINDOW_WIDTH, Raycasting.WINDOW_HEIGHT, pauseSplashText);
     }
 
@@ -57,28 +61,28 @@ public class UserInterface {
     }
 
     private void drawOptionsScreen(Graphics g, Player player){
-        g.setColor(optionsColor);
-        g.fillRect(optionsBox.x, optionsBox.y, optionsBox.width, optionsBox.height);
-        g.setFont(header);
-        drawButton(g, 200, 200, 40, Color.red, "Test", font, Color.white);
-        drawButton(g, 200, 280, 40, Color.black, "Longer test!", font, Color.white);
-        drawButton(g, 200, 360, 40, Color.orange, "Parametrai", font, Color.white);
+        g.drawImage(gui.get(0).getElementImage(), 250, 100, null);
+        saveGameButton = drawButton(g, 320, 160, 40, "Save game", font, StyleColors.white.getColor());
+        loadGameButton = drawButton(g, 320, 235, 40, "Load game", font, StyleColors.white.getColor());
+        exitButton = drawButton(g, 325, 400, 40, "Exit game", font, StyleColors.darkred.getColor());
     }
 
-    private void drawButton(Graphics g, int x, int y, int height,
-                            Color buttonColor, String text, Font font, Color fontColor){
+    private Rectangle drawButton(Graphics g, int x, int y, int height,
+                                 String text, Font font, Color fontColor){
         FontMetrics fm = g.getFontMetrics();
         Rectangle2D bounds = fm.getStringBounds(text, g);
         int offset = 30;
 
-        g.setColor(buttonColor);
-        g.fillRect(x, y, (int) bounds.getWidth() + offset, height);
+        g.drawImage(gui.get(1).getElementImage().getScaledInstance((int) bounds.getWidth() + offset, height, 1), x, y, null);
+        Rectangle button = new Rectangle(x, y, (int) bounds.getWidth() + offset, height);
 
         g.setColor(fontColor);
         g.setFont(font);
         int stringX = x + (int)(offset / 2);
         int stringY = y + (int)((height / 2) + (int)(bounds.getHeight() / 3));
         g.drawString(text, stringX, stringY);
+
+        return button;
     }
 
     private void drawCenteredString(Graphics g, String text, int boundX, int boundY, int width, int height, Font font){
@@ -93,4 +97,10 @@ public class UserInterface {
         // Draw the String
         g.drawString(text, x, y);
     }
+
+    public Rectangle getExitButton() {
+        return exitButton;
+    }
+    public Rectangle getSaveGameButton() { return saveGameButton; }
+    public Rectangle getLoadGameButton(){return loadGameButton;}
 }

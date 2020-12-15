@@ -3,7 +3,9 @@ package input;
 import raycasting.Pointer;
 import raycasting.Raycasting;
 import raycasting.Sounds;
+import raycasting.UserInterface;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
@@ -20,6 +22,9 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public int mouseX;
     public int mouseY;
 
+    public Point click = new Point();
+    private Robot robot;
+
     public int oldX, newX = 0;
     public int oldY, newY = 0;
     public double rotationValue = 0;
@@ -29,6 +34,11 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         this.raycasting = raycasting;
         this.sounds = sounds;
         this.pointer = pointer;
+        try {
+            robot = new Robot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
     }
 
     //Directional keys
@@ -100,9 +110,6 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
             if (keyCode == exit.getId()) {
                 exit.toggle(isPressed);
             }
-            if(keyCode == pause.getId()){
-
-            }
         }
         /**
          * Keys that work when the game is paused
@@ -115,6 +122,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         if (keyCode == options.getId()) {
             options.toggle(isPressed);
             Raycasting.gameIsInOptions = options.isPressed();
+            System.out.println(isPressed);
         }
         if(keyCode == pause.getId()){
             pause.toggle(isPressed);
@@ -160,7 +168,17 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         }
     }
 
-
+    public void OptionsScreenHandling(UserInterface userInterface) {
+        if(userInterface.getExitButton().contains(click)){
+            System.exit(0);
+        }
+        if(userInterface.getSaveGameButton().contains(click)){
+            System.out.println("Save game");
+        }
+        if(userInterface.getLoadGameButton().contains(click)){
+            System.out.println("Load game");
+        }
+    }
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -184,7 +202,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     }
     @Override
     public void mouseClicked(MouseEvent e) {
-
+        System.out.println(e.getX() + " " + e.getY());
     }
 
     @Override
@@ -194,7 +212,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
+        click.setLocation(e.getX(), e.getY());
     }
 
     @Override

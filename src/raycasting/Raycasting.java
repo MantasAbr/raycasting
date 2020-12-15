@@ -1,9 +1,11 @@
 package raycasting;
+import fonts.CustomFont;
+import gui.GUIElement;
+import launcher.Launcher;
 import input.Input;
 import levels.Level;
 import levels.LevelDoorMesh;
 import sprites.GameSprite;
-import sprites.Sprite;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -43,6 +45,7 @@ public class Raycasting extends JFrame implements Runnable{
     public ArrayList<Sounds> sounds;
     public ArrayList<Level> levels;
     public ArrayList<LevelDoorMesh> doorMeshes;
+    public ArrayList<GUIElement> gui;
     
     //Objects declarations
     public Camera camera;
@@ -51,6 +54,7 @@ public class Raycasting extends JFrame implements Runnable{
     public UserInterface userInterface;
     public Player player;
     public Input input;
+    public CustomFont fonts;
     
     //used for showing the ticks and frames each second on the screen
     private int finalTicks = 0;
@@ -66,9 +70,11 @@ public class Raycasting extends JFrame implements Runnable{
         textureInit();
         spriteInit();
         levelsInit();
+        guiInit();
         addKeyListener(input);
         addMouseListener(input);
         addMouseMotionListener(input);
+        fonts = new CustomFont(this, "src/fonts/yoster.ttf");
 
         player = new Player(100, 100, .8);
         screen = new Screen(levels.get(CURRENT_LEVEL).getMap(), doorMeshes.get(CURRENT_LEVEL).getMap(),
@@ -79,7 +85,7 @@ public class Raycasting extends JFrame implements Runnable{
                             FIELD_OF_VIEW, 0, 0, .66, sounds, this, screen, input);
 
         actions = new ActionHandling(camera, screen, sounds, input,this);
-        userInterface = new UserInterface(player, camera);
+        userInterface = new UserInterface(player, input, gui);
         jFrameInit();             
         start();
     }
@@ -99,8 +105,8 @@ public class Raycasting extends JFrame implements Runnable{
 
     private void spriteInit(){
         sprites = new ArrayList<GameSprite>();
-        sprites.add(GameSprite.lamp);
-        sprites.add(GameSprite.redlamp);
+        //sprites.add(GameSprite.lamp);
+        //sprites.add(GameSprite.redlamp);
     }
     
     private void audioInit(){
@@ -123,6 +129,12 @@ public class Raycasting extends JFrame implements Runnable{
         doorMeshes.add(LevelDoorMesh.firstLevelMesh);
         doorMeshes.add(LevelDoorMesh.secondLevelMesh);
         doorMeshes.add(LevelDoorMesh.thirdLevelMesh);
+    }
+
+    private void guiInit(){
+        gui = new ArrayList<GUIElement>();
+        gui.add(GUIElement.optionsScreen);
+        gui.add(GUIElement.button);
     }
     
     private void mouseInit(){
@@ -215,6 +227,9 @@ public class Raycasting extends JFrame implements Runnable{
             input.mouseMovementHandling(MOUSE_SENSITIVITY);
             player.ApplyUpdates(input);
         }
+        if(gameIsInOptions){
+            input.OptionsScreenHandling(userInterface);
+        }
     }
 
     /*
@@ -269,7 +284,8 @@ public class Raycasting extends JFrame implements Runnable{
         }
     }
 
-    public static void main(String [] args){
-        Raycasting raycasting = new Raycasting();
+    public static void main(String [] args)
+    {
+        Launcher launcher = new Launcher();
     }
 }
