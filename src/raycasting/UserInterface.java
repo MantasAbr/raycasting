@@ -69,6 +69,10 @@ public class UserInterface {
 
     private Rectangle drawButton(Graphics g, int x, int y, int height,
                                  String text, Font font, Color fontColor){
+
+        g.setColor(fontColor);
+        g.setFont(font);
+
         FontMetrics fm = g.getFontMetrics();
         Rectangle2D bounds = fm.getStringBounds(text, g);
         int offset = 30;
@@ -76,8 +80,6 @@ public class UserInterface {
         g.drawImage(gui.get(1).getElementImage().getScaledInstance((int) bounds.getWidth() + offset, height, 1), x, y, null);
         Rectangle button = new Rectangle(x, y, (int) bounds.getWidth() + offset, height);
 
-        g.setColor(fontColor);
-        g.setFont(font);
         int stringX = x + (int)(offset / 2);
         int stringY = y + (int)((height / 2) + (int)(bounds.getHeight() / 3));
         g.drawString(text, stringX, stringY);

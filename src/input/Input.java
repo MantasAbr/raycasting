@@ -174,9 +174,11 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         }
         if(userInterface.getSaveGameButton().contains(click)){
             System.out.println("Save game");
+            click.setLocation(0, 0);
         }
         if(userInterface.getLoadGameButton().contains(click)){
             System.out.println("Load game");
+            click.setLocation(0, 0);
         }
     }
 
