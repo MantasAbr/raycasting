@@ -67,6 +67,19 @@ public class ItemLinkedList {
         }
     }
 
+    public void traverseNodes(){
+        Node currentNode = head;
+
+        if(head != null){
+            do{
+                System.out.print(currentNode.value.getName() + ", ");
+                currentNode = currentNode.nextNode;
+            }
+            while(currentNode != head);
+        }
+        System.out.print("\n");
+    }
+
     /**
      * Returns the Item object that's searched by its name
      * @param itemName The name of the Item
@@ -88,31 +101,27 @@ public class ItemLinkedList {
         return null;
     }
 
-    public Item goRight(){
+    public void goRight(){
         if(current == null)
             current = head;
 
         if(head != null){
-            Item itemToReturn = current.value;
             current = current.nextNode;
-            return itemToReturn;
         }
-        return null;
     }
 
-    public Item goLeft(){
+    public void goLeft(){
         if(current == null)
             current = head;
         if(head != null){
-            Item itemToReturn = current.value;
             current = current.previousNode;
-            return itemToReturn;
+
         }
-        return null;
+
     }
 
-    public Node getCurrent() {
-        return current;
+    public Item getCurrentItem() {
+        return current.value;
     }
 }
 

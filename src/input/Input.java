@@ -198,10 +198,12 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
 
     public void mouseWheelHandling(UserInterface userInterface, ItemLinkedList items){
         if(mouseScrollValues == 1){
-            System.out.println("Current inv item: " + items.goRight().getName());
+            items.goRight();
+            System.out.println("Current inv item: " + items.getCurrentItem().getName());
         }
         else if(mouseScrollValues == -1){
-            System.out.println("Current inv item: " + items.goLeft().getName());
+            items.goLeft();
+            System.out.println("Current inv item: " + items.getCurrentItem().getName());
 
         }
         mouseScrollValues = 0;

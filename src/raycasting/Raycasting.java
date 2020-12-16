@@ -159,9 +159,10 @@ public class Raycasting extends JFrame implements Runnable{
         inventoryItems.addNode(Item.sword);
         inventoryItems.addNode(Item.gun);
         inventoryItems.addNode(Item.food);
+        inventoryItems.addNode(Item.water);
+        inventoryItems.addNode(Item.bottle);
 
-
-
+        inventoryItems.traverseNodes();
     }
     
     private void mouseInit(){
