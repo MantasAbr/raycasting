@@ -2,7 +2,7 @@ package raycasting;
 import input.Input;
 import levels.Level;
 import levels.LevelDoorMesh;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+import sounds.Sounds;
 
 import java.util.ArrayList;
 

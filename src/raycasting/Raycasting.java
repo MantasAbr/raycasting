@@ -1,10 +1,12 @@
 package raycasting;
 import fonts.CustomFont;
+import gui.CustomButton;
 import gui.GUIElement;
 import launcher.Launcher;
 import input.Input;
 import levels.Level;
 import levels.LevelDoorMesh;
+import sounds.Sounds;
 import sprites.GameSprite;
 
 import java.awt.*;
@@ -46,6 +48,7 @@ public class Raycasting extends JFrame implements Runnable{
     public ArrayList<Level> levels;
     public ArrayList<LevelDoorMesh> doorMeshes;
     public ArrayList<GUIElement> gui;
+    public ArrayList<CustomButton> buttons;
     
     //Objects declarations
     public Camera camera;
@@ -85,7 +88,7 @@ public class Raycasting extends JFrame implements Runnable{
                             FIELD_OF_VIEW, 0, 0, .66, sounds, this, screen, input);
 
         actions = new ActionHandling(camera, screen, sounds, input,this);
-        userInterface = new UserInterface(player, input, gui);
+        userInterface = new UserInterface(player, input, gui, buttons);
         jFrameInit();             
         start();
     }
@@ -135,6 +138,11 @@ public class Raycasting extends JFrame implements Runnable{
         gui = new ArrayList<GUIElement>();
         gui.add(GUIElement.optionsScreen);
         gui.add(GUIElement.button);
+
+        buttons = new ArrayList<CustomButton>();
+        buttons.add(GUIElement.saveGameButton);
+        buttons.add(GUIElement.loadGameButton);
+        buttons.add(GUIElement.exitGameButton);
     }
     
     private void mouseInit(){
@@ -228,7 +236,8 @@ public class Raycasting extends JFrame implements Runnable{
             player.ApplyUpdates(input);
         }
         if(gameIsInOptions){
-            input.OptionsScreenHandling(userInterface);
+            input.OptionsScreenClickHandling(userInterface);
+            input.OptionsScreenHoverHandling(userInterface);
         }
     }
 
@@ -286,6 +295,7 @@ public class Raycasting extends JFrame implements Runnable{
 
     public static void main(String [] args)
     {
-        Launcher launcher = new Launcher();
+        //Launcher launcher = new Launcher();
+        new Raycasting();
     }
 }

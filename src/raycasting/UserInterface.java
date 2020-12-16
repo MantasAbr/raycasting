@@ -1,5 +1,6 @@
 package raycasting;
 
+import gui.CustomButton;
 import gui.GUIElement;
 import gui.StyleColors;
 import input.Input;
@@ -13,6 +14,7 @@ public class UserInterface {
     private Player player;
     private Input input;
     private ArrayList<GUIElement> gui;
+    public static ArrayList<CustomButton> buttons;
 
     private Point SprintBarPoint = new Point(120, Raycasting.WINDOW_HEIGHT - 50);
     private Point HealthBarPoint = new Point(120, Raycasting.WINDOW_HEIGHT - 100);
@@ -25,10 +27,11 @@ public class UserInterface {
     private Rectangle saveGameButton;
     private Rectangle loadGameButton;
 
-    public UserInterface(Player player, Input input, ArrayList<GUIElement> gui){
+    public UserInterface(Player player, Input input, ArrayList<GUIElement> gui, ArrayList<CustomButton> buttons){
         this.player = player;
         this.input = input;
         this.gui = gui;
+        this.buttons = buttons;
     }
 
     public void DrawInterface(Graphics g){
@@ -42,29 +45,30 @@ public class UserInterface {
     }
 
     public void drawPauseSplashText(Graphics g){
-        g.setColor(StyleColors.white.getColor());
+        g.setColor(StyleColors.white);
         drawCenteredString(g, "Paused", 0, 0, Raycasting.WINDOW_WIDTH, Raycasting.WINDOW_HEIGHT, pauseSplashText);
     }
 
     private void drawHealthInfo(Graphics g, Player player){
         g.setColor(Color.WHITE);
-        g.drawString("Helf", HealthBarPoint.x - 90, (int)(HealthBarPoint.y + barHeight / 1.4));
+        g.drawString("Health", HealthBarPoint.x - 90, (int)(HealthBarPoint.y + barHeight / 1.4));
         g.setColor(Color.RED);
         g.fillRect(HealthBarPoint.x, HealthBarPoint.y, (int)(player.getHealthValue() * 1.5), barHeight);
     }
 
     private void drawSprintInfo(Graphics g, Player player){
         g.setColor(Color.WHITE);
-        g.drawString("Spirtn", SprintBarPoint.x - 90, (int)(SprintBarPoint.y + barHeight / 1.4));
+        g.drawString("Sprint", SprintBarPoint.x - 90, (int)(SprintBarPoint.y + barHeight / 1.4));
         g.setColor(Color.BLUE);
         g.fillRect(SprintBarPoint.x, SprintBarPoint.y, (int)(player.getSprintValue() * 1.5), barHeight);
     }
 
     private void drawOptionsScreen(Graphics g, Player player){
         g.drawImage(gui.get(0).getElementImage(), 250, 100, null);
-        saveGameButton = drawButton(g, 320, 160, 40, "Save game", font, StyleColors.white.getColor());
-        loadGameButton = drawButton(g, 320, 235, 40, "Load game", font, StyleColors.white.getColor());
-        exitButton = drawButton(g, 325, 400, 40, "Exit game", font, StyleColors.darkred.getColor());
+
+        saveGameButton = drawButton(g, buttons.get(0).getX(), buttons.get(0).getY(), buttons.get(0).getHeight(), buttons.get(0).getText(), font, buttons.get(0).getTextColor());
+        loadGameButton = drawButton(g, buttons.get(1).getX(), buttons.get(1).getY(), buttons.get(1).getHeight(), buttons.get(1).getText(), font, buttons.get(1).getTextColor());
+        exitButton = drawButton(g, buttons.get(2).getX(), buttons.get(2).getY(), buttons.get(2).getHeight(), buttons.get(2).getText(), font, buttons.get(2).getTextColor());
     }
 
     private Rectangle drawButton(Graphics g, int x, int y, int height,
@@ -98,6 +102,15 @@ public class UserInterface {
         g.setFont(font);
         // Draw the String
         g.drawString(text, x, y);
+    }
+
+    public static void resetTextColor(ArrayList<CustomButton> buttons){
+        for(CustomButton button : buttons){
+            if(button.getText() == "Exit game")
+                button.setTextColor(StyleColors.black);
+            else
+                button.setTextColor(StyleColors.white);
+        }
     }
 
     public Rectangle getExitButton() {

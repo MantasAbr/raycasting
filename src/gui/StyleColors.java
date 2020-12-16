@@ -4,16 +4,10 @@ import java.awt.*;
 
 public class StyleColors {
 
-    private Color color;
-
-    public StyleColors(int r, int g, int b){
-        color = new Color(r, g, b);
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public static StyleColors darkred = new StyleColors(139, 0, 0);
-    public static StyleColors white = new StyleColors(255, 255, 255);
+    public static Color darkred = new Color(139, 0, 0, 255);
+    public static Color white = new Color(255, 255, 255, 255);
+    public static Color black = new Color(0, 0, 0, 255);
+    public static Color darkbrown = new Color(59, 43, 27, 255);
+    public static Color cream = new Color(255, 219, 186, 255);
+    public static Color lightcream = new Color(25, 237, 221, 255);
 }

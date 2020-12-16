@@ -1,4 +1,4 @@
-package raycasting;
+package sounds;
 
 import java.io.File;
 import javax.sound.sampled.AudioInputStream;

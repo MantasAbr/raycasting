@@ -1,8 +1,9 @@
 package input;
 
+import gui.StyleColors;
 import raycasting.Pointer;
 import raycasting.Raycasting;
-import raycasting.Sounds;
+import sounds.Sounds;
 import raycasting.UserInterface;
 
 import java.awt.*;
@@ -23,7 +24,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public int mouseY;
 
     public Point click = new Point();
-    private Robot robot;
+    public Point mouseOver = new Point();
 
     public int oldX, newX = 0;
     public int oldY, newY = 0;
@@ -34,11 +35,6 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         this.raycasting = raycasting;
         this.sounds = sounds;
         this.pointer = pointer;
-        try {
-            robot = new Robot();
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
     }
 
     //Directional keys
@@ -111,22 +107,22 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
                 exit.toggle(isPressed);
             }
         }
-        /**
-         * Keys that work when the game is paused
-         */
-        else{
-
-        }
 
         //Options key should work regardless
-        if (keyCode == options.getId()) {
-            options.toggle(isPressed);
-            Raycasting.gameIsInOptions = options.isPressed();
-            System.out.println(isPressed);
+        //The if statements are to make sure that the game couldn't be in pause and options mode at the same time
+        if(!Raycasting.gameIsPaused){
+            if (keyCode == options.getId()) {
+                options.toggle(isPressed);
+                Raycasting.gameIsInOptions = options.isPressed();
+                System.out.println(isPressed);
+            }
         }
-        if(keyCode == pause.getId()){
-            pause.toggle(isPressed);
-            Raycasting.gameIsPaused = pause.isPressed();
+
+        if(!Raycasting.gameIsInOptions){
+            if(keyCode == pause.getId()){
+                pause.toggle(isPressed);
+                Raycasting.gameIsPaused = pause.isPressed();
+            }
         }
     }
 
@@ -168,7 +164,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         }
     }
 
-    public void OptionsScreenHandling(UserInterface userInterface) {
+    public void OptionsScreenClickHandling(UserInterface userInterface) {
         if(userInterface.getExitButton().contains(click)){
             System.exit(0);
         }
@@ -179,6 +175,21 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         if(userInterface.getLoadGameButton().contains(click)){
             System.out.println("Load game");
             click.setLocation(0, 0);
+        }
+    }
+
+    public void OptionsScreenHoverHandling(UserInterface userInterface){
+        if(userInterface.getSaveGameButton().contains(mouseOver)){
+            UserInterface.buttons.get(0).setTextColor(StyleColors.black);
+        }
+        else if(userInterface.getLoadGameButton().contains(mouseOver)){
+            UserInterface.buttons.get(1).setTextColor(StyleColors.black);
+        }
+        else if(userInterface.getExitButton().contains(mouseOver)){
+            UserInterface.buttons.get(2).setTextColor(StyleColors.darkred);
+        }
+        else{
+            UserInterface.resetTextColor(UserInterface.buttons);
         }
     }
 
@@ -201,6 +212,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public void mouseMoved(MouseEvent e) {
         mouseX = e.getX();
         mouseY = e.getY();
+        mouseOver.setLocation(e.getX(), e.getY());
     }
     @Override
     public void mouseClicked(MouseEvent e) {
