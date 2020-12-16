@@ -2,7 +2,8 @@ package raycasting;
 import fonts.CustomFont;
 import gui.CustomButton;
 import gui.GUIElement;
-import launcher.Launcher;
+import items.Item;
+import items.ItemLinkedList;
 import input.Input;
 import levels.Level;
 import levels.LevelDoorMesh;
@@ -10,6 +11,8 @@ import sounds.Sounds;
 import sprites.GameSprite;
 
 import java.awt.*;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -58,6 +61,8 @@ public class Raycasting extends JFrame implements Runnable{
     public Player player;
     public Input input;
     public CustomFont fonts;
+    public ItemLinkedList inventoryItems;
+    //public Item items;
     
     //used for showing the ticks and frames each second on the screen
     private int finalTicks = 0;
@@ -74,9 +79,11 @@ public class Raycasting extends JFrame implements Runnable{
         spriteInit();
         levelsInit();
         guiInit();
+        inventoryInit();
         addKeyListener(input);
         addMouseListener(input);
         addMouseMotionListener(input);
+        addMouseWheelListener(input);
         fonts = new CustomFont(this, "src/fonts/yoster.ttf");
 
         player = new Player(100, 100, .8);
@@ -138,11 +145,23 @@ public class Raycasting extends JFrame implements Runnable{
         gui = new ArrayList<GUIElement>();
         gui.add(GUIElement.optionsScreen);
         gui.add(GUIElement.button);
+        gui.add(GUIElement.inventoryScreen);
+        gui.add(GUIElement.barOverlay);
 
         buttons = new ArrayList<CustomButton>();
         buttons.add(GUIElement.saveGameButton);
         buttons.add(GUIElement.loadGameButton);
         buttons.add(GUIElement.exitGameButton);
+    }
+
+    private void inventoryInit(){
+        inventoryItems = new ItemLinkedList();
+        inventoryItems.addNode(Item.sword);
+        inventoryItems.addNode(Item.gun);
+        inventoryItems.addNode(Item.food);
+
+
+
     }
     
     private void mouseInit(){
@@ -184,25 +203,28 @@ public class Raycasting extends JFrame implements Runnable{
         Graphics g = bs.getDrawGraphics();
         g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
 
-        userInterface.DrawInterface(g);
 
-        if(input.debug.isPressed()){
+        if(Input.debug.isPressed()){
             debugInfo(g);
         }
         if(actions.levelChange){
             drawLoadScreen(g);
         }
         if(gameIsInOptions){
-            userInterface.drawOptions(g);
+            userInterface.drawOptionsScreen(g);
             getContentPane().setCursor(Pointer.gamePointer.getPointer());
+            userInterface.drawInterface(g, false);
         }
         else {
             getContentPane().setCursor(Pointer.blankPointer.getPointer());
         }
 
         if(gameIsPaused){
-            userInterface.drawPauseSplashText(g);
+            userInterface.drawInventoryScreen(g);
+            userInterface.drawInterface(g, false);
         }
+
+        userInterface.drawInterface(g, true);
 
         bs.show();
     }
@@ -233,11 +255,12 @@ public class Raycasting extends JFrame implements Runnable{
             actions.ChangeLevel(levels, doorMeshes);
             actions.HandleButtonCombos();
             input.mouseMovementHandling(MOUSE_SENSITIVITY);
+            input.mouseWheelHandling(userInterface, inventoryItems);
             player.ApplyUpdates(input);
         }
         if(gameIsInOptions){
-            input.OptionsScreenClickHandling(userInterface);
-            input.OptionsScreenHoverHandling(userInterface);
+            input.optionsScreenClickHandling(userInterface);
+            input.optionsScreenHoverHandling(userInterface);
         }
     }
 

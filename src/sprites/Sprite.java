@@ -43,4 +43,6 @@ public class Sprite{
 
     public static Sprite menuCursor = new Sprite("src/sprites/menu_cursor.png");
     public static Sprite blankCursor = new Sprite("src/sprites/blank_cursor.png");
+
+    public static Sprite swordSprite = new Sprite("src/sprites/lamp.png");
 }

@@ -35,6 +35,8 @@ public class GUIElement {
 
     public static GUIElement optionsScreen = new GUIElement("src/gui/options_container.png");
     public static GUIElement button = new GUIElement("src/gui/button.png");
+    public static GUIElement inventoryScreen = new GUIElement("src/gui/inventory_container.png");
+    public static GUIElement barOverlay = new GUIElement("src/gui/bar_overlay.png");
 
     public static CustomButton saveGameButton = new CustomButton(320, 160, 40, "Save game", StyleColors.white);
     public static CustomButton loadGameButton = new CustomButton(320, 235, 40, "Load game", StyleColors.white);

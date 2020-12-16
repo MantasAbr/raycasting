@@ -1,6 +1,7 @@
 package input;
 
 import gui.StyleColors;
+import items.ItemLinkedList;
 import raycasting.Pointer;
 import raycasting.Raycasting;
 import sounds.Sounds;
@@ -9,8 +10,9 @@ import raycasting.UserInterface;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
-public class Input implements KeyListener, MouseListener, MouseMotionListener {
+public class Input implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener{
 
     Pointer pointer;
     Raycasting raycasting;
@@ -25,6 +27,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
     public Point click = new Point();
     public Point mouseOver = new Point();
+    public int mouseScrollValues;
 
     public int oldX, newX = 0;
     public int oldY, newY = 0;
@@ -164,7 +167,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         }
     }
 
-    public void OptionsScreenClickHandling(UserInterface userInterface) {
+    public void optionsScreenClickHandling(UserInterface userInterface) {
         if(userInterface.getExitButton().contains(click)){
             System.exit(0);
         }
@@ -178,7 +181,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         }
     }
 
-    public void OptionsScreenHoverHandling(UserInterface userInterface){
+    public void optionsScreenHoverHandling(UserInterface userInterface){
         if(userInterface.getSaveGameButton().contains(mouseOver)){
             UserInterface.buttons.get(0).setTextColor(StyleColors.black);
         }
@@ -191,6 +194,17 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         else{
             UserInterface.resetTextColor(UserInterface.buttons);
         }
+    }
+
+    public void mouseWheelHandling(UserInterface userInterface, ItemLinkedList items){
+        if(mouseScrollValues == 1){
+            System.out.println("Current inv item: " + items.goRight().getName());
+        }
+        else if(mouseScrollValues == -1){
+            System.out.println("Current inv item: " + items.goLeft().getName());
+
+        }
+        mouseScrollValues = 0;
     }
 
     @Override
@@ -242,5 +256,18 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     @Override
     public void mouseDragged(MouseEvent e) {
 
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        int notches = e.getWheelRotation();
+
+        if(notches < 0){
+            mouseScrollValues = 1;
+        }
+
+        if(notches > 0) {
+            mouseScrollValues = -1;
+        }
     }
 }
