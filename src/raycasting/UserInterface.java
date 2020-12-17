@@ -77,24 +77,11 @@ public class UserInterface {
     }
 
     public void drawInventorySlots(Graphics g, ItemLinkedList inventoryList){
-        InventorySlot current = inventoryList.getCurrentItem();
-        g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
-
-        inventoryList.goRight();
-        current = inventoryList.getCurrentItem();
-        g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
-
-        inventoryList.goRight();
-        current = inventoryList.getCurrentItem();
-        g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
-
-        inventoryList.goRight();
-        current = inventoryList.getCurrentItem();
-        g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
-
-        inventoryList.goRight();
-        current = inventoryList.getCurrentItem();
-        g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
+        for(int i = 0; i < inventoryList.getCount(); i++){
+            InventorySlot current = inventoryList.getCurrentItem();
+            g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
+            inventoryList.goRight();
+        }
     }
 
     private Rectangle drawButton(Graphics g, int x, int y, int height, String text, Font font, Color fontColor){

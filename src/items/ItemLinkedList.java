@@ -164,5 +164,4 @@ class Node {
     public Node(InventorySlot value){
         this.value = value;
     }
-
 }

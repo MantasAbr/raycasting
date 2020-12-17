@@ -198,6 +198,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     }
 
     public void inventoryScreenHoverHandling(ItemLinkedList items){
+        items.goLeft();
         InventorySlot current = items.getCurrentItem();
 
         if(current.getBounds().contains(mouseOver)){
@@ -206,6 +207,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
         else{
             current.setImage(GUIElement.inventorySlot);
         }
+
     }
 
     public void mouseWheelHandling(UserInterface userInterface, ItemLinkedList items){
