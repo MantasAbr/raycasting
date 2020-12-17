@@ -51,25 +51,23 @@ public class ItemLinkedList {
         }
     }
 
-    public void deleteNode(String valueToDelete){
+    public void deleteNode(int valueToDelete) {
         Node currentNode = head;
 
-        if(head != null){
-            if(currentNode.value.getItem().getName().equals(valueToDelete)){
+        if (head != null) {
+            if (currentNode.value.getId() == valueToDelete) {
                 head = head.nextNode;
                 tail.nextNode = head;
-            }
-            else{
-                do{
+            } else {
+                do {
                     Node nextNode = currentNode.nextNode;
-                    if(nextNode.value.getItem().getName().equals(valueToDelete)){
-                        currentNode.value = null;
+                    if (nextNode.value.getId() == valueToDelete) {
                         currentNode.nextNode = nextNode.nextNode;
+                        count--;
                         break;
                     }
                     currentNode = currentNode.nextNode;
-                }
-                while(currentNode != head);
+                } while (currentNode != head);
             }
         }
     }
@@ -92,7 +90,7 @@ public class ItemLinkedList {
      * @param itemName The name of the Item
      * @return Searched Item object
      */
-    public InventorySlot getItemNodeByName(String itemName){
+    public InventorySlot getItemNode(String itemName){
         Node currentNode = head;
 
         if(head != null){
@@ -108,7 +106,7 @@ public class ItemLinkedList {
         return null;
     }
 
-    public InventorySlot getItemNodeByID(int id){
+    public InventorySlot getItemNode(int id){
         Node currentNode = head;
 
         if(head != null){
@@ -143,6 +141,26 @@ public class ItemLinkedList {
 
     }
 
+    public void insertAtLocation(InventorySlot item, int location){
+        Node temp;
+        Node newNode = new Node(item);
+
+        temp = head;
+        if(temp == null || count < 0)
+            throw new IndexOutOfBoundsException("List is empty or the position is not valid");
+        else{
+            for(int i = 1; i < location - 1; i++){
+                temp = temp.nextNode;
+            }
+
+            newNode.setNextNode(temp.nextNode);
+            (temp.nextNode).previousNode = newNode;
+            temp.setNextNode(newNode);
+            newNode.setPreviousNode(temp);
+            count++;
+        }
+    }
+
     public InventorySlot getCurrentItem() {
         if(current == null)
             current = head;
@@ -163,5 +181,26 @@ class Node {
 
     public Node(InventorySlot value){
         this.value = value;
+    }
+    public Node(){}
+
+    public Node getNextNode() {
+        return nextNode;
+    }
+
+    public Node getPreviousNode() {
+        return previousNode;
+    }
+
+    public void setNextNode(Node nextNode) {
+        this.nextNode = nextNode;
+    }
+
+    public void setPreviousNode(Node previousNode) {
+        this.previousNode = previousNode;
+    }
+
+    static Node getNode(){
+        return new Node();
     }
 }

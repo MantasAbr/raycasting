@@ -166,9 +166,6 @@ public class Raycasting extends JFrame implements Runnable{
         inventoryItems.addNode(InventorySlot.fourth);
         inventoryItems.addNode(InventorySlot.fifth);
 
-        System.out.println("Count of items is: " + inventoryItems.getCount());
-
-        inventoryItems.traverseNodes();
     }
     
     private void mouseInit(){

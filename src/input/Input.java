@@ -9,6 +9,7 @@ import raycasting.Raycasting;
 import sounds.Sounds;
 import raycasting.UserInterface;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -26,7 +27,8 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     public int mouseX;
     public int mouseY;
 
-    public Point click = new Point();
+    public Point leftClick = new Point();
+    public Point rightClick = new Point();
     public Point mouseOver = new Point();
     public int mouseScrollValues;
 
@@ -169,16 +171,16 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     }
 
     public void optionsScreenClickHandling(UserInterface userInterface) {
-        if(userInterface.getExitButton().contains(click)){
+        if(userInterface.getExitButton().contains(leftClick)){
             System.exit(0);
         }
-        if(userInterface.getSaveGameButton().contains(click)){
+        if(userInterface.getSaveGameButton().contains(leftClick)){
             System.out.println("Save game");
-            click.setLocation(0, 0);
+            leftClick.setLocation(0, 0);
         }
-        if(userInterface.getLoadGameButton().contains(click)){
+        if(userInterface.getLoadGameButton().contains(leftClick)){
             System.out.println("Load game");
-            click.setLocation(0, 0);
+            leftClick.setLocation(0, 0);
         }
     }
 
@@ -198,7 +200,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     }
 
     public void inventoryScreenHoverHandling(ItemLinkedList items){
-        items.goLeft();
+        items.goRight(); //this resets the current list tracking position (i guess? cuz this function doesn't work without this)
         InventorySlot current = items.getCurrentItem();
 
         if(current.getBounds().contains(mouseOver)){
@@ -207,6 +209,10 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
         else{
             current.setImage(GUIElement.inventorySlot);
         }
+
+    }
+
+    public void inventoryMovementHandling(ItemLinkedList items){
 
     }
 
@@ -246,17 +252,24 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     }
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println(e.getX() + " " + e.getY());
+
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        if(SwingUtilities.isLeftMouseButton(e)){
+            leftClick.setLocation(e.getPoint());
+            System.out.println("Left click at: " + e.getX() + " " + e.getY());
+        }
+        if(SwingUtilities.isRightMouseButton(e)){
+            rightClick.setLocation(e.getPoint());
+            System.out.println("Right click at: " + e.getX() + " " + e.getY());
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        click.setLocation(e.getX(), e.getY());
+
     }
 
     @Override

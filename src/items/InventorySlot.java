@@ -39,9 +39,9 @@ public class InventorySlot {
     }
 
     public static InventorySlot first = new InventorySlot(0, 161, 200, GUIElement.inventorySlot, Item.empty);
-    public static InventorySlot second = new InventorySlot(1, 261, 200, GUIElement.inventorySlot, Item.empty);
+    public static InventorySlot second = new InventorySlot(1, 261, 200, GUIElement.inventorySlot, Item.sword);
     public static InventorySlot third = new InventorySlot(2, 361, 200, GUIElement.inventorySlot, Item.empty);
-    public static InventorySlot fourth = new InventorySlot(3, 461, 200, GUIElement.inventorySlot, Item.empty);
+    public static InventorySlot fourth = new InventorySlot(3, 461, 200, GUIElement.inventorySlot, Item.gun);
     public static InventorySlot fifth = new InventorySlot(4, 561, 200, GUIElement.inventorySlot, Item.empty);
 
 }

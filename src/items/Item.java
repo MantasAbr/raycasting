@@ -32,7 +32,7 @@ public class Item {
 
     public static Item empty = new Item("Empty", Sprite.blankCursor);
     public static Item sword = new Item("Sword", Sprite.swordSprite);
-    public static Item gun = new Item("Gun", Sprite.swordSprite);
+    public static Item gun = new Item("Gun", Sprite.pistolSprite);
     public static Item food = new Item("Food", Sprite.swordSprite);
     public static Item water = new Item("Water", Sprite.swordSprite);
     public static Item bottle = new Item("Bottle", Sprite.swordSprite);

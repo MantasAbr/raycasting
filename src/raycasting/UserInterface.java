@@ -80,6 +80,7 @@ public class UserInterface {
         for(int i = 0; i < inventoryList.getCount(); i++){
             InventorySlot current = inventoryList.getCurrentItem();
             g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
+            g.drawImage(current.getItem().getSprite().getSpriteImage(), current.getBounds().x + 5, current.getBounds().y + 5, null);
             inventoryList.goRight();
         }
     }

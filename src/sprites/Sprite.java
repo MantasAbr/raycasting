@@ -28,10 +28,23 @@ public class Sprite{
             spriteWidth = spriteImage.getWidth();
             spriteHeight = spriteImage.getHeight();
             pixels = new int[spriteWidth * spriteHeight];
+            //makeTransparent(spriteImage);
             spriteImage.getRGB(0, 0, spriteWidth, spriteHeight, pixels, 0, spriteWidth);
         }
         catch(IOException e){
             e.printStackTrace();
+        }
+    }
+
+    private void makeTransparent(BufferedImage image){
+        for (int y = 0; y < image.getHeight(); ++y) {
+            for (int x = 0; x < image.getWidth(); ++x) {
+                int argb = image.getRGB(x, y);
+                if ((argb & 0x00FFFFFF) == 0x000000FF)
+                {
+                    image.setRGB(x, y, 0);
+                }
+            }
         }
     }
 
@@ -44,5 +57,7 @@ public class Sprite{
     public static Sprite menuCursor = new Sprite("src/sprites/menu_cursor.png");
     public static Sprite blankCursor = new Sprite("src/sprites/blank_cursor.png");
 
-    public static Sprite swordSprite = new Sprite("src/sprites/lamp.png");
+    public static Sprite swordSprite = new Sprite("src/sprites/sword.png");
+    public static Sprite pistolSprite = new Sprite("src/sprites/pistol.png");
+
 }
