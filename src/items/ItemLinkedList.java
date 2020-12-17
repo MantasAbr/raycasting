@@ -5,8 +5,13 @@ public class ItemLinkedList {
     private Node head;
     private Node current;
     private Node tail;
+    private int count;
 
-    public void addNode(Item value){
+    public InventorySlot start(){
+        return head.value;
+    }
+
+    public void addNode(InventorySlot value){
         Node newNode = new Node(value);
 
         if (head == null)
@@ -25,6 +30,8 @@ public class ItemLinkedList {
             head = newNode;
         }
 
+        count++;
+
     }
 
     public boolean containsNode(String itemName){
@@ -34,7 +41,7 @@ public class ItemLinkedList {
             return false;
         else{
             do {
-                if(currentNode.value.getName().equals(itemName)){
+                if(currentNode.value.getItem().getName().equals(itemName)){
                     return true;
                 }
                 currentNode = currentNode.nextNode;
@@ -48,14 +55,14 @@ public class ItemLinkedList {
         Node currentNode = head;
 
         if(head != null){
-            if(currentNode.value.getName().equals(valueToDelete)){
+            if(currentNode.value.getItem().getName().equals(valueToDelete)){
                 head = head.nextNode;
                 tail.nextNode = head;
             }
             else{
                 do{
                     Node nextNode = currentNode.nextNode;
-                    if(nextNode.value.getName().equals(valueToDelete)){
+                    if(nextNode.value.getItem().getName().equals(valueToDelete)){
                         currentNode.value = null;
                         currentNode.nextNode = nextNode.nextNode;
                         break;
@@ -72,7 +79,7 @@ public class ItemLinkedList {
 
         if(head != null){
             do{
-                System.out.print(currentNode.value.getName() + ", ");
+                System.out.print(currentNode.value.getItem().getName() + ", ");
                 currentNode = currentNode.nextNode;
             }
             while(currentNode != head);
@@ -85,12 +92,28 @@ public class ItemLinkedList {
      * @param itemName The name of the Item
      * @return Searched Item object
      */
-    public Item getItemNode(String itemName){
+    public InventorySlot getItemNodeByName(String itemName){
         Node currentNode = head;
 
         if(head != null){
             do {
-                if(currentNode.value.getName().equals(itemName)){
+                if(currentNode.value.getItem().getName().equals(itemName)){
+                    return currentNode.value;
+                }
+                else
+                    currentNode = currentNode.nextNode;
+            }
+            while(currentNode != head);
+        }
+        return null;
+    }
+
+    public InventorySlot getItemNodeByID(int id){
+        Node currentNode = head;
+
+        if(head != null){
+            do {
+                if(currentNode.value.getId() == id){
                     return currentNode.value;
                 }
                 else
@@ -120,18 +143,25 @@ public class ItemLinkedList {
 
     }
 
-    public Item getCurrentItem() {
+    public InventorySlot getCurrentItem() {
+        if(current == null)
+            current = head;
+
         return current.value;
+    }
+
+    public int getCount() {
+        return count;
     }
 }
 
 class Node {
 
-    Item value;
+    InventorySlot value;
     Node nextNode;
     Node previousNode;
 
-    public Node(Item value){
+    public Node(InventorySlot value){
         this.value = value;
     }
 

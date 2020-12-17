@@ -4,6 +4,8 @@ import gui.CustomButton;
 import gui.GUIElement;
 import gui.StyleColors;
 import input.Input;
+import items.InventorySlot;
+import items.ItemLinkedList;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -12,26 +14,26 @@ import java.util.ArrayList;
 public class UserInterface {
 
     private Player player;
-    private Input input;
     private ArrayList<GUIElement> gui;
+    private ItemLinkedList inventorySlots;
     public static ArrayList<CustomButton> buttons;
 
     private Point SprintBarPoint = new Point(140, Raycasting.WINDOW_HEIGHT - 50);
     private Point HealthBarPoint = new Point(140, Raycasting.WINDOW_HEIGHT - 100);
     private int barHeight = 20;
 
-    private Font font = new Font("Yoster Island", Font.BOLD ,20);
-    private Font pauseSplashText = new Font("Yoster Island", Font.BOLD, 80);
+    private Font font = new Font("Yoster Island", Font.PLAIN ,22);
+    private Font inventoryText = new Font("Yoster Island", Font.PLAIN, 60);
 
     private Rectangle exitButton;
     private Rectangle saveGameButton;
     private Rectangle loadGameButton;
 
-    public UserInterface(Player player, Input input, ArrayList<GUIElement> gui, ArrayList<CustomButton> buttons){
+    public UserInterface(Player player, ArrayList<GUIElement> gui, ArrayList<CustomButton> buttons, ItemLinkedList inventorySlots){
         this.player = player;
-        this.input = input;
         this.gui = gui;
         this.buttons = buttons;
+        this.inventorySlots = inventorySlots;
     }
 
     public void drawInterface(Graphics g, boolean shouldDraw){
@@ -44,14 +46,9 @@ public class UserInterface {
             g.dispose();
     }
 
-    public void drawPauseSplashText(Graphics g){
-        g.setColor(StyleColors.white);
-        drawCenteredString(g, "Paused", 0, 0, Raycasting.WINDOW_WIDTH, Raycasting.WINDOW_HEIGHT, pauseSplashText);
-    }
-
     private void drawHealthInfo(Graphics g, Player player){
         g.setColor(Color.WHITE);
-        g.drawString("Health", HealthBarPoint.x - 110, (int)(HealthBarPoint.y + barHeight - 2));
+        g.drawString("Health", HealthBarPoint.x - 110, (int)(HealthBarPoint.y + barHeight - 1));
         g.setColor(Color.RED);
         g.fillRect(HealthBarPoint.x, HealthBarPoint.y, (int)(player.getHealthValue() * 1.5), barHeight);
         g.drawImage(gui.get(3).getElementImage(), HealthBarPoint.x - 3, HealthBarPoint.y - 3, null);
@@ -59,7 +56,7 @@ public class UserInterface {
 
     private void drawSprintInfo(Graphics g, Player player){
         g.setColor(Color.WHITE);
-        g.drawString("Sprint", SprintBarPoint.x - 110, (int)(SprintBarPoint.y + barHeight - 2));
+        g.drawString("Sprint", SprintBarPoint.x - 110, (int)(SprintBarPoint.y + barHeight - 1));
         g.setColor(Color.BLUE);
         g.fillRect(SprintBarPoint.x, SprintBarPoint.y, (int)(player.getSprintValue() * 1.5), barHeight);
         g.drawImage(gui.get(3).getElementImage(), SprintBarPoint.x - 3, SprintBarPoint.y - 3, null);
@@ -75,6 +72,29 @@ public class UserInterface {
 
     public void drawInventoryScreen(Graphics g){
         g.drawImage(gui.get(2).getElementImage(), 100, 100, null);
+        drawCenteredString(g, "Inventory", 0, 0, Raycasting.WINDOW_WIDTH, 300, inventoryText);
+        drawInventorySlots(g, inventorySlots);
+    }
+
+    public void drawInventorySlots(Graphics g, ItemLinkedList inventoryList){
+        InventorySlot current = inventoryList.getCurrentItem();
+        g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
+
+        inventoryList.goRight();
+        current = inventoryList.getCurrentItem();
+        g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
+
+        inventoryList.goRight();
+        current = inventoryList.getCurrentItem();
+        g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
+
+        inventoryList.goRight();
+        current = inventoryList.getCurrentItem();
+        g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
+
+        inventoryList.goRight();
+        current = inventoryList.getCurrentItem();
+        g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
     }
 
     private Rectangle drawButton(Graphics g, int x, int y, int height, String text, Font font, Color fontColor){

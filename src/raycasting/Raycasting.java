@@ -2,7 +2,7 @@ package raycasting;
 import fonts.CustomFont;
 import gui.CustomButton;
 import gui.GUIElement;
-import items.Item;
+import items.InventorySlot;
 import items.ItemLinkedList;
 import input.Input;
 import levels.Level;
@@ -11,8 +11,6 @@ import sounds.Sounds;
 import sprites.GameSprite;
 
 import java.awt.*;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -37,7 +35,7 @@ public class Raycasting extends JFrame implements Runnable{
     //Used for the run() method
     private Thread thread;
     private volatile boolean running;
-    public static boolean gameIsPaused = false;
+    public static boolean gameIsInInventory = false;
     public static boolean gameIsInOptions = false;
     
     //Used for displaying the image
@@ -72,6 +70,7 @@ public class Raycasting extends JFrame implements Runnable{
         thread = new Thread(this);
         image = new BufferedImage(WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+
         audioInit();
         mouseInit();
         input = new Input(this, sounds, Pointer.blankPointer);
@@ -95,7 +94,7 @@ public class Raycasting extends JFrame implements Runnable{
                             FIELD_OF_VIEW, 0, 0, .66, sounds, this, screen, input);
 
         actions = new ActionHandling(camera, screen, sounds, input,this);
-        userInterface = new UserInterface(player, input, gui, buttons);
+        userInterface = new UserInterface(player, gui, buttons, inventoryItems);
         jFrameInit();             
         start();
     }
@@ -147,6 +146,11 @@ public class Raycasting extends JFrame implements Runnable{
         gui.add(GUIElement.button);
         gui.add(GUIElement.inventoryScreen);
         gui.add(GUIElement.barOverlay);
+        gui.add(GUIElement.lighterInventorySlot);
+        long sum = gui.stream()
+                .mapToLong(GUIElement::getElapsedTime)
+                .sum();
+        System.out.println("Time it took to load GUIElement objects: " + sum);
 
         buttons = new ArrayList<CustomButton>();
         buttons.add(GUIElement.saveGameButton);
@@ -156,11 +160,13 @@ public class Raycasting extends JFrame implements Runnable{
 
     private void inventoryInit(){
         inventoryItems = new ItemLinkedList();
-        inventoryItems.addNode(Item.sword);
-        inventoryItems.addNode(Item.gun);
-        inventoryItems.addNode(Item.food);
-        inventoryItems.addNode(Item.water);
-        inventoryItems.addNode(Item.bottle);
+        inventoryItems.addNode(InventorySlot.first);
+        inventoryItems.addNode(InventorySlot.second);
+        inventoryItems.addNode(InventorySlot.third);
+        inventoryItems.addNode(InventorySlot.fourth);
+        inventoryItems.addNode(InventorySlot.fifth);
+
+        System.out.println("Count of items is: " + inventoryItems.getCount());
 
         inventoryItems.traverseNodes();
     }
@@ -211,18 +217,22 @@ public class Raycasting extends JFrame implements Runnable{
         if(actions.levelChange){
             drawLoadScreen(g);
         }
-        if(gameIsInOptions){
-            userInterface.drawOptionsScreen(g);
-            getContentPane().setCursor(Pointer.gamePointer.getPointer());
-            userInterface.drawInterface(g, false);
-        }
-        else {
-            getContentPane().setCursor(Pointer.blankPointer.getPointer());
-        }
 
-        if(gameIsPaused){
-            userInterface.drawInventoryScreen(g);
-            userInterface.drawInterface(g, false);
+        if(gameIsInOptions || gameIsInInventory){
+            getContentPane().setCursor(Pointer.gamePointer.getPointer());
+            if(gameIsInOptions){
+                userInterface.drawOptionsScreen(g);
+                getContentPane().setCursor(Pointer.gamePointer.getPointer());
+                userInterface.drawInterface(g, false);
+            }
+            if(gameIsInInventory){
+                userInterface.drawInventoryScreen(g);
+                getContentPane().setCursor(Pointer.gamePointer.getPointer());
+                userInterface.drawInterface(g, false);
+            }
+        }
+        else{
+            getContentPane().setCursor(Pointer.blankPointer.getPointer());
         }
 
         userInterface.drawInterface(g, true);
@@ -249,7 +259,7 @@ public class Raycasting extends JFrame implements Runnable{
     }
     
     public void tick(){
-        if(!(gameIsPaused || gameIsInOptions)){
+        if(!(gameIsInInventory || gameIsInOptions)){
             actions.GetNextBlock();
             actions.CheckForActions();
             actions.ApplyBlockChanges(levels.get(CURRENT_LEVEL).getMap());
@@ -262,6 +272,9 @@ public class Raycasting extends JFrame implements Runnable{
         if(gameIsInOptions){
             input.optionsScreenClickHandling(userInterface);
             input.optionsScreenHoverHandling(userInterface);
+        }
+        if(gameIsInInventory){
+            input.inventoryScreenHoverHandling(inventoryItems);
         }
     }
 

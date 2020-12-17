@@ -1,6 +1,8 @@
 package input;
 
+import gui.GUIElement;
 import gui.StyleColors;
+import items.InventorySlot;
 import items.ItemLinkedList;
 import raycasting.Pointer;
 import raycasting.Raycasting;
@@ -10,7 +12,6 @@ import raycasting.UserInterface;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Enumeration;
 
 public class Input implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener{
 
@@ -56,7 +57,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     public static Key action = new Key("VK_E", 69, true, false);
     public static Key shift = new Key("VK_SHIFT", 16, true, false);
     public static Key options = new Key("VK_ESCAPE", 27, false, false);
-    public static Key pause = new Key("VP_P", 80, false, false);
+    public static Key inventory = new Key("VP_I", 73, false, false);
     public static Key debug = new Key("VK_F3", 114, false, false);
     public static Key exit = new Key("VK_X", 88, true, false);
 
@@ -65,7 +66,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
         /**
          * Keys that work when the game is not paused
          */
-        if(!(Raycasting.gameIsInOptions || Raycasting.gameIsPaused)) {
+        if(!(Raycasting.gameIsInOptions || Raycasting.gameIsInInventory)) {
 
             if (keyCode == forward.getId()) {
                 forward.toggle(isPressed);
@@ -113,7 +114,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
 
         //Options key should work regardless
         //The if statements are to make sure that the game couldn't be in pause and options mode at the same time
-        if(!Raycasting.gameIsPaused){
+        if(!Raycasting.gameIsInInventory){
             if (keyCode == options.getId()) {
                 options.toggle(isPressed);
                 Raycasting.gameIsInOptions = options.isPressed();
@@ -122,9 +123,9 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
         }
 
         if(!Raycasting.gameIsInOptions){
-            if(keyCode == pause.getId()){
-                pause.toggle(isPressed);
-                Raycasting.gameIsPaused = pause.isPressed();
+            if(keyCode == inventory.getId()){
+                inventory.toggle(isPressed);
+                Raycasting.gameIsInInventory = inventory.isPressed();
             }
         }
     }
@@ -196,14 +197,25 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
         }
     }
 
+    public void inventoryScreenHoverHandling(ItemLinkedList items){
+        InventorySlot current = items.getCurrentItem();
+
+        if(current.getBounds().contains(mouseOver)){
+            current.setImage(GUIElement.lighterInventorySlot);
+        }
+        else{
+            current.setImage(GUIElement.inventorySlot);
+        }
+    }
+
     public void mouseWheelHandling(UserInterface userInterface, ItemLinkedList items){
         if(mouseScrollValues == 1){
             items.goRight();
-            System.out.println("Current inv item: " + items.getCurrentItem().getName());
+            System.out.println("Current inv item: " + items.getCurrentItem().getItem().getName());
         }
         else if(mouseScrollValues == -1){
             items.goLeft();
-            System.out.println("Current inv item: " + items.getCurrentItem().getName());
+            System.out.println("Current inv item: " + items.getCurrentItem().getItem().getName());
 
         }
         mouseScrollValues = 0;

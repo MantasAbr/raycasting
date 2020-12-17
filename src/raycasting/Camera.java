@@ -64,7 +64,7 @@ public class Camera{
 
     public void update(int[][] map) {
 
-        if(!(Raycasting.gameIsPaused || Raycasting.gameIsInOptions)) {
+        if(!(Raycasting.gameIsInInventory || Raycasting.gameIsInOptions)) {
 
 
             if (input.turningLeft || input.turningRight) {
