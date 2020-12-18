@@ -128,11 +128,6 @@ public class ItemLinkedList {
             return current.value;
     }
 
-    /**
-     * Returns the Item object that's searched by its name
-     * @param itemName The name of the Item
-     * @return Searched Item object
-     */
     public InventorySlot getItemNode(String itemName){
         Node currentNode = head;
 
@@ -213,7 +208,7 @@ public class ItemLinkedList {
                 index = current.nextNode;
                 while(index != head) {
                 //If current node is greater than index data, swaps the data
-                    if(current.value.getId() > index.value.getId()) {
+                    if(current.value.getBoundsX() > index.value.getBoundsX()) {
                         temp = current.value;
                         current.value = index.value;
                         index.value = temp;
@@ -246,19 +241,53 @@ public class ItemLinkedList {
         }
     }
 
+    /**
+     * This is legitimately a mess
+     * Will DEFINITELY need to use the swapNodes function in the future instead of this one
+     * @param a
+     * @param b
+     */
     public void swapInfo(Node a, Node b){
-       InventorySlot tempA = a.value;
-       InventorySlot tempB = b.value;
 
-       deleteNode(a);
-       deleteNode(b);
+        //If it's the same thing, don't do anything
+        if(a.equals(b))
+            return;
 
-       int tempX = tempA.getBoundsX();
-       tempA.setBounds(tempB.getBoundsX());
-       tempB.setBounds(tempX);
+        //Create the temporary values that need to be switched
+        InventorySlot tempA = a.value;
+        InventorySlot tempB = b.value;
 
-       addNodeAtLocation(tempA, tempA.getId());
-       addNodeAtLocation(tempB, tempB.getId());
+        //Delete the nodes from the list
+        deleteNode(a);
+        deleteNode(b);
+
+        //Switch the display x coordinate between the two items so that changes would be visible in the GUI
+        int tempX = tempA.getBoundsX();
+        tempA.setBounds(tempB.getBoundsX());
+        tempB.setBounds(tempX);
+
+        //Add the two deleted nodes back according to their id's
+        addNodeAtLocation(tempA, tempA.getId());
+        addNodeAtLocation(tempB, tempB.getId());
+
+        //Sort and reset the id's of the list, so that the changes in the GUI would be the same "under the hood"
+        sortList();
+        resetIds();
+    }
+
+    public void resetIds(){
+        Node currentNode = head;
+        int counter = 1;
+
+        if(head != null){
+            do{
+                currentNode.value.setId(counter);
+                counter++;
+                currentNode = currentNode.nextNode;
+            }
+            while(currentNode != head);
+        }
+        System.out.print("\n");
     }
 
     public void swapNodes(Node a, Node b){

@@ -224,13 +224,21 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
             rightClick.setLocation(0, 0);
         }
         if(items.getCurrentItem().getBounds().contains(leftClick)){
-            carryToId = items.getCurrentItem().getId();
-            System.out.println(carryToId);
-            items.swapInfo(items.getNodeById(carryFromId), items.getNodeById(carryToId));
-            items.traverseNodes();
-            leftClick.setLocation(0,0);
-            carryFromId = -1; carryToId = -1;
+            if(carryFromId == -1)
+                System.out.println("item to carry not selected!");
+            else{
+                carryToId = items.getCurrentItem().getId();
+                System.out.println("carry from: " + carryFromId + ", carry to: " + carryToId);
+                items.swapInfo(items.getNodeById(carryFromId), items.getNodeById(carryToId));
+                items.traverseNodes();
+                leftClick.setLocation(0,0);
+                carryFromId = -1; carryToId = -1;
+            }
         }
+    }
+
+    public void swapItems(){
+
     }
 
     public void mouseWheelHandling(UserInterface userInterface, ItemLinkedList items){
