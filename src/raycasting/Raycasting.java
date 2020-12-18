@@ -15,7 +15,6 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
-import java.util.Collections;
 import javax.swing.JFrame;
 
 /**
@@ -61,7 +60,6 @@ public class Raycasting extends JFrame implements Runnable{
     public Input input;
     public CustomFont fonts;
     public ItemLinkedList inventoryItems;
-    //public Item items;
     
     //used for showing the ticks and frames each second on the screen
     private int finalTicks = 0;
@@ -115,7 +113,7 @@ public class Raycasting extends JFrame implements Runnable{
 
     private void spriteInit(){
         sprites = new ArrayList<GameSprite>();
-        //sprites.add(GameSprite.lamp);
+        sprites.add(GameSprite.lamp);
         //sprites.add(GameSprite.redlamp);
     }
     
@@ -301,6 +299,7 @@ public class Raycasting extends JFrame implements Runnable{
                 delta -= 1;
                 shouldRender = true;
                 screen.update(camera, pixels);
+                screen.updateSprites(camera, pixels);
                 camera.update(levels.get(CURRENT_LEVEL).getMap());
                 if(input.exit.isPressed())
                     stop();

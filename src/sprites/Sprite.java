@@ -22,6 +22,10 @@ public class Sprite{
         load();
     }
 
+    public Sprite(){
+
+    }
+
     private void load(){
         try {
             spriteImage = ImageIO.read(new File(fileLocation));
@@ -57,7 +61,8 @@ public class Sprite{
     public static Sprite menuCursor = new Sprite("src/sprites/menu_cursor.png");
     public static Sprite blankCursor = new Sprite("src/sprites/blank_cursor.png");
 
+
     public static Sprite swordSprite = new Sprite("src/sprites/sword.png");
     public static Sprite pistolSprite = new Sprite("src/sprites/pistol.png");
-
+    public static Sprite blankItem = new Sprite();
 }

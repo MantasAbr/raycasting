@@ -30,7 +30,7 @@ public class Item {
         this.sprite = sprite;
     }
 
-    public static Item empty = new Item("Empty", Sprite.blankCursor);
+    public static Item empty = new Item("Empty", Sprite.blankItem);
     public static Item sword = new Item("Sword", Sprite.swordSprite);
     public static Item gun = new Item("Gun", Sprite.pistolSprite);
     public static Item food = new Item("Food", Sprite.swordSprite);

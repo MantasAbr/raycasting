@@ -293,7 +293,7 @@ public class Screen {
             double step = 1.0 * textureSize / lineHeight;
             double texPos = (drawStart - pitch - (posZ / perpWallDist) - height / 2 + lineHeight / 2) * step;
 
-            ZBuffer[x] = perpWallDist;
+
             //calculate y coordinate on texture
 
             for(int y = drawStart; y < drawEnd; y++) {
@@ -312,83 +312,86 @@ public class Screen {
                 pixels[x + y*(width)] = color;
             }
 
+            ZBuffer[x] = perpWallDist;
+
+        }
+        return pixels;
+    }
+
+    public int[] updateSprites(Camera camera, int[] pixels){
+        //SPRITE CASTING
+
+        //sort sprites from far to close
+        for(int i = 0; i < numberOfSprites; i++){
+            spriteOrder[i] = i;
+            spriteDistance[i] = ((camera.xPos - sprites.get(i).getXLoc()) * (camera.xPos - sprites.get(i).getXLoc()) +
+                    (camera.yPos - sprites.get(i).getYLoc()) * (camera.yPos - sprites.get(i).getYLoc()));
+        }
+
+        sortSprites(spriteOrder, spriteDistance, numberOfSprites);
+
+        //after sorting the sprites, do the projection and draw them
+        for(int i = 0; i < numberOfSprites; i++){
+
+            double spriteX = sprites.get(spriteOrder[i]).getXLoc() - camera.xPos;
+            double spriteY = sprites.get(spriteOrder[i]).getYLoc() - camera.yPos;
+
+            //transform sprite with the inverse camera matrix
+            // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
+            // [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
+            // [ planeY   dirY ]                                          [ -planeY  planeX ]
+
+            double invDet = 1.0 / (camera.xPlane * camera.yDir - camera.xDir * camera.yPlane);
+
+            double transformX = invDet * (camera.yDir * spriteX - camera.xDir * spriteY);
+            double transformY = invDet * (-camera.yPlane * spriteX + camera.xPlane * spriteY); //this is actually the depth inside the screen, that what Z is in 3D
+
+            int spriteScreenX = (int)((width / 2) * (1 + transformX / transformY));
+
+            int uDiv = 3;
+            int vDiv = 3;
+            double vMove = 0.0;
+            int vMoveScreen = (int)(vMove / transformY);
 
 
+            //calculate height of the sprite on screen
+            int spriteHeight = Math.abs((int)(height / (transformY))) / vDiv;
 
-            //SPRITE CASTING
+            //calculate lowest and highest pixel to fill in current sprite
+            int drawStartY = -spriteHeight / 2 + height / 2 + vMoveScreen;
+            if(drawStartY < 0 )
+                drawStartY = 0;
 
-            //sort sprites from far to close
-            for(int i = 0; i < numberOfSprites; i++){
-                spriteOrder[i] = i;
-                spriteDistance[i] = ((camera.xPos - sprites.get(i).getXLoc()) * (camera.xPos - sprites.get(i).getXLoc()) +
-                                     (camera.yPos - sprites.get(i).getYLoc()) * (camera.yPos - sprites.get(i).getYLoc()));
-            }
+            int drawEndY = spriteHeight / 2 + height / 2 + vMoveScreen;
+            if(drawEndY >= height)
+                drawEndY = height - 1;
 
-            sortSprites(spriteOrder, spriteDistance, numberOfSprites);
+            //calculate width of the sprite
+            int spriteWidth = Math.abs((int)(height / (transformY))) / uDiv;
 
-            //after sorting the sprites, do the projection and draw them
-            for(int i = 0; i < numberOfSprites; i++){
+            int drawStartX = -spriteWidth / 2 + spriteScreenX;
+            if(drawStartX < 0)
+                drawStartX = 0;
 
-                double spriteX = sprites.get(spriteOrder[i]).getXLoc() - camera.xPos;
-                double spriteY = sprites.get(spriteOrder[i]).getYLoc() - camera.yPos;
+            int drawEndX = spriteWidth / 2 + spriteScreenX;
+            if(drawEndX >= width)
+                drawEndX = width - 1;
 
-                //transform sprite with the inverse camera matrix
-                // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
-                // [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
-                // [ planeY   dirY ]                                          [ -planeY  planeX ]
-
-                double invDet = 1.0 / (camera.xPlane * camera.yDir - camera.xDir * camera.yPlane);
-
-                double transformX = invDet * (camera.yDir * spriteX - camera.xDir * spriteY);
-                double transformY = invDet * (-camera.yPlane * spriteX + camera.xPlane * spriteY); //this is actually the depth inside the screen, that what Z is in 3D
-
-                int spriteScreenX = (int)((width / 2) * (1 + transformX / transformY));
-
-                int uDiv = 3;
-                int vDiv = 3;
-                double vMove = 0.0;
-                int vMoveScreen = (int)(vMove / transformY);
-
-
-                //calculate height of the sprite on screen
-                int spriteHeight = Math.abs((int)(height / (transformY))) / vDiv;
-
-                //calculate lowest and highest pixel to fill in current sprite
-                int drawStartY = -spriteHeight / 2 + height / 2 + vMoveScreen;
-                if(drawStartY < 0 )
-                    drawStartY = 0;
-
-                int drawEndY = spriteHeight / 2 + height / 2 + vMoveScreen;
-                if(drawEndY >= height)
-                    drawEndY = height - 1;
-
-                //calculate width of the sprite
-                int spriteWidth = Math.abs((int)(height / (transformY))) / uDiv;
-
-                int drawStartX = -spriteWidth / 2 + spriteScreenX;
-                if(drawStartX < 0)
-                    drawStartX = 0;
-
-                int drawEndX = spriteWidth / 2 + spriteScreenX;
-                if(drawEndX >= width)
-                    drawEndX = width - 1;
-
-                //loop through every vertical stripe of the sprite on screen
-                for(int stripe = drawStartX; stripe < drawEndX; stripe++){
-                    int spriteTexX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * sprites.get(spriteOrder[i]).getSpriteWidth() / spriteWidth) / 256;
-                    //the conditions in the if are:
-                    //1) it's in front of camera plane so you don't see things behind you
-                    //2) it's on the screen (left)
-                    //3) it's on the screen (right)
-                    //4) ZBuffer, with perpendicular distance
-                    if(transformY > 0 && stripe > 0 && stripe < width && transformY < ZBuffer[stripe]){
-                        for(int y  = drawStartY; y < drawEndY; y++){//for every pixel of the current stripe
-                            int d = (y - vMoveScreen) * 256 - height * 128 + spriteHeight * 128;
-                            int spriteTexY =((d * sprites.get(spriteOrder[i]).getSpriteHeight()) / spriteHeight) / 256;
-                            int color = sprites.get(spriteOrder[i]).pixels[sprites.get(spriteOrder[i]).getSpriteWidth() * spriteTexY + spriteTexX];
-                            if((color & 0x00FFFFFF) != 0)
-                                pixels[stripe + y * (width)] = color;
-                        }
+            //loop through every vertical stripe of the sprite on screen
+            for(int stripe = drawStartX; stripe < drawEndX; stripe++){
+                int spriteTexX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * sprites.get(spriteOrder[i]).getSpriteWidth() / spriteWidth) / 256;
+                //the conditions in the if are:
+                //1) it's in front of camera plane so you don't see things behind you
+                //2) it's on the screen (left)
+                //3) it's on the screen (right)
+                //4) ZBuffer, with perpendicular distance
+                if(transformY > 0 && stripe > 0 && stripe < width && transformY < ZBuffer[stripe]){
+                    for(int y  = drawStartY; y < drawEndY; y++){//for every pixel of the current stripe
+                        int d = (y - vMoveScreen) * 256 - height * 128 + spriteHeight * 128;
+                        int spriteTexY =((d * sprites.get(spriteOrder[i]).getSpriteHeight()) / spriteHeight) / 256;
+                        int color = sprites.get(spriteOrder[i]).pixels[sprites.get(spriteOrder[i]).getSpriteWidth() * spriteTexY + spriteTexX];
+                        if((color & 0x00FFFFFF) != 0)
+                            pixels[stripe + y * (width)] = color;
                     }
                 }
             }

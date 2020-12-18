@@ -67,7 +67,6 @@ public class InventorySlot {
     }
 
 
-    //The x value of the Inventory slot is changed with the code, so that item changes would display correctly
     public static InventorySlot first = new InventorySlot(1, 561, 200, GUIElement.inventorySlot, Item.empty);
     public static InventorySlot second = new InventorySlot(2, 461, 200, GUIElement.inventorySlot, Item.sword);
     public static InventorySlot third = new InventorySlot(3, 361, 200, GUIElement.inventorySlot, Item.gun);

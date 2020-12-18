@@ -24,6 +24,7 @@ public class UserInterface {
 
     private Font font = new Font("Yoster Island", Font.PLAIN ,22);
     private Font inventoryText = new Font("Yoster Island", Font.PLAIN, 60);
+    private Font inventoryMessageText = new Font("Yoster Island", Font.PLAIN, 18);
 
     private Rectangle exitButton;
     private Rectangle saveGameButton;
@@ -74,6 +75,8 @@ public class UserInterface {
         g.drawImage(gui.get(2).getElementImage(), 100, 100, null);
         drawCenteredString(g, "Inventory", 0, 0, Raycasting.WINDOW_WIDTH, 300, inventoryText);
         drawInventorySlots(g, inventorySlots);
+        if(Input.carryMessageAlertOn)
+            drawCenteredString(g, "select item to carry with right-click", 0, 0, Raycasting.WINDOW_WIDTH, 900, inventoryMessageText);
     }
 
     public void drawInventorySlots(Graphics g, ItemLinkedList inventoryList){

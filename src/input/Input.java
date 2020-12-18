@@ -24,10 +24,10 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     public boolean isSprinting = false;
     public boolean isWalking = false;
     public boolean soundAlreadyPlaying = false;
-    public boolean itemCarry = false;
 
     private int carryFromId = 0;
     private int carryToId = 0;
+    public static boolean carryMessageAlertOn = false;
 
     public int mouseX;
     public int mouseY;
@@ -218,27 +218,30 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     }
 
     public void inventoryMovementHandling(ItemLinkedList items){
+        swapItems(items);
+    }
+
+    public void swapItems(ItemLinkedList items){
         if(items.getCurrentItem().getBounds().contains(rightClick)){
+            carryMessageAlertOn = false;
             carryFromId = items.getCurrentItem().getId();
             System.out.println(carryFromId);
             rightClick.setLocation(0, 0);
         }
         if(items.getCurrentItem().getBounds().contains(leftClick)){
-            if(carryFromId == -1)
-                System.out.println("item to carry not selected!");
+            if(carryFromId == 0){
+                leftClick.setLocation(0,0);
+                carryMessageAlertOn = true;
+            }
             else{
                 carryToId = items.getCurrentItem().getId();
                 System.out.println("carry from: " + carryFromId + ", carry to: " + carryToId);
                 items.swapInfo(items.getNodeById(carryFromId), items.getNodeById(carryToId));
                 items.traverseNodes();
                 leftClick.setLocation(0,0);
-                carryFromId = -1; carryToId = -1;
+                carryFromId = 0; carryToId = 0;
             }
         }
-    }
-
-    public void swapItems(){
-
     }
 
     public void mouseWheelHandling(UserInterface userInterface, ItemLinkedList items){
