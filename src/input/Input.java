@@ -8,6 +8,7 @@ import raycasting.Pointer;
 import raycasting.Raycasting;
 import sounds.Sounds;
 import raycasting.UserInterface;
+import sprites.Sprite;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,6 +24,10 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     public boolean isSprinting = false;
     public boolean isWalking = false;
     public boolean soundAlreadyPlaying = false;
+    public boolean itemCarry = false;
+
+    private int carryFromId = 0;
+    private int carryToId = 0;
 
     public int mouseX;
     public int mouseY;
@@ -200,8 +205,8 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     }
 
     public void inventoryScreenHoverHandling(ItemLinkedList items){
-        items.goRight(); //this resets the current list tracking position (i guess? cuz this function doesn't work without this)
         InventorySlot current = items.getCurrentItem();
+        items.goRight(); //this resets the current list tracking position (i guess? cuz this function doesn't work without this)
 
         if(current.getBounds().contains(mouseOver)){
             current.setImage(GUIElement.lighterInventorySlot);
@@ -213,7 +218,19 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     }
 
     public void inventoryMovementHandling(ItemLinkedList items){
-
+        if(items.getCurrentItem().getBounds().contains(rightClick)){
+            carryFromId = items.getCurrentItem().getId();
+            System.out.println(carryFromId);
+            rightClick.setLocation(0, 0);
+        }
+        if(items.getCurrentItem().getBounds().contains(leftClick)){
+            carryToId = items.getCurrentItem().getId();
+            System.out.println(carryToId);
+            items.swapInfo(items.getNodeById(carryFromId), items.getNodeById(carryToId));
+            items.traverseNodes();
+            leftClick.setLocation(0,0);
+            carryFromId = -1; carryToId = -1;
+        }
     }
 
     public void mouseWheelHandling(UserInterface userInterface, ItemLinkedList items){

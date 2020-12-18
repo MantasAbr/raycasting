@@ -78,10 +78,9 @@ public class UserInterface {
 
     public void drawInventorySlots(Graphics g, ItemLinkedList inventoryList){
         for(int i = 0; i < inventoryList.getCount(); i++){
-            InventorySlot current = inventoryList.getCurrentItem();
+            InventorySlot current = inventoryList.traverseInventorySlots();
             g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
             g.drawImage(current.getItem().getSprite().getSpriteImage(), current.getBounds().x + 5, current.getBounds().y + 5, null);
-            inventoryList.goRight();
         }
     }
 

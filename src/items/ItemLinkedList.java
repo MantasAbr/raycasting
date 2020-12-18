@@ -1,5 +1,10 @@
 package items;
 
+import gui.GUIElement;
+import sprites.GameSprite;
+
+import java.util.Comparator;
+
 public class ItemLinkedList {
 
     private Node head;
@@ -72,17 +77,55 @@ public class ItemLinkedList {
         }
     }
 
+    public void deleteNode(Node node){
+        Node currentNode = head;
+
+        if (head != null) {
+            if (currentNode.equals(node)) {
+                head = head.nextNode;
+                tail.nextNode = head;
+            } else {
+                do {
+                    Node nextNode = currentNode.nextNode;
+                    if (nextNode.equals(node)) {
+                        currentNode.nextNode = nextNode.nextNode;
+                        count--;
+                        break;
+                    }
+                    currentNode = currentNode.nextNode;
+                } while (currentNode != head);
+            }
+        }
+    }
+
     public void traverseNodes(){
         Node currentNode = head;
 
         if(head != null){
             do{
                 System.out.print(currentNode.value.getItem().getName() + ", ");
+                System.out.print(currentNode.value.getId() + ", ");
+                System.out.print(currentNode.value.getBounds().x + "-" + currentNode.value.getBounds().y + ", ");
                 currentNode = currentNode.nextNode;
             }
             while(currentNode != head);
         }
         System.out.print("\n");
+    }
+
+    public InventorySlot traverseInventorySlots(){
+        Node currentNode = current;
+
+        if(currentNode == null)
+            currentNode = head;
+
+        if(head != null){
+            InventorySlot itemToReturn = currentNode.value;
+            goRight();
+            return itemToReturn;
+        }
+        else
+            return current.value;
     }
 
     /**
@@ -122,6 +165,22 @@ public class ItemLinkedList {
         return null;
     }
 
+    public Node getNodeById(int id){
+        Node currentNode = head;
+
+        if(head != null){
+            do {
+                if(currentNode.value.getId() == id){
+                    return currentNode;
+                }
+                else
+                    currentNode = currentNode.nextNode;
+            }
+            while(currentNode != head);
+        }
+        return null;
+    }
+
     public void goRight(){
         if(current == null)
             current = head;
@@ -141,7 +200,33 @@ public class ItemLinkedList {
 
     }
 
-    public void insertAtLocation(InventorySlot item, int location){
+    public void sortList(){
+        //Current will point to head
+        Node current = head, index = null;
+        InventorySlot temp;
+        if(head == null) {
+            System.out.println("List is empty");
+        }
+        else {
+            do{
+            //Index will point to node next to current
+                index = current.nextNode;
+                while(index != head) {
+                //If current node is greater than index data, swaps the data
+                    if(current.value.getId() > index.value.getId()) {
+                        temp = current.value;
+                        current.value = index.value;
+                        index.value = temp;
+                    }
+                    index= index.nextNode;
+                }
+                current = current.nextNode;
+            } while(current.nextNode != head);
+        }
+    }
+
+
+    public void addNodeAtLocation(InventorySlot item, int location){
         Node temp;
         Node newNode = new Node(item);
 
@@ -158,6 +243,68 @@ public class ItemLinkedList {
             temp.setNextNode(newNode);
             newNode.setPreviousNode(temp);
             count++;
+        }
+    }
+
+    public void swapInfo(Node a, Node b){
+       InventorySlot tempA = a.value;
+       InventorySlot tempB = b.value;
+
+       deleteNode(a);
+       deleteNode(b);
+
+       int tempX = tempA.getBoundsX();
+       tempA.setBounds(tempB.getBoundsX());
+       tempB.setBounds(tempX);
+
+       addNodeAtLocation(tempA, tempA.getId());
+       addNodeAtLocation(tempB, tempB.getId());
+    }
+
+    public void swapNodes(Node a, Node b){
+        if(a == b)
+            return;
+        if(a.nextNode == b){
+            int tempX = b.value.getBoundsX();
+            a.nextNode = b.nextNode;
+            b.previousNode = a.previousNode;
+
+
+            if (a.nextNode != null)
+                a.nextNode.previousNode = a;
+
+            if (b.previousNode != null)
+                b.previousNode.nextNode = b;
+
+
+
+            b.value.setBounds(a.value.getBounds());
+            b.nextNode = a;
+            a.value.setBounds(tempX);
+            a.previousNode = b;
+        }
+        else{
+            Node p = b.previousNode;
+            Node n = b.nextNode;
+            int tempX = b.value.getBoundsX();
+
+            b.previousNode = a.previousNode;
+            b.nextNode = a.nextNode;
+            b.value.setBounds(a.value.getBoundsX());
+
+            a.previousNode = p;
+            a.nextNode = n;
+            a.value.setBounds(tempX);
+
+            if (b.nextNode != null)
+                b.nextNode.previousNode = b;
+            if (b.previousNode != null)
+                b.previousNode.nextNode = b;
+
+            if (a.nextNode != null)
+                a.nextNode.previousNode = a;
+            if (a.previousNode != null)
+                a.previousNode.nextNode = a;
         }
     }
 
@@ -203,4 +350,5 @@ class Node {
     static Node getNode(){
         return new Node();
     }
+
 }

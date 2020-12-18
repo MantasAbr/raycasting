@@ -15,6 +15,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
+import java.util.Collections;
 import javax.swing.JFrame;
 
 /**
@@ -272,6 +273,7 @@ public class Raycasting extends JFrame implements Runnable{
         }
         if(gameIsInInventory){
             input.inventoryScreenHoverHandling(inventoryItems);
+            input.inventoryMovementHandling(inventoryItems);
         }
     }
 
