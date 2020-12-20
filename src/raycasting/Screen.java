@@ -2,6 +2,7 @@ package raycasting;
 import sprites.GameSprite;
 import sprites.Sprite;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.awt.Color;
 import java.util.Collections;
@@ -16,7 +17,7 @@ public class Screen {
     public int[][] doorMap;
     public int mapWidth, mapHeight, width, height;
     public ArrayList<Texture> textures;
-    public ArrayList<GameSprite> sprites;
+    public ArrayList<ArrayList<GameSprite>> allLevelSprites;
     public double distanceToWall;
     public int lookingAtTextureId;
     public int lookingAtMeshId;
@@ -26,7 +27,7 @@ public class Screen {
     public double pitch = 0;
     public double posZ = 0;
 
-    public int ceilingColor;
+    private final int textureSize = 64;
 
     private int ceilingTexture = 2;
     private int floorTexture = 0;
@@ -39,13 +40,14 @@ public class Screen {
     private int spriteOrder[];
     private double spriteDistance[];
     
-    public Screen(int[][] map, int[][] doorMap, int mapWidth, int mapHeight, ArrayList<Texture> textures, ArrayList<GameSprite> sprites, int width, int height, int renderDistance){
+    public Screen(int[][] map, int[][] doorMap, int mapWidth, int mapHeight, ArrayList<Texture> textures,
+                  ArrayList<ArrayList<GameSprite>> allLevelSprites, int currentLevel, int width, int height, int renderDistance){
         this.map = map;
         this.doorMap = doorMap;
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
         this.textures = textures;
-        this.sprites = sprites;
+        this.allLevelSprites = allLevelSprites;
         this.width = width;
         this.height = height;
         this.renderDistance = renderDistance;
@@ -54,7 +56,7 @@ public class Screen {
         floorBuffer = new double[width * height];
 
         ZBuffer = new double[width];
-        numberOfSprites = sprites.size();
+        numberOfSprites = allLevelSprites.get(currentLevel).size();
         spriteOrder = new int[numberOfSprites];
         spriteDistance = new double[numberOfSprites];
     }
@@ -66,101 +68,13 @@ public class Screen {
     public void setDoorMap(int[][] newMap){
         this.doorMap = newMap;
     }
-    
-    /**
-     * The update method recalculates how the screen should look to the user 
-     * based on their position in the map. 
-     * The method is called constantly, and returns the updated array of pixels 
-     * to the Raycasting class. The method begins by "clearing" the screen.
-     * @param camera
-     * @param pixels
-     * @return 
-     */
-    public int[] update(Camera camera, int[] pixels){
-        
-        int textureSize = textures.get(0).SIZE;
 
-        //FLOOR CASTING
-        for(int y = 0; y < height; y++)
-        {
-            // whether this section is floor or ceiling
-            boolean isFloor = y > height / 2 + pitch;
-
-            // rayDir for leftmost ray (x = 0) and rightmost ray (x = w)
-            float rayDirX0 = (float)(camera.xDir - camera.xPlane);
-            float rayDirY0 = (float)(camera.yDir - camera.yPlane);
-            float rayDirX1 = (float)(camera.xDir + camera.xPlane);
-            float rayDirY1 = (float)(camera.yDir + camera.yPlane);
-
-            // Current y position compared to the center of the screen (the horizon)
-            int p = isFloor ? (int)(y - height / 2 - pitch) : (int)(height / 2 - y + pitch);
-
-            // Vertical position of the camera.
-            // NOTE: with 0.5, it's exactly in the center between floor and ceiling,
-            // matching also how the walls are being raycasted. For different values
-            // than 0.5, a separate loop must be done for ceiling and floor since
-            // they're no longer symmetrical.
-            float camZ = isFloor ? (float)(0.5 * height + posZ) : (float)(0.5 * height - posZ);
-
-            // Horizontal distance from the camera to the floor for the current row.
-            // 0.5 is the z position exactly in the middle between floor and ceiling.
-            // NOTE: this is affine texture mapping, which is not perspective correct
-            // except for perfectly horizontal and vertical surfaces like the floor.
-            // NOTE: this formula is explained as follows: The camera ray goes through
-            // the following two points: the camera itself, which is at a certain
-            // height (posZ), and a point in front of the camera (through an imagined
-            // vertical plane containing the screen pixels) with horizontal distance
-            // 1 from the camera, and vertical position p lower than posZ (posZ - p). When going
-            // through that point, the line has vertically traveled by p units and
-            // horizontally by 1 unit. To hit the floor, it instead needs to travel by
-            // posZ units. It will travel the same ratio horizontally. The ratio was
-            // 1 / p for going through the camera plane, so to go posZ times farther
-            // to reach the floor, we get that the total horizontal distance is posZ / p.
-            float rowDistance = camZ / p;
-
-            // calculate the real world step vector we have to add for each x (parallel to camera plane)
-            // adding step by step avoids multiplications with a weight in the inner loop
-            float floorStepX = rowDistance * (rayDirX1 - rayDirX0) / width;
-            float floorStepY = rowDistance * (rayDirY1 - rayDirY0) / width;
-
-            // real world coordinates of the leftmost column. This will be updated as we step to the right.
-            float floorX = (float)(camera.xPos + rowDistance * rayDirX0);
-            float floorY = (float)(camera.yPos + rowDistance * rayDirY0);
-
-            for(int x = 0; x < width; ++x)
-            {
-                // the cell coord is simply got from the integer parts of floorX and floorY
-                int cellX = (int)(floorX);
-                int cellY = (int)(floorY);
-
-                // get the texture coordinate from the fractional part
-                int tx = (int)(textureSize * (floorX - cellX)) & (textureSize - 1);
-                int ty = (int)(textureSize * (floorY - cellY)) & (textureSize - 1);
-
-                floorX += floorStepX;
-                floorY += floorStepY;
-
-                int color;
-
-                // ceiling
-                if(isFloor){
-                    color = textures.get(ceilingTexture).pixels[textureSize * ty + tx];
-                }
-                else{
-                    color = textures.get(floorTexture).pixels[textureSize * ty + tx];
-                }
-
-                color = (color >> 1) & 8355711;
+    public void setNumberOfSprites(int currentLevel){
+        numberOfSprites = allLevelSprites.get(currentLevel).size();
+    }
 
 
-                    color = setPixelColorForFloorRenderLimiter(color, rowDistance);
-
-                    pixels[y * width + x] = color;
-
-            }
-        }
-
-        
+    public int[] updateWalls(Camera camera, int[] pixels){
         for(int x = 0; x < width; x++){            
             /**
              * All that happens here is some variables that will be used by
@@ -318,23 +232,109 @@ public class Screen {
         return pixels;
     }
 
-    public int[] updateSprites(Camera camera, int[] pixels){
+    public int[] updateFloorAndCeiling(Camera camera, int[] pixels){
+        //FLOOR CASTING
+        for(int y = 0; y < height; y++)
+        {
+            // whether this section is floor or ceiling
+            boolean isFloor = y > height / 2 + pitch;
+
+            // rayDir for leftmost ray (x = 0) and rightmost ray (x = w)
+            float rayDirX0 = (float)(camera.xDir - camera.xPlane);
+            float rayDirY0 = (float)(camera.yDir - camera.yPlane);
+            float rayDirX1 = (float)(camera.xDir + camera.xPlane);
+            float rayDirY1 = (float)(camera.yDir + camera.yPlane);
+
+            // Current y position compared to the center of the screen (the horizon)
+            int p = isFloor ? (int)(y - height / 2 - pitch) : (int)(height / 2 - y + pitch);
+
+            // Vertical position of the camera.
+            // NOTE: with 0.5, it's exactly in the center between floor and ceiling,
+            // matching also how the walls are being raycasted. For different values
+            // than 0.5, a separate loop must be done for ceiling and floor since
+            // they're no longer symmetrical.
+            float camZ = isFloor ? (float)(0.5 * height + posZ) : (float)(0.5 * height - posZ);
+
+            // Horizontal distance from the camera to the floor for the current row.
+            // 0.5 is the z position exactly in the middle between floor and ceiling.
+            // NOTE: this is affine texture mapping, which is not perspective correct
+            // except for perfectly horizontal and vertical surfaces like the floor.
+            // NOTE: this formula is explained as follows: The camera ray goes through
+            // the following two points: the camera itself, which is at a certain
+            // height (posZ), and a point in front of the camera (through an imagined
+            // vertical plane containing the screen pixels) with horizontal distance
+            // 1 from the camera, and vertical position p lower than posZ (posZ - p). When going
+            // through that point, the line has vertically traveled by p units and
+            // horizontally by 1 unit. To hit the floor, it instead needs to travel by
+            // posZ units. It will travel the same ratio horizontally. The ratio was
+            // 1 / p for going through the camera plane, so to go posZ times farther
+            // to reach the floor, we get that the total horizontal distance is posZ / p.
+            float rowDistance = camZ / p;
+
+            // calculate the real world step vector we have to add for each x (parallel to camera plane)
+            // adding step by step avoids multiplications with a weight in the inner loop
+            float floorStepX = rowDistance * (rayDirX1 - rayDirX0) / width;
+            float floorStepY = rowDistance * (rayDirY1 - rayDirY0) / width;
+
+            // real world coordinates of the leftmost column. This will be updated as we step to the right.
+            float floorX = (float)(camera.xPos + rowDistance * rayDirX0);
+            float floorY = (float)(camera.yPos + rowDistance * rayDirY0);
+
+            for(int x = 0; x < width; ++x)
+            {
+                // the cell coord is simply got from the integer parts of floorX and floorY
+                int cellX = (int)(floorX);
+                int cellY = (int)(floorY);
+
+                // get the texture coordinate from the fractional part
+                int tx = (int)(textureSize * (floorX - cellX)) & (textureSize - 1);
+                int ty = (int)(textureSize * (floorY - cellY)) & (textureSize - 1);
+
+                floorX += floorStepX;
+                floorY += floorStepY;
+
+                int color;
+
+                // ceiling
+                if(isFloor){
+                    color = textures.get(ceilingTexture).pixels[textureSize * ty + tx];
+                }
+                else{
+                    color = textures.get(floorTexture).pixels[textureSize * ty + tx];
+                }
+
+                color = (color >> 1) & 8355711;
+
+
+                color = setPixelColorForFloorRenderLimiter(color, rowDistance);
+
+                pixels[y * width + x] = color;
+
+            }
+        }
+        return pixels;
+    }
+
+    public int[] updateSprites(Camera camera, int[] pixels, int currentLevel){
         //SPRITE CASTING
+
+        setNumberOfSprites(currentLevel);
+        ArrayList<GameSprite> currentLevelSprites = allLevelSprites.get(currentLevel);
 
         //sort sprites from far to close
         for(int i = 0; i < numberOfSprites; i++){
             spriteOrder[i] = i;
-            spriteDistance[i] = ((camera.xPos - sprites.get(i).getXLoc()) * (camera.xPos - sprites.get(i).getXLoc()) +
-                    (camera.yPos - sprites.get(i).getYLoc()) * (camera.yPos - sprites.get(i).getYLoc()));
+            spriteDistance[i] = ((camera.xPos - currentLevelSprites.get(i).getXLoc()) * (camera.xPos - currentLevelSprites.get(i).getXLoc()) +
+                    (camera.yPos - currentLevelSprites.get(i).getYLoc()) * (camera.yPos - currentLevelSprites.get(i).getYLoc()));
         }
 
-        sortSprites(spriteOrder, spriteDistance, numberOfSprites);
+        sortSprites(spriteOrder, spriteDistance, numberOfSprites, currentLevelSprites);
 
         //after sorting the sprites, do the projection and draw them
         for(int i = 0; i < numberOfSprites; i++){
 
-            double spriteX = sprites.get(spriteOrder[i]).getXLoc() - camera.xPos;
-            double spriteY = sprites.get(spriteOrder[i]).getYLoc() - camera.yPos;
+            double spriteX = currentLevelSprites.get(spriteOrder[i]).getXLoc() - camera.xPos;
+            double spriteY = currentLevelSprites.get(spriteOrder[i]).getYLoc() - camera.yPos;
 
             //transform sprite with the inverse camera matrix
             // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
@@ -350,8 +350,8 @@ public class Screen {
 
             int uDiv = 3;
             int vDiv = 3;
-            double vMove = 0.0;
-            int vMoveScreen = (int)(vMove / transformY);
+            double vMove = currentLevelSprites.get(i).getZPos();
+            int vMoveScreen = (int)((vMove / transformY) + pitch + posZ / transformY);
 
 
             //calculate height of the sprite on screen
@@ -379,7 +379,7 @@ public class Screen {
 
             //loop through every vertical stripe of the sprite on screen
             for(int stripe = drawStartX; stripe < drawEndX; stripe++){
-                int spriteTexX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * sprites.get(spriteOrder[i]).getSpriteWidth() / spriteWidth) / 256;
+                int spriteTexX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * currentLevelSprites.get(spriteOrder[i]).getSpriteWidth() / spriteWidth) / 256;
                 //the conditions in the if are:
                 //1) it's in front of camera plane so you don't see things behind you
                 //2) it's on the screen (left)
@@ -388,8 +388,8 @@ public class Screen {
                 if(transformY > 0 && stripe > 0 && stripe < width && transformY < ZBuffer[stripe]){
                     for(int y  = drawStartY; y < drawEndY; y++){//for every pixel of the current stripe
                         int d = (y - vMoveScreen) * 256 - height * 128 + spriteHeight * 128;
-                        int spriteTexY =((d * sprites.get(spriteOrder[i]).getSpriteHeight()) / spriteHeight) / 256;
-                        int color = sprites.get(spriteOrder[i]).pixels[sprites.get(spriteOrder[i]).getSpriteWidth() * spriteTexY + spriteTexX];
+                        int spriteTexY =((d * currentLevelSprites.get(spriteOrder[i]).getSpriteHeight()) / spriteHeight) / 256;
+                        int color = currentLevelSprites.get(spriteOrder[i]).pixels[currentLevelSprites.get(spriteOrder[i]).getSpriteWidth() * spriteTexY + spriteTexX];
                         if((color & 0x00FFFFFF) != 0)
                             pixels[stripe + y * (width)] = color;
                     }
@@ -399,7 +399,7 @@ public class Screen {
         return pixels;
     }
 
-    private void sortSprites(int[] order, double[] dist, int amount){
+    private void sortSprites(int[] order, double[] dist, int amount, ArrayList<GameSprite> sprites){
         for(int i = 0; i < amount; i++){
             sprites.get(i).setDistance(dist[i]);
             sprites.get(i).setOrder(order[i]);

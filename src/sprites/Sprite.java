@@ -58,11 +58,11 @@ public class Sprite{
 
     public BufferedImage getSpriteImage(){return spriteImage;}
 
-    public static Sprite menuCursor = new Sprite("src/sprites/menu_cursor.png");
-    public static Sprite blankCursor = new Sprite("src/sprites/blank_cursor.png");
+    public static Sprite menuCursor = new Sprite("src/sprites/img/menu_cursor.png");
+    public static Sprite blankCursor = new Sprite("src/sprites/img/blank_cursor.png");
 
 
-    public static Sprite swordSprite = new Sprite("src/sprites/sword.png");
-    public static Sprite pistolSprite = new Sprite("src/sprites/pistol.png");
+    public static Sprite swordSprite = new Sprite("src/sprites/img/sword.png");
+    public static Sprite pistolSprite = new Sprite("src/sprites/img/pistol.png");
     public static Sprite blankItem = new Sprite();
 }

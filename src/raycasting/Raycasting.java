@@ -44,7 +44,7 @@ public class Raycasting extends JFrame implements Runnable{
     
     //ArrayList for objects
     public ArrayList<Texture> textures;
-    public ArrayList<GameSprite> sprites;
+    public ArrayList<ArrayList<GameSprite>> allLevelSprites;
     public ArrayList<Sounds> sounds;
     public ArrayList<Level> levels;
     public ArrayList<LevelDoorMesh> doorMeshes;
@@ -87,7 +87,7 @@ public class Raycasting extends JFrame implements Runnable{
         player = new Player(100, 100, .8);
         screen = new Screen(levels.get(CURRENT_LEVEL).getMap(), doorMeshes.get(CURRENT_LEVEL).getMap(),
                             levels.get(CURRENT_LEVEL).getMapWidth(), levels.get(CURRENT_LEVEL).getMapHeight(),
-                            textures, sprites, WINDOW_WIDTH, WINDOW_HEIGHT, RENDER_DISTANCE);
+                            textures, allLevelSprites, CURRENT_LEVEL, WINDOW_WIDTH, WINDOW_HEIGHT, RENDER_DISTANCE);
 
         camera = new Camera(levels.get(CURRENT_LEVEL).getPlayerLocX(), levels.get(CURRENT_LEVEL).getPlayerLocY(),
                             FIELD_OF_VIEW, 0, 0, .66, sounds, this, screen, input);
@@ -112,9 +112,15 @@ public class Raycasting extends JFrame implements Runnable{
     }
 
     private void spriteInit(){
-        sprites = new ArrayList<GameSprite>();
-        sprites.add(GameSprite.lamp);
-        //sprites.add(GameSprite.redlamp);
+        GameSprite.firstLevelSprites.add(GameSprite.ceilingLampGreen);
+        GameSprite.secondLevelSprites.add(GameSprite.ceilingLampBlack);
+        GameSprite.thirdLevelSprites.add(GameSprite.ceilingLampGreen);
+
+        allLevelSprites = new ArrayList<>();
+        allLevelSprites.add(GameSprite.firstLevelSprites);
+        allLevelSprites.add(GameSprite.secondLevelSprites);
+        allLevelSprites.add(GameSprite.thirdLevelSprites);
+
     }
     
     private void audioInit(){
@@ -233,6 +239,8 @@ public class Raycasting extends JFrame implements Runnable{
 
         userInterface.drawInterface(g, true);
 
+        g.dispose();
+
         bs.show();
     }
     
@@ -298,8 +306,9 @@ public class Raycasting extends JFrame implements Runnable{
                 tick();
                 delta -= 1;
                 shouldRender = true;
-                screen.update(camera, pixels);
-                screen.updateSprites(camera, pixels);
+                screen.updateFloorAndCeiling(camera, pixels);
+                screen.updateWalls(camera, pixels);
+                screen.updateSprites(camera, pixels, CURRENT_LEVEL);
                 camera.update(levels.get(CURRENT_LEVEL).getMap());
                 if(input.exit.isPressed())
                     stop();
@@ -307,7 +316,7 @@ public class Raycasting extends JFrame implements Runnable{
                                 
             try {
                 //can increase the sleep rate to lower the fps and processing power
-                Thread.sleep(8);
+                Thread.sleep(7);
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
