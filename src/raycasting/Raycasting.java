@@ -113,6 +113,10 @@ public class Raycasting extends JFrame implements Runnable{
 
     private void spriteInit(){
         GameSprite.firstLevelSprites.add(GameSprite.ceilingLampGreen);
+//        GameSprite.firstLevelSprites.add(GameSprite.boxFirst);
+//        GameSprite.firstLevelSprites.add(GameSprite.boxSecond);
+//        GameSprite.firstLevelSprites.add(GameSprite.boxThird);
+//        GameSprite.firstLevelSprites.add(GameSprite.boxFourth);
         GameSprite.secondLevelSprites.add(GameSprite.ceilingLampBlack);
         GameSprite.thirdLevelSprites.add(GameSprite.ceilingLampGreen);
 
@@ -255,6 +259,7 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
         g.drawString("Current level: " + CURRENT_LEVEL, 10, 150);
         g.drawString("Pitch: " + screen.pitch + ", posZ: " + screen.posZ, 10, 170);
+        g.drawString("" + Math.atan2((camera.xPos) - (GameSprite.ceilingLampGreen.getXLoc()),((camera.yPos) - (GameSprite.ceilingLampGreen.getYLoc()))),10, 190);
     }
 
     public void drawLoadScreen(Graphics g){

@@ -58,6 +58,12 @@ public class GameSprite extends Sprite{
     public static GameSprite ceilingLampGreen = new GameSprite(9, 7, -128,"src/sprites/img/ceiling_lamp.png");
     public static GameSprite ceilingLampBlack = new GameSprite(8, 6, -128, "src/sprites/img/ceiling_lamp_black.png");
 
+    public static GameSprite boxDefault = new GameSprite(3,3, 128, "src/sprites/img/box_dir/box_dir_1.png");
+    public static GameSprite boxSecond = new GameSprite(3,3, 128, "src/sprites/img/box_dir/box_dir_2.png");
+    public static GameSprite boxThird = new GameSprite(3,3, 128, "src/sprites/img/box_dir/box_dir_3.png");
+    public static GameSprite boxFourth = new GameSprite(3,3, 128, "src/sprites/img/box_dir/box_dir_4.png");
+    public static ArrayList<GameSprite> box = new ArrayList<>();
+
     public static ArrayList<GameSprite> firstLevelSprites = new ArrayList<>();
     public static ArrayList<GameSprite> secondLevelSprites = new ArrayList<>();
     public static ArrayList<GameSprite> thirdLevelSprites = new ArrayList<>();

@@ -222,7 +222,7 @@ public class Screen {
 
                 wallBuffer[x + y*(width)] = perpWallDist;
 
-                color = setPixelColorForWallRenderLimiter(color, perpWallDist);
+                color = setPixelColorForRenderLimiter(color, perpWallDist, true);
                 pixels[x + y*(width)] = color;
             }
 
@@ -306,7 +306,7 @@ public class Screen {
                 color = (color >> 1) & 8355711;
 
 
-                color = setPixelColorForFloorRenderLimiter(color, rowDistance);
+                color = setPixelColorForRenderLimiter(color, rowDistance, false);
 
                 pixels[y * width + x] = color;
 
@@ -333,8 +333,11 @@ public class Screen {
         //after sorting the sprites, do the projection and draw them
         for(int i = 0; i < numberOfSprites; i++){
 
+
             double spriteX = currentLevelSprites.get(spriteOrder[i]).getXLoc() - camera.xPos;
             double spriteY = currentLevelSprites.get(spriteOrder[i]).getYLoc() - camera.yPos;
+
+            double angle = Math.atan2((camera.xPos - spriteX), (camera.xPos - spriteY));
 
             //transform sprite with the inverse camera matrix
             // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
@@ -390,6 +393,7 @@ public class Screen {
                         int d = (y - vMoveScreen) * 256 - height * 128 + spriteHeight * 128;
                         int spriteTexY =((d * currentLevelSprites.get(spriteOrder[i]).getSpriteHeight()) / spriteHeight) / 256;
                         int color = currentLevelSprites.get(spriteOrder[i]).pixels[currentLevelSprites.get(spriteOrder[i]).getSpriteWidth() * spriteTexY + spriteTexX];
+                        color = setPixelColorForRenderLimiter(color, transformY, false);
                         if((color & 0x00FFFFFF) != 0)
                             pixels[stripe + y * (width)] = color;
                     }
@@ -411,12 +415,16 @@ public class Screen {
         }
     }
 
-    private int setPixelColorForWallRenderLimiter(int color, double distance){
+    private int setPixelColorForRenderLimiter(int color, double distance, boolean isWall){
 
         int r = (color >> 16) & 0xff;
         int g = (color >> 8) & 0xff;
         int b = (color) & 0xff;
 
+        if(!isWall){
+            if(distance > 10)
+                distance = 10;
+        }
 
         if(distance > Raycasting.RENDER_DISTANCE){
             for(int i = 0; i < (int)distance - Raycasting.RENDER_DISTANCE; i++){
@@ -429,26 +437,4 @@ public class Screen {
         color = r << 16 | g << 8 | b;
         return color;
     }
-
-    private int setPixelColorForFloorRenderLimiter(int color, double distance){
-        int r = (color >> 16) & 0xff;
-        int g = (color >> 8) & 0xff;
-        int b = (color) & 0xff;
-
-        //Making a check so that distance wouldn't equal infinity, because rowDistance could get that value
-        if(distance > 10)
-            distance = 10;
-
-        if(distance > Raycasting.RENDER_DISTANCE) {
-            for (int i = 0; i < (int) distance - Raycasting.RENDER_DISTANCE; i++) {
-                r = r >>> i;
-                g = g >>> i;
-                b = b >>> i;
-            }
-        }
-
-        color = r << 16 | g << 8 | b;
-        return color;
-    }
-
 }
