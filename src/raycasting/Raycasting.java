@@ -64,6 +64,8 @@ public class Raycasting extends JFrame implements Runnable{
     //used for showing the ticks and frames each second on the screen
     private int finalTicks = 0;
     private int finalFrames = 0;
+
+    private long tickSum = 0;
     
     public Raycasting(){
         thread = new Thread(this);
@@ -113,10 +115,7 @@ public class Raycasting extends JFrame implements Runnable{
 
     private void spriteInit(){
         GameSprite.firstLevelSprites.add(GameSprite.ceilingLampGreen);
-//        GameSprite.firstLevelSprites.add(GameSprite.boxFirst);
-//        GameSprite.firstLevelSprites.add(GameSprite.boxSecond);
-//        GameSprite.firstLevelSprites.add(GameSprite.boxThird);
-//        GameSprite.firstLevelSprites.add(GameSprite.boxFourth);
+        GameSprite.firstLevelSprites.add(GameSprite.revolverAmmo);
         GameSprite.secondLevelSprites.add(GameSprite.ceilingLampBlack);
         GameSprite.thirdLevelSprites.add(GameSprite.ceilingLampGreen);
 
@@ -124,7 +123,6 @@ public class Raycasting extends JFrame implements Runnable{
         allLevelSprites.add(GameSprite.firstLevelSprites);
         allLevelSprites.add(GameSprite.secondLevelSprites);
         allLevelSprites.add(GameSprite.thirdLevelSprites);
-
     }
     
     private void audioInit(){
@@ -259,7 +257,8 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
         g.drawString("Current level: " + CURRENT_LEVEL, 10, 150);
         g.drawString("Pitch: " + screen.pitch + ", posZ: " + screen.posZ, 10, 170);
-        g.drawString("" + Math.atan2((camera.xPos) - (GameSprite.ceilingLampGreen.getXLoc()),((camera.yPos) - (GameSprite.ceilingLampGreen.getYLoc()))),10, 190);
+        g.drawString("" + allLevelSprites.get(CURRENT_LEVEL).get(0).getDistance(), 10, 190);
+        //g.drawString("" + Math.atan2((camera.xPos) - (GameSprite.ceilingLampGreen.getXLoc()),((camera.yPos) - (GameSprite.ceilingLampGreen.getYLoc()))),10, 190);
     }
 
     public void drawLoadScreen(Graphics g){
@@ -308,6 +307,7 @@ public class Raycasting extends JFrame implements Runnable{
                 
             while(delta >= 1){
                 ticks++;
+                tickSum++;
                 tick();
                 delta -= 1;
                 shouldRender = true;

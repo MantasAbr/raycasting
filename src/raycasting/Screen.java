@@ -333,11 +333,14 @@ public class Screen {
         //after sorting the sprites, do the projection and draw them
         for(int i = 0; i < numberOfSprites; i++){
 
+            GameSprite currRenderSprite = currentLevelSprites.get(spriteOrder[i]);
 
-            double spriteX = currentLevelSprites.get(spriteOrder[i]).getXLoc() - camera.xPos;
-            double spriteY = currentLevelSprites.get(spriteOrder[i]).getYLoc() - camera.yPos;
+            double spriteX = currRenderSprite.getXLoc() - camera.xPos;
+            double spriteY = currRenderSprite.getYLoc() - camera.yPos;
 
             double angle = Math.atan2((camera.xPos - spriteX), (camera.xPos - spriteY));
+            currRenderSprite.setAngle(angle);
+
 
             //transform sprite with the inverse camera matrix
             // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
@@ -353,7 +356,7 @@ public class Screen {
 
             int uDiv = 3;
             int vDiv = 3;
-            double vMove = currentLevelSprites.get(i).getZPos();
+            double vMove = currRenderSprite.getZPos();
             int vMoveScreen = (int)((vMove / transformY) + pitch + posZ / transformY);
 
 
@@ -382,7 +385,7 @@ public class Screen {
 
             //loop through every vertical stripe of the sprite on screen
             for(int stripe = drawStartX; stripe < drawEndX; stripe++){
-                int spriteTexX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * currentLevelSprites.get(spriteOrder[i]).getSpriteWidth() / spriteWidth) / 256;
+                int spriteTexX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * currRenderSprite.getSpriteWidth() / spriteWidth) / 256;
                 //the conditions in the if are:
                 //1) it's in front of camera plane so you don't see things behind you
                 //2) it's on the screen (left)
@@ -391,8 +394,8 @@ public class Screen {
                 if(transformY > 0 && stripe > 0 && stripe < width && transformY < ZBuffer[stripe]){
                     for(int y  = drawStartY; y < drawEndY; y++){//for every pixel of the current stripe
                         int d = (y - vMoveScreen) * 256 - height * 128 + spriteHeight * 128;
-                        int spriteTexY =((d * currentLevelSprites.get(spriteOrder[i]).getSpriteHeight()) / spriteHeight) / 256;
-                        int color = currentLevelSprites.get(spriteOrder[i]).pixels[currentLevelSprites.get(spriteOrder[i]).getSpriteWidth() * spriteTexY + spriteTexX];
+                        int spriteTexY =((d * currRenderSprite.getSpriteHeight()) / spriteHeight) / 256;
+                        int color = currRenderSprite.pixels[currentLevelSprites.get(spriteOrder[i]).getSpriteWidth() * spriteTexY + spriteTexX];
                         color = setPixelColorForRenderLimiter(color, transformY, false);
                         if((color & 0x00FFFFFF) != 0)
                             pixels[stripe + y * (width)] = color;
