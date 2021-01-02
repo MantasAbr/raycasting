@@ -338,8 +338,19 @@ public class Screen {
             double spriteX = currRenderSprite.getXLoc() - camera.xPos;
             double spriteY = currRenderSprite.getYLoc() - camera.yPos;
 
-            double angle = Math.atan2((camera.xPos - spriteX), (camera.xPos - spriteY));
+            //calculate the difference between player and object position
+            double dx = (camera.xPos - currRenderSprite.getXLoc());
+            double dy = -(camera.yPos - currRenderSprite.getYLoc());
+
+            //get the angle in radians and convert to 0-360 degrees
+            double angle = Math.atan2(dx, dy);
+            angle = Math.toDegrees(angle) + 180;
+
             currRenderSprite.setAngle(angle);
+
+            if(currRenderSprite.isMultiSided()){
+                currRenderSprite.setSpriteAccordingToAngle();
+            }
 
 
             //transform sprite with the inverse camera matrix

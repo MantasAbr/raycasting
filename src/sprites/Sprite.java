@@ -11,24 +11,46 @@ import java.io.IOException;
  */
 public class Sprite{
 
+
+    protected String fileLocation;
+    protected BufferedImage[] spriteImageSides = new BufferedImage[4];
+    protected int spriteWidth;
+    protected int spriteHeight;
+
     public int[] pixels;
-    private String fileLocation;
-    private BufferedImage spriteImage;
-    private int spriteWidth;
-    private int spriteHeight;
+    protected BufferedImage spriteImage;
 
     public Sprite(String location){
         this.fileLocation = location;
-        load();
+        load(fileLocation);
     }
 
-    public Sprite(){
-
+    public Sprite(String first, String second, String third, String fourth){
+        loadSides(first, second, third, fourth);
     }
 
-    private void load(){
+    public Sprite(){}
+
+    private void loadSides(String first, String second, String third, String fourth){
         try {
-            spriteImage = ImageIO.read(new File(fileLocation));
+            spriteImage = ImageIO.read(new File(first));
+            spriteImageSides[0] = ImageIO.read(new File(first));
+            spriteImageSides[1] = ImageIO.read(new File(second));
+            spriteImageSides[2] = ImageIO.read(new File(third));
+            spriteImageSides[3] = ImageIO.read(new File(fourth));
+            spriteWidth = spriteImageSides[0].getWidth();
+            spriteHeight = spriteImageSides[0].getHeight();
+            pixels = new int[spriteWidth * spriteHeight];
+            spriteImage.getRGB(0, 0, spriteWidth, spriteHeight, pixels, 0, spriteWidth);
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    private void load(String location){
+        try {
+            spriteImage = ImageIO.read(new File(location));
             spriteWidth = spriteImage.getWidth();
             spriteHeight = spriteImage.getHeight();
             pixels = new int[spriteWidth * spriteHeight];
@@ -57,6 +79,8 @@ public class Sprite{
     public int getSpriteHeight(){return spriteHeight;}
 
     public BufferedImage getSpriteImage(){return spriteImage;}
+
+    public BufferedImage getSpriteImageSide(int side){return spriteImageSides[side];}
 
     public static Sprite menuCursor = new Sprite("src/sprites/img/menu_cursor.png");
     public static Sprite blankCursor = new Sprite("src/sprites/img/blank_cursor.png");
