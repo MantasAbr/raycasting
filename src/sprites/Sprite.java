@@ -13,7 +13,7 @@ public class Sprite{
 
 
     protected String fileLocation;
-    protected BufferedImage[] spriteImageSides = new BufferedImage[4];
+    protected BufferedImage[] spriteImageSides = new BufferedImage[12];
     protected int spriteWidth;
     protected int spriteHeight;
 
@@ -25,19 +25,32 @@ public class Sprite{
         load(fileLocation);
     }
 
-    public Sprite(String first, String second, String third, String fourth){
-        loadSides(first, second, third, fourth);
-    }
-
     public Sprite(){}
 
-    private void loadSides(String first, String second, String third, String fourth){
+    public Sprite(boolean isMultiSided, String folderLocation){
+
+        File folder = new File(folderLocation);
+
+        if(!isMultiSided){
+            this.fileLocation = folderLocation;
+            load(fileLocation);
+        }
+        else{
+            String[] namesOfSpriteSides = folder.list();
+            File[] files = folder.listFiles();
+            for(int i = 0; i < files.length; i++){
+                namesOfSpriteSides[i] = files[i].getAbsolutePath();
+            }
+            loadSides(namesOfSpriteSides);
+        }
+    }
+
+    private void loadSides(String[] sides){
         try {
-            spriteImage = ImageIO.read(new File(first));
-            spriteImageSides[0] = ImageIO.read(new File(first));
-            spriteImageSides[1] = ImageIO.read(new File(second));
-            spriteImageSides[2] = ImageIO.read(new File(third));
-            spriteImageSides[3] = ImageIO.read(new File(fourth));
+            spriteImage = ImageIO.read(new File(sides[0]));
+            for(int i = 0; i < sides.length; i++){
+                spriteImageSides[i] = ImageIO.read(new File(sides[i]));
+            }
             spriteWidth = spriteImageSides[0].getWidth();
             spriteHeight = spriteImageSides[0].getHeight();
             pixels = new int[spriteWidth * spriteHeight];

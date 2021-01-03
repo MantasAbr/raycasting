@@ -5,11 +5,10 @@ import gui.GUIElement;
 import items.InventorySlot;
 import items.ItemLinkedList;
 import input.Input;
-import launcher.Launcher;
 import levels.Level;
 import levels.LevelDoorMesh;
 import sounds.Sounds;
-import sprites.GameSprite;
+import sprites.Entity;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -45,7 +44,7 @@ public class Raycasting extends JFrame implements Runnable{
     
     //ArrayList for objects
     public ArrayList<Texture> textures;
-    public ArrayList<ArrayList<GameSprite>> allLevelSprites;
+    public ArrayList<ArrayList<Entity>> allLevelEntities;
     public ArrayList<Sounds> sounds;
     public ArrayList<Level> levels;
     public ArrayList<LevelDoorMesh> doorMeshes;
@@ -90,7 +89,7 @@ public class Raycasting extends JFrame implements Runnable{
         player = new Player(100, 100, .8);
         screen = new Screen(levels.get(CURRENT_LEVEL).getMap(), doorMeshes.get(CURRENT_LEVEL).getMap(),
                             levels.get(CURRENT_LEVEL).getMapWidth(), levels.get(CURRENT_LEVEL).getMapHeight(),
-                            textures, allLevelSprites, CURRENT_LEVEL, WINDOW_WIDTH, WINDOW_HEIGHT, RENDER_DISTANCE);
+                            textures, allLevelEntities, CURRENT_LEVEL, WINDOW_WIDTH, WINDOW_HEIGHT, RENDER_DISTANCE);
 
         camera = new Camera(levels.get(CURRENT_LEVEL).getPlayerLocX(), levels.get(CURRENT_LEVEL).getPlayerLocY(),
                             FIELD_OF_VIEW, 0, 0, .66, sounds, this, screen, input);
@@ -115,16 +114,17 @@ public class Raycasting extends JFrame implements Runnable{
     }
 
     private void spriteInit(){
-        //GameSprite.firstLevelSprites.add(GameSprite.ceilingLampGreen);
-        //GameSprite.firstLevelSprites.add(GameSprite.revolverAmmo);
-        GameSprite.firstLevelSprites.add(GameSprite.box);
-        GameSprite.secondLevelSprites.add(GameSprite.ceilingLampBlack);
-        GameSprite.thirdLevelSprites.add(GameSprite.ceilingLampGreen);
+        Entity.firstLevelEntities.add(Entity.ceilingLampGreen);
+        //Entity.firstLevelEntities.add(Entity.revolverAmmo);
+        Entity.firstLevelEntities.add(Entity.box);
+        //Entity.firstLevelEntities.add(Entity.joke);
+        Entity.secondLevelEntities.add(Entity.ceilingLampBlack);
+        Entity.thirdLevelEntities.add(Entity.ceilingLampGreen);
 
-        allLevelSprites = new ArrayList<>();
-        allLevelSprites.add(GameSprite.firstLevelSprites);
-        allLevelSprites.add(GameSprite.secondLevelSprites);
-        allLevelSprites.add(GameSprite.thirdLevelSprites);
+        allLevelEntities = new ArrayList<>();
+        allLevelEntities.add(Entity.firstLevelEntities);
+        allLevelEntities.add(Entity.secondLevelEntities);
+        allLevelEntities.add(Entity.thirdLevelEntities);
     }
     
     private void audioInit(){
@@ -259,8 +259,7 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
         g.drawString("Current level: " + CURRENT_LEVEL, 10, 150);
         g.drawString("Pitch: " + screen.pitch + ", posZ: " + screen.posZ, 10, 170);
-        //g.drawString("" + Math.atan2((camera.xPos) - (GameSprite.box.getXLoc()),((camera.yPos) - (GameSprite.box.getYLoc()))),10, 190);
-        g.drawString("" + GameSprite.box.getAngle(), 10, 190);
+        g.drawString("" + Entity.box.getAngle(), 10, 190);
     }
 
     public void drawLoadScreen(Graphics g){

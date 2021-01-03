@@ -1,10 +1,5 @@
 package items;
 
-import gui.GUIElement;
-import sprites.GameSprite;
-
-import java.util.Comparator;
-
 public class ItemLinkedList {
 
     private Node head;

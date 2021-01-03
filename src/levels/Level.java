@@ -1,6 +1,6 @@
 package levels;
 
-import sprites.GameSprite;
+import sprites.Entity;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,9 +15,9 @@ public class Level {
     private double playerLocY;
     private int[][] map;
     private String location;
-    private ArrayList<GameSprite> sprites;
+    private ArrayList<Entity> sprites;
 
-    public Level(double playerX, double playerY, String location, ArrayList<GameSprite> sprites) {
+    public Level(double playerX, double playerY, String location, ArrayList<Entity> sprites) {
         this.playerLocX = playerX;
         this.playerLocY = playerY;
         this.location = location;
@@ -77,9 +77,9 @@ public class Level {
         this.playerLocY = location;
     }
 
-    public static Level firstLevel = new Level(1.5, 1.5, "src/levels/source/01.txt", GameSprite.firstLevelSprites);
-    public static Level secondLevel = new Level(2, 4.5, "src/levels/source/02.txt", GameSprite.secondLevelSprites);
-    public static Level thirdLevel = new Level(8.5, 1.5, "src/levels/source/03.txt", GameSprite.firstLevelSprites);
+    public static Level firstLevel = new Level(1.5, 1.5, "src/levels/source/01.txt", Entity.firstLevelEntities);
+    public static Level secondLevel = new Level(2, 4.5, "src/levels/source/02.txt", Entity.secondLevelEntities);
+    public static Level thirdLevel = new Level(8.5, 1.5, "src/levels/source/03.txt", Entity.firstLevelEntities);
 
 
 }

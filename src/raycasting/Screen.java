@@ -1,10 +1,7 @@
 package raycasting;
-import sprites.GameSprite;
-import sprites.Sprite;
+import sprites.Entity;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.awt.Color;
 import java.util.Collections;
 
 /**
@@ -17,7 +14,7 @@ public class Screen {
     public int[][] doorMap;
     public int mapWidth, mapHeight, width, height;
     public ArrayList<Texture> textures;
-    public ArrayList<ArrayList<GameSprite>> allLevelSprites;
+    public ArrayList<ArrayList<Entity>> allLevelSprites;
     public double distanceToWall;
     public int lookingAtTextureId;
     public int lookingAtMeshId;
@@ -41,7 +38,7 @@ public class Screen {
     private double spriteDistance[];
     
     public Screen(int[][] map, int[][] doorMap, int mapWidth, int mapHeight, ArrayList<Texture> textures,
-                  ArrayList<ArrayList<GameSprite>> allLevelSprites, int currentLevel, int width, int height, int renderDistance){
+                  ArrayList<ArrayList<Entity>> allLevelSprites, int currentLevel, int width, int height, int renderDistance){
         this.map = map;
         this.doorMap = doorMap;
         this.mapWidth = mapWidth;
@@ -319,7 +316,7 @@ public class Screen {
         //SPRITE CASTING
 
         setNumberOfSprites(currentLevel);
-        ArrayList<GameSprite> currentLevelSprites = allLevelSprites.get(currentLevel);
+        ArrayList<Entity> currentLevelSprites = allLevelSprites.get(currentLevel);
 
         //sort sprites from far to close
         for(int i = 0; i < numberOfSprites; i++){
@@ -333,7 +330,7 @@ public class Screen {
         //after sorting the sprites, do the projection and draw them
         for(int i = 0; i < numberOfSprites; i++){
 
-            GameSprite currRenderSprite = currentLevelSprites.get(spriteOrder[i]);
+            Entity currRenderSprite = currentLevelSprites.get(spriteOrder[i]);
 
             double spriteX = currRenderSprite.getXLoc() - camera.xPos;
             double spriteY = currRenderSprite.getYLoc() - camera.yPos;
@@ -417,12 +414,12 @@ public class Screen {
         return pixels;
     }
 
-    private void sortSprites(int[] order, double[] dist, int amount, ArrayList<GameSprite> sprites){
+    private void sortSprites(int[] order, double[] dist, int amount, ArrayList<Entity> sprites){
         for(int i = 0; i < amount; i++){
             sprites.get(i).setDistance(dist[i]);
             sprites.get(i).setOrder(order[i]);
         }
-        Collections.sort(sprites, GameSprite.renderOrder);
+        Collections.sort(sprites, Entity.renderOrder);
         for(int i = 0; i < amount; i++){
             dist[i] = sprites.get(amount - i - 1 ).getDistance();
             order[i] = sprites.get(amount - i - 1).getOrder();
