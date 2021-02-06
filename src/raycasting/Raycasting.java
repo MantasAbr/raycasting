@@ -117,7 +117,8 @@ public class Raycasting extends JFrame implements Runnable{
         Entity.firstLevelEntities.add(Entity.ceilingLampGreen);
         //Entity.firstLevelEntities.add(Entity.revolverAmmo);
         Entity.firstLevelEntities.add(Entity.box);
-        //Entity.firstLevelEntities.add(Entity.joke);
+        Entity.firstLevelEntities.add(Entity.joke);
+        Entity.firstLevelEntities.add(Entity.table);
         Entity.secondLevelEntities.add(Entity.ceilingLampBlack);
         Entity.thirdLevelEntities.add(Entity.ceilingLampGreen);
 
@@ -189,6 +190,8 @@ public class Raycasting extends JFrame implements Runnable{
         setIconImage(textures.get(1).getTexImage());
         setBackground(Color.black);
         setLocationRelativeTo(null);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(true);
         setVisible(true);
     }
     
@@ -214,7 +217,8 @@ public class Raycasting extends JFrame implements Runnable{
             return;
         }
         Graphics g = bs.getDrawGraphics();
-        g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
+        image.getScaledInstance(SCREEN_WIDTH, SCREEN_HEIGHT, java.awt.Image.SCALE_SMOOTH);
+        g.drawImage(image, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
 
 
         if(Input.debug.isPressed()){
@@ -259,7 +263,6 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
         g.drawString("Current level: " + CURRENT_LEVEL, 10, 150);
         g.drawString("Pitch: " + screen.pitch + ", posZ: " + screen.posZ, 10, 170);
-        g.drawString("" + Entity.box.getAngle(), 10, 190);
     }
 
     public void drawLoadScreen(Graphics g){

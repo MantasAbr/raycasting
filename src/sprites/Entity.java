@@ -90,6 +90,7 @@ public class Entity extends Sprite{
     public static Entity revolverAmmo = new Entity(3,3, 128,false,"src/sprites/img/357_bullets.png");
     public static Entity joke = new Entity(4,4, 128,false,"src/sprites/img/joke.png");
     public static Entity box = new Entity(5, 5, 128, true, "src/sprites/img/box_dir/");
+    public static Entity table = new Entity(6, 5, 128, true, "src/sprites/img/table_dir/");
 
     public static ArrayList<Entity> firstLevelEntities = new ArrayList<>();
     public static ArrayList<Entity> secondLevelEntities = new ArrayList<>();
