@@ -110,7 +110,7 @@ public class Camera{
                 resetPerspective();
 
 
-            if (input.turningRight || input.right.isPressed()) {
+            if (input.turningRight) {
                 double oldxDir = xDir;
                 xDir = xDir * Math.cos(-ROTATION_SPEED) - yDir * Math.sin(-ROTATION_SPEED);
                 yDir = oldxDir * Math.sin(-ROTATION_SPEED) + yDir * Math.cos(-ROTATION_SPEED);
@@ -118,13 +118,31 @@ public class Camera{
                 xPlane = xPlane * Math.cos(-ROTATION_SPEED) - yPlane * Math.sin(-ROTATION_SPEED);
                 yPlane = oldxPlane * Math.sin(-ROTATION_SPEED) + yPlane * Math.cos(-ROTATION_SPEED);
             }
-            if (input.turningLeft || input.left.isPressed()) {
+            if(Input.right.isPressed()){
+                if (map[(int) (xPos + xPlane * MOVE_SPEED)][(int) yPos] == 0) {
+                    xPos += xPlane * MOVE_SPEED;
+                }
+                if (map[(int) xPos][(int) (yPos + yPlane * MOVE_SPEED)] == 0)
+                    yPos += yPlane * MOVE_SPEED;
+
+                viewBobbing(2, -20, 20);
+            }
+            if (input.turningLeft) {
                 double oldxDir = xDir;
                 xDir = xDir * Math.cos(ROTATION_SPEED) - yDir * Math.sin(ROTATION_SPEED);
                 yDir = oldxDir * Math.sin(ROTATION_SPEED) + yDir * Math.cos(ROTATION_SPEED);
                 double oldxPlane = xPlane;
                 xPlane = xPlane * Math.cos(ROTATION_SPEED) - yPlane * Math.sin(ROTATION_SPEED);
                 yPlane = oldxPlane * Math.sin(ROTATION_SPEED) + yPlane * Math.cos(ROTATION_SPEED);
+            }
+
+            if(Input.left.isPressed()){
+                if (map[(int) (xPos - xPlane * MOVE_SPEED)][(int) yPos] == 0)
+                    xPos -= xPlane * MOVE_SPEED;
+                if (map[(int) xPos][(int) (yPos - yPlane * MOVE_SPEED)] == 0)
+                    yPos -= yPlane * MOVE_SPEED;
+
+                viewBobbing(2, -20, 20);
             }
 
             //If the player looks up, increase the pitch until a threshold
