@@ -1,5 +1,7 @@
 package gui;
 
+import raycasting.Raycasting;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -43,9 +45,9 @@ public class GUIElement {
     public static GUIElement inventorySlot = new GUIElement("src/gui/inventory_slot.png");
     public static GUIElement lighterInventorySlot = new GUIElement("src/gui/inventory_slot_lighter.png");
 
-    public static CustomButton saveGameButton = new CustomButton(320, 160, 40, "Save game", StyleColors.white);
-    public static CustomButton loadGameButton = new CustomButton(320, 235, 40, "Load game", StyleColors.white);
-    public static CustomButton exitGameButton = new CustomButton(325, 400, 40, "Exit game", StyleColors.black);
+    public static CustomButton saveGameButton = new CustomButton(Raycasting.SCREEN_WIDTH / 2, 160 + Raycasting.SCREEN_HEIGHT / 4, 40, "Save game", StyleColors.white);
+    public static CustomButton loadGameButton = new CustomButton(Raycasting.SCREEN_WIDTH / 2, 235 + Raycasting.SCREEN_HEIGHT / 4, 40, "Load game", StyleColors.white);
+    public static CustomButton exitGameButton = new CustomButton(Raycasting.SCREEN_WIDTH / 2, 400 + Raycasting.SCREEN_HEIGHT / 4, 40, "Exit game", StyleColors.black);
 
     public BufferedImage getElementImage() {
         return elementImage;
@@ -79,7 +81,16 @@ public class GUIElement {
         this.elementHeight = elementHeight;
     }
 
+    public int getElementXCenter(){
+        return (int)elementWidth / 2;
+    }
+
+    public int getElementYCenter(){
+        return (int)elementHeight / 2;
+    }
+
     public long getElapsedTime() {
         return elapsedTime;
     }
+
 }

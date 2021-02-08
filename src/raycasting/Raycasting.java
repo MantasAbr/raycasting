@@ -23,8 +23,8 @@ import javax.swing.JFrame;
  */
 public class Raycasting extends JFrame implements Runnable{
     private static final long serialVersionUID = 1L;
-    public static int WINDOW_WIDTH = 800;
-    public static int WINDOW_HEIGHT = 600;
+    public static int IMAGE_WIDTH = 800;
+    public static int IMAGE_HEIGHT = 450;
     public static int SCREEN_WIDTH;
     public static int SCREEN_HEIGHT;
     public static final double MOUSE_SENSITIVITY = 150.5;
@@ -69,7 +69,7 @@ public class Raycasting extends JFrame implements Runnable{
     
     public Raycasting(){
         thread = new Thread(this);
-        image = new BufferedImage(WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
+        image = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 
         audioInit();
@@ -89,7 +89,7 @@ public class Raycasting extends JFrame implements Runnable{
         player = new Player(100, 100, .8);
         screen = new Screen(levels.get(CURRENT_LEVEL).getMap(), doorMeshes.get(CURRENT_LEVEL).getMap(),
                             levels.get(CURRENT_LEVEL).getMapWidth(), levels.get(CURRENT_LEVEL).getMapHeight(),
-                            textures, allLevelEntities, CURRENT_LEVEL, WINDOW_WIDTH, WINDOW_HEIGHT, RENDER_DISTANCE);
+                            textures, allLevelEntities, CURRENT_LEVEL, IMAGE_WIDTH, IMAGE_HEIGHT, RENDER_DISTANCE);
 
         camera = new Camera(levels.get(CURRENT_LEVEL).getPlayerLocX(), levels.get(CURRENT_LEVEL).getPlayerLocY(),
                             FIELD_OF_VIEW, 0, 0, .66, sounds, this, screen, input);
@@ -183,7 +183,7 @@ public class Raycasting extends JFrame implements Runnable{
     }
     
     private void jFrameInit(){
-        setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        setSize(IMAGE_WIDTH, IMAGE_HEIGHT);
         setResizable(false);
         setTitle("Puzzled v0.1");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -213,7 +213,7 @@ public class Raycasting extends JFrame implements Runnable{
     public void render() {
         BufferStrategy bs = getBufferStrategy();
         if(bs == null){
-            createBufferStrategy(3);
+            createBufferStrategy(4);
             return;
         }
         Graphics g = bs.getDrawGraphics();
@@ -267,11 +267,13 @@ public class Raycasting extends JFrame implements Runnable{
 
     public void drawLoadScreen(Graphics g){
         g.setColor(Color.black);
-        g.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        g.fillRect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
     }
     
     public void tick(){
         if(!(gameIsInInventory || gameIsInOptions)){
+            input.resetMousePointerForPlay();
+            actions.resetPlayerFacingPosition();
             actions.GetNextBlock();
             actions.CheckForActions();
             actions.ApplyBlockChanges(levels.get(CURRENT_LEVEL).getMap());
@@ -282,10 +284,14 @@ public class Raycasting extends JFrame implements Runnable{
             player.ApplyUpdates(input);
         }
         if(gameIsInOptions){
+            input.setMousePointerFlag();
+            actions.setPlayerFacingPosition();
             input.optionsScreenClickHandling(userInterface);
             input.optionsScreenHoverHandling(userInterface);
         }
         if(gameIsInInventory){
+            input.setMousePointerFlag();
+            actions.setPlayerFacingPosition();
             input.inventoryScreenHoverHandling(inventoryItems);
             input.inventoryMovementHandling(inventoryItems);
         }

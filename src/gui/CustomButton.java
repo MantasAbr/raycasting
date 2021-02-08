@@ -7,6 +7,7 @@ public class CustomButton{
     private int x;
     private int y;
     private int height;
+    private double width;
     private String text;
     private Color textColor;
 
@@ -40,6 +41,12 @@ public class CustomButton{
 
     public void setHeight(int height) {
         this.height = height;
+    }
+
+    public double getWidth(){return width;}
+
+    public void setWidth(double width){
+        this.width = width;
     }
 
     public String getText() {

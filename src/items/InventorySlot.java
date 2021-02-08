@@ -1,6 +1,7 @@
 package items;
 
 import gui.GUIElement;
+import raycasting.Raycasting;
 
 import java.awt.*;
 
@@ -66,11 +67,16 @@ public class InventorySlot {
         this.id = id;
     }
 
+    // Because the inventory has an uneven number of slots, and we want them to snap horizontally in the middle
+    // of the screen, we can simply draw the middle one in the center of the screen, and then reference its location for
+    // the other slots
+    public static InventorySlot third = new InventorySlot(3, Raycasting.SCREEN_WIDTH / 2 - GUIElement.inventorySlot.getElementXCenter(),
+                                                          Raycasting.SCREEN_HEIGHT / 2 - GUIElement.inventorySlot.getElementYCenter(),
+                                                             GUIElement.inventorySlot, Item.gun);
 
-    public static InventorySlot first = new InventorySlot(1, 561, 200, GUIElement.inventorySlot, Item.empty);
-    public static InventorySlot second = new InventorySlot(2, 461, 200, GUIElement.inventorySlot, Item.sword);
-    public static InventorySlot third = new InventorySlot(3, 361, 200, GUIElement.inventorySlot, Item.gun);
-    public static InventorySlot fourth = new InventorySlot(4, 261, 200, GUIElement.inventorySlot, Item.empty);
-    public static InventorySlot fifth = new InventorySlot(5, 161, 200, GUIElement.inventorySlot, Item.empty);
+    public static InventorySlot first = new InventorySlot(1, third.getBoundsX() + 200, Raycasting.SCREEN_HEIGHT / 2 - GUIElement.inventorySlot.getElementYCenter(), GUIElement.inventorySlot, Item.empty);
+    public static InventorySlot second = new InventorySlot(2, third.getBoundsX() + 100, Raycasting.SCREEN_HEIGHT / 2 - GUIElement.inventorySlot.getElementYCenter(), GUIElement.inventorySlot, Item.sword);
+    public static InventorySlot fourth = new InventorySlot(4, third.getBoundsX() - 100, Raycasting.SCREEN_HEIGHT / 2 - GUIElement.inventorySlot.getElementYCenter(), GUIElement.inventorySlot, Item.empty);
+    public static InventorySlot fifth = new InventorySlot(5, third.getBoundsX() - 200, Raycasting.SCREEN_HEIGHT / 2 - GUIElement.inventorySlot.getElementYCenter(), GUIElement.inventorySlot, Item.empty);
 
 }

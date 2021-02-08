@@ -18,8 +18,8 @@ public class UserInterface {
     private ItemLinkedList inventorySlots;
     public static ArrayList<CustomButton> buttons;
 
-    private Point SprintBarPoint = new Point(140, Raycasting.WINDOW_HEIGHT - 50);
-    private Point HealthBarPoint = new Point(140, Raycasting.WINDOW_HEIGHT - 100);
+    private Point SprintBarPoint = new Point(140, Raycasting.SCREEN_HEIGHT - 50);
+    private Point HealthBarPoint = new Point(140, Raycasting.SCREEN_HEIGHT - 100);
     private int barHeight = 20;
 
     private Font font = new Font("Yoster Island", Font.PLAIN ,22);
@@ -64,19 +64,29 @@ public class UserInterface {
     }
 
     public void drawOptionsScreen(Graphics g){
-        g.drawImage(gui.get(0).getElementImage(), 250, 100, null);
 
-        saveGameButton = drawButton(g, buttons.get(0).getX(), buttons.get(0).getY(), buttons.get(0).getHeight(), buttons.get(0).getText(), font, buttons.get(0).getTextColor());
-        loadGameButton = drawButton(g, buttons.get(1).getX(), buttons.get(1).getY(), buttons.get(1).getHeight(), buttons.get(1).getText(), font, buttons.get(1).getTextColor());
-        exitButton = drawButton(g, buttons.get(2).getX(), buttons.get(2).getY(), buttons.get(2).getHeight(), buttons.get(2).getText(), font, buttons.get(2).getTextColor());
+        g.drawImage(gui.get(0).getElementImage(), (Raycasting.SCREEN_WIDTH / 2) - (gui.get(0).getElementWidth() / 2),
+                (Raycasting.SCREEN_HEIGHT / 2) - (gui.get(0).getElementHeight() / 2), null);
+
+        saveGameButton = drawButton(g, buttons.get(0).getX(), buttons.get(0).getY(),
+                                    buttons.get(0).getHeight(), buttons.get(0).getText(), font, buttons.get(0).getTextColor());
+
+        loadGameButton = drawButton(g, buttons.get(1).getX(), buttons.get(1).getY(),
+                                    buttons.get(1).getHeight(), buttons.get(1).getText(), font, buttons.get(1).getTextColor());
+
+        exitButton = drawButton(g, buttons.get(2).getX(), buttons.get(2).getY(),
+                                    buttons.get(2).getHeight(), buttons.get(2).getText(), font, buttons.get(2).getTextColor());
     }
 
     public void drawInventoryScreen(Graphics g){
-        g.drawImage(gui.get(2).getElementImage(), 100, 100, null);
-        drawCenteredString(g, "Inventory", 0, 0, Raycasting.WINDOW_WIDTH, 300, inventoryText);
+        g.drawImage(gui.get(2).getElementImage(), (Raycasting.SCREEN_WIDTH / 2) - (gui.get(2).getElementWidth() / 2),
+                (Raycasting.SCREEN_HEIGHT / 2) - (gui.get(2).getElementHeight() / 2), null);
+        drawCenteredString(g, "Inventory", 0, 0, Raycasting.SCREEN_WIDTH, 500 + Raycasting.SCREEN_HEIGHT / 4, inventoryText);
         drawInventorySlots(g, inventorySlots);
+
         if(Input.carryMessageAlertOn)
-            drawCenteredString(g, "select item to carry with right-click", 0, 0, Raycasting.WINDOW_WIDTH, 900, inventoryMessageText);
+            drawCenteredString(g, "select item to carry with right-click", 0, 0,
+                               Raycasting.SCREEN_WIDTH, 1100 + Raycasting.SCREEN_HEIGHT / 4, inventoryMessageText);
     }
 
     public void drawInventorySlots(Graphics g, ItemLinkedList inventoryList){
@@ -96,11 +106,14 @@ public class UserInterface {
         Rectangle2D bounds = fm.getStringBounds(text, g);
         int offset = 30;
 
-        g.drawImage(gui.get(1).getElementImage().getScaledInstance((int) bounds.getWidth() + offset, height, 1), x, y, null);
-        Rectangle button = new Rectangle(x, y, (int) bounds.getWidth() + offset, height);
+        int centeredX = (int)(x - ((bounds.getWidth() + offset) / 2));
+        int centeredY = (int)(y - (height / 2));
 
-        int stringX = x + (int)(offset / 2);
-        int stringY = y + (int)((height / 2) + (int)(bounds.getHeight() / 3));
+        Rectangle button = new Rectangle(centeredX, centeredY, (int) bounds.getWidth() + offset, height);
+        g.drawImage(gui.get(1).getElementImage().getScaledInstance((int) bounds.getWidth() + offset, height, 1), centeredX, centeredY, null);
+
+        int stringX = centeredX + (int)(offset / 2);
+        int stringY = centeredY + (int)((height / 2) + (int)(bounds.getHeight() / 3));
         g.drawString(text, stringX, stringY);
 
         return button;

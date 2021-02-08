@@ -8,7 +8,6 @@ import raycasting.Pointer;
 import raycasting.Raycasting;
 import sounds.Sounds;
 import raycasting.UserInterface;
-import sprites.Sprite;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,6 +34,8 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     public Point leftClick = new Point();
     public Point rightClick = new Point();
     public Point mouseOver = new Point();
+    public Point mousePositionDuringPlaying = new Point();
+    private boolean isMousePositionReset = false;
     public int mouseScrollValues;
 
     public int oldX, newX = 0;
@@ -141,11 +142,13 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
 
         if(newX <= 10 || newY <= 10)
             pointer.robot.mouseMove(Raycasting.SCREEN_WIDTH / 2, Raycasting.SCREEN_HEIGHT / 2);
-        if(newX >= Raycasting.WINDOW_WIDTH - 10 || newY >= Raycasting.WINDOW_HEIGHT - 10)
+        if(newX >= Raycasting.SCREEN_WIDTH - 10 || newY >= Raycasting.SCREEN_HEIGHT - 10)
             pointer.robot.mouseMove(Raycasting.SCREEN_WIDTH / 2, Raycasting.SCREEN_HEIGHT / 2);
 
         newX = mouseX;
         newY = mouseY;
+
+        mousePositionDuringPlaying.setLocation(newX, newY);
 
         rotationValue = (Math.abs(newX - oldX) / sensitivity);
 
@@ -160,6 +163,17 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
 
         oldX = newX;
         oldY = newY;
+    }
+
+    public void resetMousePointerForPlay(){
+        if(!isMousePositionReset){
+            pointer.robot.mouseMove(mousePositionDuringPlaying.x, mousePositionDuringPlaying.y);
+            isMousePositionReset = true;
+        }
+    }
+
+    public void setMousePointerFlag(){
+        isMousePositionReset = false;
     }
 
     private void playSound(boolean isToggled, int soundID){
