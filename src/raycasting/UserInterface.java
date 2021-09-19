@@ -18,13 +18,15 @@ public class UserInterface {
     private ItemLinkedList inventorySlots;
     public static ArrayList<CustomButton> buttons;
 
-    private Point SprintBarPoint = new Point(140, Raycasting.SCREEN_HEIGHT - 50);
-    private Point HealthBarPoint = new Point(140, Raycasting.SCREEN_HEIGHT - 100);
-    private int barHeight = 20;
+    private final Point sprintBarPoint = new Point(140, Raycasting.SCREEN_HEIGHT - 50);
+    private final Point healthBarPoint = new Point(140, Raycasting.SCREEN_HEIGHT - 100);
+    private final int barHeight = 20;
+    private final Point selectedItemPoint = new Point ((int)(Raycasting.SCREEN_WIDTH - Raycasting.SCREEN_WIDTH * 0.05), Raycasting.SCREEN_HEIGHT - 100);
 
-    private Font font = new Font("Yoster Island", Font.PLAIN ,22);
-    private Font inventoryText = new Font("Yoster Island", Font.PLAIN, 60);
-    private Font inventoryMessageText = new Font("Yoster Island", Font.PLAIN, 18);
+
+    private final Font font = new Font("Yoster Island", Font.PLAIN ,22);
+    private final Font inventoryText = new Font("Yoster Island", Font.PLAIN, 60);
+    private final Font inventoryMessageText = new Font("Yoster Island", Font.PLAIN, 18);
 
     private Rectangle exitButton;
     private Rectangle saveGameButton;
@@ -37,11 +39,13 @@ public class UserInterface {
         this.inventorySlots = inventorySlots;
     }
 
+    // In-game GUI elements
     public void drawInterface(Graphics g, boolean shouldDraw){
         if(shouldDraw){
             g.setFont(font);
             drawSprintInfo(g, player);
             drawHealthInfo(g, player);
+            drawSelectedItem(g, inventorySlots);
         }
         else
             g.dispose();
@@ -49,20 +53,25 @@ public class UserInterface {
 
     private void drawHealthInfo(Graphics g, Player player){
         g.setColor(Color.WHITE);
-        g.drawString("Health", HealthBarPoint.x - 110, (int)(HealthBarPoint.y + barHeight - 1));
+        g.drawString("Health", healthBarPoint.x - 110, (int)(healthBarPoint.y + barHeight - 1));
         g.setColor(Color.RED);
-        g.fillRect(HealthBarPoint.x, HealthBarPoint.y, (int)(player.getHealthValue() * 1.5), barHeight);
-        g.drawImage(gui.get(3).getElementImage(), HealthBarPoint.x - 3, HealthBarPoint.y - 3, null);
+        g.fillRect(healthBarPoint.x, healthBarPoint.y, (int)(player.getHealthValue() * 1.5), barHeight);
+        g.drawImage(gui.get(3).getElementImage(), healthBarPoint.x - 3, healthBarPoint.y - 3, null);
     }
 
     private void drawSprintInfo(Graphics g, Player player){
         g.setColor(Color.WHITE);
-        g.drawString("Sprint", SprintBarPoint.x - 110, (int)(SprintBarPoint.y + barHeight - 1));
+        g.drawString("Sprint", sprintBarPoint.x - 110, (int)(sprintBarPoint.y + barHeight - 1));
         g.setColor(Color.BLUE);
-        g.fillRect(SprintBarPoint.x, SprintBarPoint.y, (int)(player.getSprintValue() * 1.5), barHeight);
-        g.drawImage(gui.get(3).getElementImage(), SprintBarPoint.x - 3, SprintBarPoint.y - 3, null);
+        g.fillRect(sprintBarPoint.x, sprintBarPoint.y, (int)(player.getSprintValue() * 1.5), barHeight);
+        g.drawImage(gui.get(3).getElementImage(), sprintBarPoint.x - 3, sprintBarPoint.y - 3, null);
     }
 
+    private void drawSelectedItem(Graphics g, ItemLinkedList items){
+        g.drawImage(items.getCurrentItem().getItem().getSprite().getSpriteImage(), selectedItemPoint.x, selectedItemPoint.y, null);
+    }
+
+    // Options screen GUI elements
     public void drawOptionsScreen(Graphics g){
 
         g.drawImage(gui.get(0).getElementImage(), (Raycasting.SCREEN_WIDTH / 2) - (gui.get(0).getElementWidth() / 2),
@@ -78,6 +87,7 @@ public class UserInterface {
                                     buttons.get(2).getHeight(), buttons.get(2).getText(), font, buttons.get(2).getTextColor());
     }
 
+    // Inventory screen GUI elements
     public void drawInventoryScreen(Graphics g){
         g.drawImage(gui.get(2).getElementImage(), (Raycasting.SCREEN_WIDTH / 2) - (gui.get(2).getElementWidth() / 2),
                 (Raycasting.SCREEN_HEIGHT / 2) - (gui.get(2).getElementHeight() / 2), null);
@@ -97,6 +107,8 @@ public class UserInterface {
         }
     }
 
+
+    // Utility functions
     private Rectangle drawButton(Graphics g, int x, int y, int height, String text, Font font, Color fontColor){
 
         g.setColor(fontColor);

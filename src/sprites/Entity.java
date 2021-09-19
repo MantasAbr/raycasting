@@ -1,5 +1,7 @@
 package sprites;
 
+import raycasting.Camera;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -15,20 +17,24 @@ public class Entity extends Sprite{
     private double distance = 0;
     private int order = 0;
 
-    public Entity(double xPos, double yPos, double zPos, String fileLocation) {
+    private boolean isHostile;
+
+    public Entity(double xPos, double yPos, double zPos, String fileLocation, boolean isHostile) {
         super(fileLocation);
         isMultiSided = false;
         this.xPos = xPos;
         this.yPos = yPos;
         this.zPos = zPos;
+        this.isHostile = isHostile;
     }
 
-    public Entity(double xPos, double yPos, double zPos, boolean isMultiSided, String folderLocation) {
+    public Entity(double xPos, double yPos, double zPos, boolean isMultiSided, String folderLocation, boolean isHostile) {
         super(isMultiSided, folderLocation);
         this.isMultiSided = isMultiSided;
         this.xPos = xPos;
         this.yPos = yPos;
         this.zPos = zPos;
+        this.isHostile = isHostile;
     }
 
     public static Comparator<Entity> renderOrder = new Comparator<Entity>() {
@@ -71,6 +77,13 @@ public class Entity extends Sprite{
         return isMultiSided;
     }
 
+    public boolean isHostile() { return isHostile; }
+
+
+    public void setXLoc(double newXPos){ xPos = newXPos;}
+
+    public void setYLoc(double newYPos){ yPos = newYPos;}
+
     public void setDistance(double newDistance){
         distance = newDistance;
     }
@@ -85,12 +98,20 @@ public class Entity extends Sprite{
         isMultiSided = multiSided;
     }
 
-    public static Entity ceilingLampGreen = new Entity(9, 7, -128, false,"src/sprites/img/ceiling_lamp.png");
-    public static Entity ceilingLampBlack = new Entity(8, 6, -128, false,"src/sprites/img/ceiling_lamp_black.png");
-    public static Entity revolverAmmo = new Entity(3,3, 128,false,"src/sprites/img/357_bullets.png");
-    public static Entity joke = new Entity(4,4, 128,false,"src/sprites/img/joke.png");
-    public static Entity box = new Entity(5, 5, 128, true, "src/sprites/img/box_dir/");
-    public static Entity table = new Entity(6, 5, 128, true, "src/sprites/img/table_dir/");
+    public void setHostile(boolean hostile) { isHostile = hostile; }
+
+    public static Entity ceilingLampGreen1 = new Entity(9, 7, -128, false,"src/sprites/img/ceiling_lamp.png", false);
+    public static Entity ceilingLampGreen2 = new Entity(2, 7, -128, false,"src/sprites/img/ceiling_lamp.png", false);
+    public static Entity ceilingLampGreen3 = new Entity(9, 2, -128, false,"src/sprites/img/ceiling_lamp.png", false);
+    public static Entity ceilingLampGreen4 = new Entity(2, 2, -128, false,"src/sprites/img/ceiling_lamp.png", false);
+    public static Entity ceilingLampGreen5 = new Entity(9, 4.5, -128, false,"src/sprites/img/ceiling_lamp.png", false);
+    public static Entity ceilingLampGreen6 = new Entity(2, 4.5, -128, false,"src/sprites/img/ceiling_lamp.png", false);
+    public static Entity joke = new Entity(4,4, 0,false,"src/sprites/img/joke.png", true);
+
+    //public static Entity ceilingLampBlack = new Entity(8, 6, -128, false,"src/sprites/img/ceiling_lamp_black.png");
+    //public static Entity revolverAmmo = new Entity(3,3, 128,false,"src/sprites/img/357_bullets.png");
+    //public static Entity box = new Entity(5, 5, 128, true, "src/sprites/img/box_dir/");
+    //public static Entity table = new Entity(6, 5, 128, true, "src/sprites/img/table_dir/");
 
     public static ArrayList<Entity> firstLevelEntities = new ArrayList<>();
     public static ArrayList<Entity> secondLevelEntities = new ArrayList<>();

@@ -5,6 +5,7 @@ import gui.GUIElement;
 import items.InventorySlot;
 import items.ItemLinkedList;
 import input.Input;
+import launcher.Launcher;
 import levels.Level;
 import levels.LevelDoorMesh;
 import sounds.Sounds;
@@ -29,7 +30,7 @@ public class Raycasting extends JFrame implements Runnable{
     public static int SCREEN_HEIGHT;
     public static final double MOUSE_SENSITIVITY = 150.5;
     public static int CURRENT_LEVEL;
-    public static int RENDER_DISTANCE = 3;
+    public static int RENDER_DISTANCE = 5;
     public static double FIELD_OF_VIEW = -1;
 
     //Used for the run() method
@@ -55,6 +56,7 @@ public class Raycasting extends JFrame implements Runnable{
     public Camera camera;
     public Screen screen;
     public ActionHandling actions;
+    public EntityHandling entityActions;
     public UserInterface userInterface;
     public Player player;
     public Input input;
@@ -95,6 +97,7 @@ public class Raycasting extends JFrame implements Runnable{
                             FIELD_OF_VIEW, 0, 0, .66, sounds, this, screen, input);
 
         actions = new ActionHandling(camera, screen, sounds, input,this);
+        entityActions = new EntityHandling(camera, Entity.firstLevelEntities, player);
         userInterface = new UserInterface(player, gui, buttons, inventoryItems);
         jFrameInit();             
         start();
@@ -114,13 +117,17 @@ public class Raycasting extends JFrame implements Runnable{
     }
 
     private void spriteInit(){
-        Entity.firstLevelEntities.add(Entity.ceilingLampGreen);
+        Entity.firstLevelEntities.add(Entity.ceilingLampGreen1);
+        Entity.firstLevelEntities.add(Entity.ceilingLampGreen2);
+        Entity.firstLevelEntities.add(Entity.ceilingLampGreen3);
+        Entity.firstLevelEntities.add(Entity.ceilingLampGreen4);
+        Entity.firstLevelEntities.add(Entity.ceilingLampGreen5);
+        Entity.firstLevelEntities.add(Entity.ceilingLampGreen6);
         //Entity.firstLevelEntities.add(Entity.revolverAmmo);
-        Entity.firstLevelEntities.add(Entity.box);
+        //Entity.firstLevelEntities.add(Entity.box);
         Entity.firstLevelEntities.add(Entity.joke);
-        Entity.firstLevelEntities.add(Entity.table);
-        Entity.secondLevelEntities.add(Entity.ceilingLampBlack);
-        Entity.thirdLevelEntities.add(Entity.ceilingLampGreen);
+        //Entity.firstLevelEntities.add(Entity.table);
+        //Entity.secondLevelEntities.add(Entity.ceilingLampBlack);
 
         allLevelEntities = new ArrayList<>();
         allLevelEntities.add(Entity.firstLevelEntities);
@@ -263,6 +270,8 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Facing block coords. X: " + actions.forwardBlockX + ", Y: " + actions.forwardBlockY, 10, 130);
         g.drawString("Current level: " + CURRENT_LEVEL, 10, 150);
         g.drawString("Pitch: " + screen.pitch + ", posZ: " + screen.posZ, 10, 170);
+        g.drawString("Currently holding: " + inventoryItems.getCurrentItem().getItem().getName(), 10, 190);
+        g.drawString("Domio atstumas: " + Entity.joke.getDistance(), 10, 210);
     }
 
     public void drawLoadScreen(Graphics g){
@@ -281,6 +290,8 @@ public class Raycasting extends JFrame implements Runnable{
             actions.HandleButtonCombos();
             input.mouseMovementHandling(MOUSE_SENSITIVITY);
             input.mouseWheelHandling(userInterface, inventoryItems);
+            entityActions.moveEntities();
+            entityActions.applyHostileEntityDamage();
             player.ApplyUpdates(input);
         }
         if(gameIsInOptions){

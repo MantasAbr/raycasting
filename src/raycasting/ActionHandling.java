@@ -3,6 +3,7 @@ import input.Input;
 import levels.Level;
 import levels.LevelDoorMesh;
 import sounds.Sounds;
+import sprites.Entity;
 
 import java.util.ArrayList;
 

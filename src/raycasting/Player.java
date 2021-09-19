@@ -31,4 +31,9 @@ public class Player{
     public double getHealthValue(){
         return healthValue;
     }
+
+
+    public void setSprintValue(double newSprintValue) {sprintValue = newSprintValue;}
+
+    public void setHealthValue(double newHealthValue) {healthValue = newHealthValue;}
 }
