@@ -75,7 +75,7 @@ public class UserInterface {
     public void drawOptionsScreen(Graphics g){
 
         g.drawImage(gui.get(0).getElementImage(), (Raycasting.SCREEN_WIDTH / 2) - (gui.get(0).getElementWidth() / 2),
-                (Raycasting.SCREEN_HEIGHT / 2) - (gui.get(0).getElementHeight() / 2), null);
+                (Raycasting.SCREEN_HEIGHT / 2) - (Raycasting.SCREEN_HEIGHT / 5), null);
 
         saveGameButton = drawButton(g, buttons.get(0).getX(), buttons.get(0).getY(),
                                     buttons.get(0).getHeight(), buttons.get(0).getText(), font, buttons.get(0).getTextColor());

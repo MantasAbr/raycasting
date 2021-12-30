@@ -125,7 +125,7 @@ public class Raycasting extends JFrame implements Runnable{
         Entity.firstLevelEntities.add(Entity.ceilingLampGreen6);
         //Entity.firstLevelEntities.add(Entity.revolverAmmo);
         //Entity.firstLevelEntities.add(Entity.box);
-        Entity.firstLevelEntities.add(Entity.joke);
+        //Entity.firstLevelEntities.add(Entity.joke);
         //Entity.firstLevelEntities.add(Entity.table);
         //Entity.secondLevelEntities.add(Entity.ceilingLampBlack);
 
