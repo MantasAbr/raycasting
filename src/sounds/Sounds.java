@@ -46,4 +46,12 @@ public class Sounds {
             e.printStackTrace();
         }
     }
+
+    public void StopSound(){
+        if(clip != null){
+            clip.stop();
+            clip.close();
+            clip = null;
+        }
+    }
 }

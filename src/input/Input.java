@@ -68,26 +68,18 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
 
     public void toggleKey(int keyCode, boolean isPressed){
 
+        // Releases must still clear movement keys while a menu is open.
+        if(!(Raycasting.gameIsInOptions || Raycasting.gameIsInInventory) || !isPressed){
+            if(keyCode == forward.getId()) forward.toggle(isPressed);
+            if(keyCode == back.getId()) back.toggle(isPressed);
+            if(keyCode == left.getId()) left.toggle(isPressed);
+            if(keyCode == right.getId()) right.toggle(isPressed);
+        }
+
         /**
          * Keys that work when the game is not paused
          */
         if(!(Raycasting.gameIsInOptions || Raycasting.gameIsInInventory)) {
-
-            if (keyCode == forward.getId()) {
-                forward.toggle(isPressed);
-                playSound(isPressed, 1);
-            }
-            if (keyCode == left.getId()) {
-                left.toggle(isPressed);
-            }
-            if (keyCode == back.getId()) {
-                back.toggle(isPressed);
-                playSound(isPressed, 1);
-            }
-            if (keyCode == right.getId()) {
-                right.toggle(isPressed);
-            }
-
 
             if (keyCode == crouch.getId()) {
                 crouch.toggle(isPressed);
@@ -204,17 +196,26 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
         setMousePointerFlag();
     }
 
-    private void playSound(boolean isToggled, int soundID){
-        if(isToggled){
-            if(!soundAlreadyPlaying){
-                sounds.get(soundID).PlaySound(true);
-                soundAlreadyPlaying = true;
-            }
-        }
-        else{
-            sounds.get(soundID).clip.close();
-            soundAlreadyPlaying = false;
-        }
+    public int getForwardMovement(){
+        return (forward.isPressed() ? 1 : 0) - (back.isPressed() ? 1 : 0);
+    }
+
+    public int getSidewaysMovement(){
+        return (right.isPressed() ? 1 : 0) - (left.isPressed() ? 1 : 0);
+    }
+
+    public boolean isMovementRequested(){
+        return getForwardMovement() != 0 || getSidewaysMovement() != 0;
+    }
+
+    public void updateFootsteps(boolean moving){
+        if(sounds.size() <= 1 || moving == soundAlreadyPlaying)
+            return;
+        if(moving)
+            sounds.get(1).PlaySound(true);
+        else
+            sounds.get(1).StopSound();
+        soundAlreadyPlaying = moving;
     }
 
     public void optionsScreenClickHandling(UserInterface userInterface) {

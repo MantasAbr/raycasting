@@ -26,10 +26,15 @@ public class Camera{
     public double CROUCH_SPEED = .04;
     public double FASTER_MOVE_SPEED = .12;
     public double ROTATION_SPEED = .045;
-    public double BOBBING_SPEED = 0.3;
+    // Camera-height change per map unit travelled (walking .08 gives a change of 2).
+    public double BOBBING_SPEED = 25;
+    private static final double BOBBING_SETTLE_SPEED = 2;
 
     public int jumpTimer = 10;
     public int jumpChargeTimer = 3;
+    private boolean jumpInProgress;
+    private boolean jumpWasPressed;
+    private boolean recoveringFromCrouch;
 
     public ArrayList<Sounds> sounds;
     public Raycasting game;
@@ -65,51 +70,19 @@ public class Camera{
     public void update(int[][] map) {
 
         if(!(Raycasting.gameIsInInventory || Raycasting.gameIsInOptions)) {
-
+            boolean jumpPressed = input.jump.isPressed();
+            if(jumpPressed && !jumpWasPressed && !jumpInProgress){
+                jumpInProgress = true;
+                jumpTimer = 10;
+                jumpChargeTimer = 3;
+            }
+            jumpWasPressed = jumpPressed;
 
             if (input.turningLeft || input.turningRight) {
                 ROTATION_SPEED = input.rotationValue;
             } else {
                 ROTATION_SPEED = .045;
             }
-
-            if (input.forward.isPressed()) {
-
-                if (input.isSprinting) {
-
-                    //resetPerspective();
-
-                    // Check the same destination that the sprint step will actually reach.
-                    if (map[(int) (xPos + xDir * FASTER_MOVE_SPEED)][(int) yPos] == 0) {
-                        xPos += xDir * FASTER_MOVE_SPEED;
-                    }
-                    if (map[(int) xPos][(int) (yPos + yDir * FASTER_MOVE_SPEED)] == 0)
-                        yPos += yDir * FASTER_MOVE_SPEED;
-
-                    //view bobbing for sprinting is turned off, because it's buggy
-                    //viewBobbing(5, -20, 20);
-                } else {
-                    if (map[(int) (xPos + xDir * MOVE_SPEED)][(int) yPos] == 0) {
-                        xPos += xDir * MOVE_SPEED;
-                    }
-                    if (map[(int) xPos][(int) (yPos + yDir * MOVE_SPEED)] == 0)
-                        yPos += yDir * MOVE_SPEED;
-
-                    viewBobbing(2, -20, 20);
-                }
-            }
-            if (input.back.isPressed()) {
-                if (map[(int) (xPos - xDir * MOVE_SPEED)][(int) yPos] == 0)
-                    xPos -= xDir * MOVE_SPEED;
-                if (map[(int) xPos][(int) (yPos - yDir * MOVE_SPEED)] == 0)
-                    yPos -= yDir * MOVE_SPEED;
-
-                viewBobbing(2, -20, 20);
-            }
-
-            if (!input.isWalking)
-                resetPerspective();
-
 
             if (input.turningRight) {
                 double oldxDir = xDir;
@@ -118,15 +91,6 @@ public class Camera{
                 double oldxPlane = xPlane;
                 xPlane = xPlane * Math.cos(-ROTATION_SPEED) - yPlane * Math.sin(-ROTATION_SPEED);
                 yPlane = oldxPlane * Math.sin(-ROTATION_SPEED) + yPlane * Math.cos(-ROTATION_SPEED);
-            }
-            if(Input.right.isPressed()){
-                if (map[(int) (xPos + xPlane * MOVE_SPEED)][(int) yPos] == 0) {
-                    xPos += xPlane * MOVE_SPEED;
-                }
-                if (map[(int) xPos][(int) (yPos + yPlane * MOVE_SPEED)] == 0)
-                    yPos += yPlane * MOVE_SPEED;
-
-                viewBobbing(2, -20, 20);
             }
             if (input.turningLeft) {
                 double oldxDir = xDir;
@@ -137,14 +101,7 @@ public class Camera{
                 yPlane = oldxPlane * Math.sin(ROTATION_SPEED) + yPlane * Math.cos(ROTATION_SPEED);
             }
 
-            if(Input.left.isPressed()){
-                if (map[(int) (xPos - xPlane * MOVE_SPEED)][(int) yPos] == 0)
-                    xPos -= xPlane * MOVE_SPEED;
-                if (map[(int) xPos][(int) (yPos - yPlane * MOVE_SPEED)] == 0)
-                    yPos -= yPlane * MOVE_SPEED;
-
-                viewBobbing(2, -20, 20);
-            }
+            updateMovement(map);
 
             //If the player looks up, increase the pitch until a threshold
             if (input.up.isPressed()) {
@@ -161,70 +118,126 @@ public class Camera{
             //If the player crouches, decrease the posZ until a certain threshold
             //and slow down the player
             if (input.crouch.isPressed()) {
-                screen.posZ -= 400 * PITCH_SPEED;
-                if (screen.posZ < -170)
-                    screen.posZ = -170;
+                if(!jumpInProgress){
+                    screen.posZ = Math.max(-170, screen.posZ - 400 * PITCH_SPEED);
+                    recoveringFromCrouch = true;
+                }
                 MOVE_SPEED = CROUCH_SPEED;
             }
 
-            //If the player stops crouching and isn't moving forwards or backwards, push them back up on their feet smoothly,
-            //and put the regular walking speed back
-            if (!input.crouch.isPressed() && !input.isWalking) {
+            // Only crouching needs the slower posture recovery; a negative bob is not a crouch.
+            if (!input.crouch.isPressed()) {
                 MOVE_SPEED = .08;
-                if (screen.posZ < 0)
+                if (!jumpInProgress && recoveringFromCrouch){
                     screen.posZ = Math.min(0, screen.posZ + 100 * PITCH_SPEED);
-            }
-
-            //If the player holds the jump button, decrease the jumpTimer, so that the player won't levitate
-            //If the player reaches a certain threshold, stop the jump
-            if (input.jump.isPressed()) {
-                jumpChargeTimer--;
-                if (jumpChargeTimer > 0) {
-                    screen.posZ -= 200 * PITCH_SPEED;
-                } else {
-                    jumpTimer--;
-                    if (jumpTimer > 0) {
-                        screen.posZ += 500 * PITCH_SPEED;
-                        if (screen.posZ > 190)
-                            screen.posZ = 190;
-                    } else
-                        screen.posZ = Math.max(0, screen.posZ - 100 * PITCH_SPEED);
+                    if(screen.posZ == 0)
+                        recoveringFromCrouch = false;
                 }
             }
 
-            //If the player stops the jump and isn't moving forwards or backwards, push them down smoothly,
-            //and reset the jumpTimer
-            if (!input.jump.isPressed() && !input.isWalking) {
-                jumpTimer = 10;
-                jumpChargeTimer = 3;
-                if (screen.posZ > 0)
-                    screen.posZ = Math.max(0, screen.posZ - 100 * PITCH_SPEED);
-            }
+            updateJumpHeight(jumpPressed);
+            resetPerspective();
 
             //pitch smoothing
             if (screen.pitch > 0) screen.pitch = Math.max(0, screen.pitch - 100 * PITCH_SPEED);
             if (screen.pitch < 0) screen.pitch = Math.min(0, screen.pitch + 100 * PITCH_SPEED);
 
+        } else {
+            input.updateFootsteps(false);
+        }
+    }
+
+    private void updateMovement(int[][] map){
+        int forwardMovement = input.getForwardMovement();
+        int sidewaysMovement = input.getSidewaysMovement();
+        double directionLength = Math.hypot(xDir, yDir);
+        double planeLength = Math.hypot(xPlane, yPlane);
+        double moveX = xDir / directionLength * forwardMovement + xPlane / planeLength * sidewaysMovement;
+        double moveY = yDir / directionLength * forwardMovement + yPlane / planeLength * sidewaysMovement;
+        double movementLength = Math.hypot(moveX, moveY);
+        if(movementLength == 0){
+            input.updateFootsteps(false);
+            return;
+        }
+
+        boolean sprinting = input.isSprinting && forwardMovement > 0 && !input.crouch.isPressed();
+        double speed = input.crouch.isPressed() ? CROUCH_SPEED : sprinting ? FASTER_MOVE_SPEED : MOVE_SPEED;
+        double stepX = moveX / movementLength * speed;
+        double stepY = moveY / movementLength * speed;
+        double oldX = xPos;
+        double oldY = yPos;
+
+        // Use the actual combined step for collision checks, preserving wall sliding.
+        if(isWalkable(map, xPos + stepX, yPos))
+            xPos += stepX;
+        if(isWalkable(map, xPos, yPos + stepY))
+            yPos += stepY;
+
+        double distanceMoved = Math.hypot(xPos - oldX, yPos - oldY);
+        boolean moved = distanceMoved > 0;
+        if(moved)
+            viewBobbing(distanceMoved * BOBBING_SPEED, -20, 20);
+        input.updateFootsteps(moved && !jumpInProgress);
+    }
+
+    private boolean isWalkable(int[][] map, double x, double y){
+        return x >= 0 && x < map.length && y >= 0 && y < map[(int)x].length
+                && map[(int)x][(int)y] == 0;
+    }
+
+    private void updateJumpHeight(boolean jumpPressed){
+        if(!jumpInProgress)
+            return;
+
+        // Releasing Jump ends the ascent; movement must not interrupt landing.
+        if(!jumpPressed){
+            jumpChargeTimer = 0;
+            jumpTimer = 0;
+        } else if(jumpChargeTimer > 0){
+            jumpChargeTimer--;
+        }
+
+        if(jumpChargeTimer > 0){
+            screen.posZ -= 200 * PITCH_SPEED;
+        } else if(jumpTimer > 1){
+            jumpTimer--;
+            screen.posZ = Math.min(190, screen.posZ + 500 * PITCH_SPEED);
+        } else {
+            jumpTimer = 0;
+            if(screen.posZ > 0)
+                screen.posZ = Math.max(0, screen.posZ - 100 * PITCH_SPEED);
+            else
+                screen.posZ = Math.min(0, screen.posZ + 100 * PITCH_SPEED);
+
+            if(screen.posZ == 0){
+                jumpInProgress = false;
+                recoveringFromCrouch = false;
+                minBobbingAmplitudeReached = true;
+                maxBobbingAmplitudeReached = false;
+            }
         }
     }
 
     /**
      * View bobbing logic
-     * @param change How fast the camera should "bop"
+     * @param change Height change based on distance travelled this update
      * @param lowestPoint Lowest PosZ point
      * @param highestPoint Highest PosZ point
      */
-    public void viewBobbing(int change, int lowestPoint, int highestPoint){
+    public void viewBobbing(double change, int lowestPoint, int highestPoint){
+        if(jumpInProgress || input.crouch.isPressed() || recoveringFromCrouch)
+            return;
+
         if(!minBobbingAmplitudeReached && maxBobbingAmplitudeReached){
-            screen.posZ -= change;
-            if(screen.posZ == lowestPoint){
+            screen.posZ = Math.max(lowestPoint, screen.posZ - change);
+            if(screen.posZ <= lowestPoint){
                 minBobbingAmplitudeReached = true;
                 maxBobbingAmplitudeReached = false;
             }
         }
-        if(!maxBobbingAmplitudeReached && minBobbingAmplitudeReached){
-            screen.posZ += change;
-            if(screen.posZ == highestPoint){
+        else if(!maxBobbingAmplitudeReached && minBobbingAmplitudeReached){
+            screen.posZ = Math.min(highestPoint, screen.posZ + change);
+            if(screen.posZ >= highestPoint){
                 maxBobbingAmplitudeReached = true;
                 minBobbingAmplitudeReached = false;
             }
@@ -232,15 +245,18 @@ public class Camera{
     }
 
     /**
-     * Resets the screen's posZ to 0
+     * Quickly settles the last walking bob when all movement keys are released.
      */
     public void resetPerspective(){
-        if(!input.forward.isPressed() && !input.back.isPressed()){
+        if(jumpInProgress || input.crouch.isPressed() || recoveringFromCrouch)
+            return;
+
+        if(!input.isMovementRequested()){
             minBobbingAmplitudeReached = true;
             maxBobbingAmplitudeReached = false;
 
-            if(screen.posZ > 0) screen.posZ = Math.max(0, screen.posZ - 1 * PITCH_SPEED);
-            if(screen.posZ < 0) screen.posZ = Math.min(0, screen.posZ + 1 * PITCH_SPEED);
+            if(screen.posZ > 0) screen.posZ = Math.max(0, screen.posZ - BOBBING_SETTLE_SPEED);
+            if(screen.posZ < 0) screen.posZ = Math.min(0, screen.posZ + BOBBING_SETTLE_SPEED);
         }
     }
 }

@@ -132,10 +132,10 @@ public class ActionHandling {
     private boolean canOpenNewLevelDoor(){return screen.lookingAtTextureId == 6 && screen.distanceToWall <= 1;}
 
     private boolean playerIsSprinting(){
-        return input.forward.isPressed() && input.shift.isPressed();
+        return input.getForwardMovement() > 0 && input.shift.isPressed() && !input.crouch.isPressed();
     }
 
     private boolean playerIsWalking(){
-        return input.forward.isPressed() || input.back.isPressed();
+        return input.isMovementRequested();
     }
 }
