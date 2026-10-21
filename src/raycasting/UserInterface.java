@@ -28,6 +28,10 @@ public class UserInterface {
     private final Font inventoryText = new Font("Yoster Island", Font.PLAIN, 60);
     private final Font inventoryMessageText = new Font("Yoster Island", Font.PLAIN, 18);
 
+    // Text offsets inside the inventory panel, independent of monitor resolution.
+    private static final int INVENTORY_TITLE_TOP_PADDING = 24;
+    private static final int INVENTORY_MESSAGE_BOTTOM_PADDING = 32;
+
     private Rectangle exitButton;
     private Rectangle saveGameButton;
     private Rectangle loadGameButton;
@@ -89,14 +93,22 @@ public class UserInterface {
 
     // Inventory screen GUI elements
     public void drawInventoryScreen(Graphics g){
-        g.drawImage(gui.get(2).getElementImage(), (Raycasting.SCREEN_WIDTH / 2) - (gui.get(2).getElementWidth() / 2),
-                (Raycasting.SCREEN_HEIGHT / 2) - (gui.get(2).getElementHeight() / 2), null);
-        drawCenteredString(g, "Inventory", 0, 0, Raycasting.SCREEN_WIDTH, 500 + Raycasting.SCREEN_HEIGHT / 4, inventoryText);
+        GUIElement panel = gui.get(2);
+        int panelX = Raycasting.SCREEN_WIDTH / 2 - panel.getElementWidth() / 2;
+        int panelY = Raycasting.SCREEN_HEIGHT / 2 - panel.getElementHeight() / 2;
+        g.drawImage(panel.getElementImage(), panelX, panelY, null);
+
+        g.setColor(StyleColors.darkbrown);
+        drawCenteredString(g, "Inventory", panelX, panelY + INVENTORY_TITLE_TOP_PADDING,
+                panel.getElementWidth(), g.getFontMetrics(inventoryText).getHeight(), inventoryText);
         drawInventorySlots(g, inventorySlots);
 
-        if(Input.carryMessageAlertOn)
-            drawCenteredString(g, "select item to carry with right-click", 0, 0,
-                               Raycasting.SCREEN_WIDTH, 1100 + Raycasting.SCREEN_HEIGHT / 4, inventoryMessageText);
+        if(Input.carryMessageAlertOn){
+            int messageHeight = g.getFontMetrics(inventoryMessageText).getHeight();
+            drawCenteredString(g, "select item to carry with right-click", panelX,
+                    panelY + panel.getElementHeight() - INVENTORY_MESSAGE_BOTTOM_PADDING - messageHeight,
+                    panel.getElementWidth(), messageHeight, inventoryMessageText);
+        }
     }
 
     public void drawInventorySlots(Graphics g, ItemLinkedList inventoryList){

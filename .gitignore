@@ -1,8 +1,5 @@
-/build/
-/dist/
-/out/
-/progress/
-/tests/
-/production/
-/skills/
-/.idea
+*
+!*/
+!/.gitignore
+!/README.md
+!/src/**
