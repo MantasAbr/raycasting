@@ -20,7 +20,6 @@ public class Pointer{
             gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
             Raycasting.SCREEN_WIDTH = gd.getDisplayMode().getWidth();
             Raycasting.SCREEN_HEIGHT = gd.getDisplayMode().getHeight();
-            robot.mouseMove(Raycasting.SCREEN_WIDTH / 2, Raycasting.SCREEN_HEIGHT / 2);
         }
         catch (AWTException e){
             System.exit(1);

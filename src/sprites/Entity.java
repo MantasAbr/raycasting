@@ -108,10 +108,10 @@ public class Entity extends Sprite{
     public static Entity ceilingLampGreen6 = new Entity(2, 4.5, -128, false,"src/sprites/img/ceiling_lamp.png", false);
     public static Entity joke = new Entity(4,4, 0,false,"src/sprites/img/joke.png", true);
 
-    //public static Entity ceilingLampBlack = new Entity(8, 6, -128, false,"src/sprites/img/ceiling_lamp_black.png");
-    //public static Entity revolverAmmo = new Entity(3,3, 128,false,"src/sprites/img/357_bullets.png");
-    //public static Entity box = new Entity(5, 5, 128, true, "src/sprites/img/box_dir/");
-    //public static Entity table = new Entity(6, 5, 128, true, "src/sprites/img/table_dir/");
+    public static Entity ceilingLampBlack = new Entity(8, 6, -128, false,"src/sprites/img/ceiling_lamp_black.png", false);
+    public static Entity revolverAmmo = new Entity(3,3, 128,false,"src/sprites/img/357_bullets.png", false);
+    public static Entity box = new Entity(5, 5, 128, true, "src/sprites/img/box_dir/", false);
+    public static Entity table = new Entity(6, 5, 128, true, "src/sprites/img/table_dir/", false);
 
     public static ArrayList<Entity> firstLevelEntities = new ArrayList<>();
     public static ArrayList<Entity> secondLevelEntities = new ArrayList<>();

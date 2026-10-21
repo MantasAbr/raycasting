@@ -79,10 +79,11 @@ public class Camera{
 
                     //resetPerspective();
 
-                    if (map[(int) (xPos + xDir * MOVE_SPEED)][(int) yPos] == 0) {
+                    // Check the same destination that the sprint step will actually reach.
+                    if (map[(int) (xPos + xDir * FASTER_MOVE_SPEED)][(int) yPos] == 0) {
                         xPos += xDir * FASTER_MOVE_SPEED;
                     }
-                    if (map[(int) xPos][(int) (yPos + yDir * MOVE_SPEED)] == 0)
+                    if (map[(int) xPos][(int) (yPos + yDir * FASTER_MOVE_SPEED)] == 0)
                         yPos += yDir * FASTER_MOVE_SPEED;
 
                     //view bobbing for sprinting is turned off, because it's buggy

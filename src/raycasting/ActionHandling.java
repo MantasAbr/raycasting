@@ -14,7 +14,6 @@ import java.util.ArrayList;
 public class ActionHandling {
     
     public Camera camera;
-    private Camera tempCamera;
     public Screen screen;
     public Input input;
     public Raycasting raycasting;
@@ -27,11 +26,9 @@ public class ActionHandling {
     public boolean canOpen;
     public boolean canEnterNewLevel;
     public boolean levelChange;
-    private boolean playerDirectionIsChanged = false;
     
     public ActionHandling(Camera camera, Screen screen, ArrayList<Sounds> sounds, Input input, Raycasting raycasting){
         this.camera = camera;
-        this.tempCamera = camera;
         this.screen = screen;
         this.sounds = sounds;
         this.input = input;
@@ -128,20 +125,6 @@ public class ActionHandling {
 
     }
 
-    public void resetPlayerFacingPosition(){
-        if(!playerDirectionIsChanged){
-            camera.xDir = tempCamera.xDir;
-            camera.yDir = tempCamera.yDir;
-            playerDirectionIsChanged = true;
-        }
-    }
-
-    public void setPlayerFacingPosition(){
-        tempCamera.xDir = camera.xDir;
-        tempCamera.yDir = camera.yDir;
-        playerDirectionIsChanged = false;
-    }
-    
     private boolean canOpenDoor(){
         return screen.lookingAtTextureId == 5 && screen.distanceToWall <= 1;
     }

@@ -14,7 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-public class Input implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener{
+public class Input implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener, WindowFocusListener{
 
     Pointer pointer;
     Raycasting raycasting;
@@ -34,12 +34,9 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     public Point leftClick = new Point();
     public Point rightClick = new Point();
     public Point mouseOver = new Point();
-    public Point mousePositionDuringPlaying = new Point();
-    private boolean isMousePositionReset = false;
+    private Point mouseCaptureCenter;
     public int mouseScrollValues;
 
-    public int oldX, newX = 0;
-    public int oldY, newY = 0;
     public double rotationValue = 0;
     public boolean turningLeft, turningRight = false;
 
@@ -126,6 +123,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
             if (keyCode == options.getId()) {
                 options.toggle(isPressed);
                 Raycasting.gameIsInOptions = options.isPressed();
+                setMousePointerFlag();
                 System.out.println(isPressed);
             }
         }
@@ -134,46 +132,76 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
             if(keyCode == inventory.getId()){
                 inventory.toggle(isPressed);
                 Raycasting.gameIsInInventory = inventory.isPressed();
+                setMousePointerFlag();
             }
         }
     }
 
-    public void mouseMovementHandling(double sensitivity){
+    public synchronized void mouseMovementHandling(double sensitivity){
+        rotationValue = 0;
+        turningLeft = false;
+        turningRight = false;
 
-        if(newX <= 10 || newY <= 10)
-            pointer.robot.mouseMove(Raycasting.SCREEN_WIDTH / 2, Raycasting.SCREEN_HEIGHT / 2);
-        if(newX >= Raycasting.SCREEN_WIDTH - 10 || newY >= Raycasting.SCREEN_HEIGHT - 10)
-            pointer.robot.mouseMove(Raycasting.SCREEN_WIDTH / 2, Raycasting.SCREEN_HEIGHT / 2);
-
-        newX = mouseX;
-        newY = mouseY;
-
-        mousePositionDuringPlaying.setLocation(newX, newY);
-
-        rotationValue = (Math.abs(newX - oldX) / sensitivity);
-
-        if(newX > oldX)
-            turningRight = true;
-        if(newX < oldX)
-            turningLeft = true;
-        if(newX == oldX){
-            turningRight = false;
-            turningLeft = false;
+        Point center = getMouseCaptureCenter();
+        if(Raycasting.gameIsInOptions || Raycasting.gameIsInInventory || center == null){
+            mouseCaptureCenter = null;
+            return;
         }
 
-        oldX = newX;
-        oldY = newY;
-    }
-
-    public void resetMousePointerForPlay(){
-        if(!isMousePositionReset){
-            pointer.robot.mouseMove(mousePositionDuringPlaying.x, mousePositionDuringPlaying.y);
-            isMousePositionReset = true;
+        // First capture (also after menus/focus changes) establishes a new baseline.
+        if(!center.equals(mouseCaptureCenter)){
+            moveMousePointer(center);
+            mouseCaptureCenter = center;
+            return;
         }
+
+        // Poll screen coordinates rather than MouseEvents: Robot-generated events
+        // may arrive later, and must never be interpreted as player movement.
+        Point position = getMouseScreenPosition();
+        if(position == null){
+            mouseCaptureCenter = null;
+            return;
+        }
+        int deltaX = position.x - center.x;
+        rotationValue = Math.abs((double)deltaX) / sensitivity;
+        turningRight = deltaX > 0;
+        turningLeft = deltaX < 0;
+        if(!position.equals(center))
+            moveMousePointer(center);
     }
 
-    public void setMousePointerFlag(){
-        isMousePositionReset = false;
+    protected Point getMouseCaptureCenter(){
+        if(raycasting == null || !raycasting.isShowing() || !raycasting.isFocused())
+            return null;
+        Point center = raycasting.getLocationOnScreen();
+        center.translate(raycasting.getWidth() / 2, raycasting.getHeight() / 2);
+        return center;
+    }
+
+    protected Point getMouseScreenPosition(){
+        PointerInfo info = MouseInfo.getPointerInfo();
+        return info == null ? null : info.getLocation();
+    }
+
+    protected void moveMousePointer(Point position){
+        pointer.robot.mouseMove(position.x, position.y);
+    }
+
+    public synchronized void setMousePointerFlag(){
+        mouseCaptureCenter = null;
+        rotationValue = 0;
+        turningLeft = false;
+        turningRight = false;
+    }
+
+    @Override
+    public void windowLostFocus(WindowEvent e){
+        setMousePointerFlag();
+    }
+
+    @Override
+    public void windowGainedFocus(WindowEvent e){
+        setMousePointerFlag();
     }
 
     private void playSound(boolean isToggled, int soundID){

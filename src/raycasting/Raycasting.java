@@ -30,14 +30,14 @@ public class Raycasting extends JFrame implements Runnable{
     public static int SCREEN_HEIGHT;
     public static final double MOUSE_SENSITIVITY = 150.5;
     public static int CURRENT_LEVEL;
-    public static int RENDER_DISTANCE = 5;
+    public static int RENDER_DISTANCE = 4;
     public static double FIELD_OF_VIEW = -1;
 
     //Used for the run() method
     private Thread thread;
     private volatile boolean running;
-    public static boolean gameIsInInventory = false;
-    public static boolean gameIsInOptions = false;
+    public static volatile boolean gameIsInInventory = false;
+    public static volatile boolean gameIsInOptions = false;
     
     //Used for displaying the image
     private BufferedImage image;
@@ -86,12 +86,13 @@ public class Raycasting extends JFrame implements Runnable{
         addMouseListener(input);
         addMouseMotionListener(input);
         addMouseWheelListener(input);
+        addWindowFocusListener(input);
         fonts = new CustomFont(this, "src/fonts/yoster.ttf");
 
         player = new Player(100, 100, .8);
         screen = new Screen(levels.get(CURRENT_LEVEL).getMap(), doorMeshes.get(CURRENT_LEVEL).getMap(),
                             levels.get(CURRENT_LEVEL).getMapWidth(), levels.get(CURRENT_LEVEL).getMapHeight(),
-                            textures, allLevelEntities, CURRENT_LEVEL, IMAGE_WIDTH, IMAGE_HEIGHT, RENDER_DISTANCE);
+                            textures, allLevelEntities, CURRENT_LEVEL, IMAGE_WIDTH, IMAGE_HEIGHT);
 
         camera = new Camera(levels.get(CURRENT_LEVEL).getPlayerLocX(), levels.get(CURRENT_LEVEL).getPlayerLocY(),
                             FIELD_OF_VIEW, 0, 0, .66, sounds, this, screen, input);
@@ -123,11 +124,11 @@ public class Raycasting extends JFrame implements Runnable{
         Entity.firstLevelEntities.add(Entity.ceilingLampGreen4);
         Entity.firstLevelEntities.add(Entity.ceilingLampGreen5);
         Entity.firstLevelEntities.add(Entity.ceilingLampGreen6);
-        //Entity.firstLevelEntities.add(Entity.revolverAmmo);
-        //Entity.firstLevelEntities.add(Entity.box);
+        Entity.firstLevelEntities.add(Entity.revolverAmmo);
+        Entity.firstLevelEntities.add(Entity.box);
         //Entity.firstLevelEntities.add(Entity.joke);
-        //Entity.firstLevelEntities.add(Entity.table);
-        //Entity.secondLevelEntities.add(Entity.ceilingLampBlack);
+        Entity.firstLevelEntities.add(Entity.table);
+        Entity.secondLevelEntities.add(Entity.ceilingLampBlack);
 
         allLevelEntities = new ArrayList<>();
         allLevelEntities.add(Entity.firstLevelEntities);
@@ -272,6 +273,7 @@ public class Raycasting extends JFrame implements Runnable{
         g.drawString("Pitch: " + screen.pitch + ", posZ: " + screen.posZ, 10, 170);
         g.drawString("Currently holding: " + inventoryItems.getCurrentItem().getItem().getName(), 10, 190);
         g.drawString("Domio atstumas: " + Entity.joke.getDistance(), 10, 210);
+        g.drawString("MouseX: " + input.mouseX + ", MouseY: " + input.mouseY, 10, 230);
     }
 
     public void drawLoadScreen(Graphics g){
@@ -281,8 +283,6 @@ public class Raycasting extends JFrame implements Runnable{
     
     public void tick(){
         if(!(gameIsInInventory || gameIsInOptions)){
-            input.resetMousePointerForPlay();
-            actions.resetPlayerFacingPosition();
             actions.GetNextBlock();
             actions.CheckForActions();
             actions.ApplyBlockChanges(levels.get(CURRENT_LEVEL).getMap());
@@ -296,13 +296,11 @@ public class Raycasting extends JFrame implements Runnable{
         }
         if(gameIsInOptions){
             input.setMousePointerFlag();
-            actions.setPlayerFacingPosition();
             input.optionsScreenClickHandling(userInterface);
             input.optionsScreenHoverHandling(userInterface);
         }
         if(gameIsInInventory){
             input.setMousePointerFlag();
-            actions.setPlayerFacingPosition();
             input.inventoryScreenHoverHandling(inventoryItems);
             input.inventoryMovementHandling(inventoryItems);
         }

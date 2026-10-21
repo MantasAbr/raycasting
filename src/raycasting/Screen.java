@@ -19,7 +19,6 @@ public class Screen {
     public int lookingAtTextureId;
     public int lookingAtMeshId;
     public double rayX, rayY;
-    public int renderDistance;
 
     public double pitch = 0;
     public double posZ = 0;
@@ -38,7 +37,7 @@ public class Screen {
     private double spriteDistance[];
     
     public Screen(int[][] map, int[][] doorMap, int mapWidth, int mapHeight, ArrayList<Texture> textures,
-                  ArrayList<ArrayList<Entity>> allLevelSprites, int currentLevel, int width, int height, int renderDistance){
+                  ArrayList<ArrayList<Entity>> allLevelSprites, int currentLevel, int width, int height){
         this.map = map;
         this.doorMap = doorMap;
         this.mapWidth = mapWidth;
@@ -47,7 +46,6 @@ public class Screen {
         this.allLevelSprites = allLevelSprites;
         this.width = width;
         this.height = height;
-        this.renderDistance = renderDistance;
 
         wallBuffer = new double[width * height];
         floorBuffer = new double[width * height];

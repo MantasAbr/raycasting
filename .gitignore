@@ -2,4 +2,7 @@
 /dist/
 /out/
 /progress/
-/test/
+/tests/
+/production/
+/skills/
+/.idea
