@@ -43,26 +43,8 @@ public class ActionHandling {
      */
     public void GetNextBlock(){
 
-        //East direction
-        if(screen.rayX >= -.5 && screen.rayX <= .5 && screen.rayY >= 1){
-            forwardBlockX = (int)camera.xPos;
-            forwardBlockY = (int)camera.yPos + 1;
-        }
-        //North direction
-        if(screen.rayX >= 1 && screen.rayY >= -.5 && screen.rayY <= .5){
-            forwardBlockX = (int)camera.xPos + 1;
-            forwardBlockY = (int)camera.yPos;
-        }
-        //West direction
-        if(screen.rayX >= -.5 && screen.rayX <= .5 && screen.rayY <= -1){
-            forwardBlockX = (int)camera.xPos;
-            forwardBlockY = (int)camera.yPos - 1;
-        }
-        //South direction
-        if(screen.rayX <= -1 && screen.rayY >= -.5 && screen.rayY <= .5){
-            forwardBlockX = (int)camera.xPos - 1;
-            forwardBlockY = (int)camera.yPos;
-        }
+        forwardBlockX = screen.lookingAtTileX;
+        forwardBlockY = screen.lookingAtTileY;
     }
     
     public void CheckForActions(){
@@ -118,7 +100,7 @@ public class ActionHandling {
             camera.setYPos(levels.get(Raycasting.CURRENT_LEVEL).getPlayerLocY());
 
             //Set the level
-            screen.setMap(levels.get(Raycasting.CURRENT_LEVEL).getMap());
+            screen.setLevel(levels.get(Raycasting.CURRENT_LEVEL));
             //Set the door mesh for the new level
             screen.setDoorMap(doorMeshes.get(Raycasting.CURRENT_LEVEL).getMap());
         }
@@ -126,10 +108,10 @@ public class ActionHandling {
     }
 
     private boolean canOpenDoor(){
-        return screen.lookingAtTextureId == 5 && screen.distanceToWall <= 1;
+        return !screen.lookingAtThinWall && screen.lookingAtTextureId == 5 && screen.distanceToWall <= 1;
     }
 
-    private boolean canOpenNewLevelDoor(){return screen.lookingAtTextureId == 6 && screen.distanceToWall <= 1;}
+    private boolean canOpenNewLevelDoor(){return !screen.lookingAtThinWall && screen.lookingAtTextureId == 6 && screen.distanceToWall <= 1;}
 
     private boolean playerIsSprinting(){
         return input.getForwardMovement() > 0 && input.shift.isPressed() && !input.crouch.isPressed();

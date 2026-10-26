@@ -43,6 +43,7 @@ public class Camera{
 
     boolean maxBobbingAmplitudeReached = false;
     boolean minBobbingAmplitudeReached = true;
+    private WorldGeometry tileGeometry;
 
     
     public Camera(double x, double y, double xd, double yd, double xp, double yp, ArrayList<Sounds> sounds, Raycasting game, Screen screen, Input input){
@@ -68,6 +69,12 @@ public class Camera{
 
 
     public void update(int[][] map) {
+        if (tileGeometry == null || tileGeometry.getMap() != map)
+            tileGeometry = new WorldGeometry(map);
+        update(tileGeometry);
+    }
+
+    public void update(WorldGeometry geometry) {
 
         if(!(Raycasting.gameIsInInventory || Raycasting.gameIsInOptions)) {
             boolean jumpPressed = input.jump.isPressed();
@@ -101,7 +108,7 @@ public class Camera{
                 yPlane = oldxPlane * Math.sin(ROTATION_SPEED) + yPlane * Math.cos(ROTATION_SPEED);
             }
 
-            updateMovement(map);
+            updateMovement(geometry);
 
             //If the player looks up, increase the pitch until a threshold
             if (input.up.isPressed()) {
@@ -147,7 +154,7 @@ public class Camera{
         }
     }
 
-    private void updateMovement(int[][] map){
+    private void updateMovement(WorldGeometry geometry){
         int forwardMovement = input.getForwardMovement();
         int sidewaysMovement = input.getSidewaysMovement();
         double directionLength = Math.hypot(xDir, yDir);
@@ -168,9 +175,9 @@ public class Camera{
         double oldY = yPos;
 
         // Use the actual combined step for collision checks, preserving wall sliding.
-        if(isWalkable(map, xPos + stepX, yPos))
+        if(geometry.canMove(xPos, yPos, xPos + stepX, yPos))
             xPos += stepX;
-        if(isWalkable(map, xPos, yPos + stepY))
+        if(geometry.canMove(xPos, yPos, xPos, yPos + stepY))
             yPos += stepY;
 
         double distanceMoved = Math.hypot(xPos - oldX, yPos - oldY);
@@ -178,11 +185,6 @@ public class Camera{
         if(moved)
             viewBobbing(distanceMoved * BOBBING_SPEED, -20, 20);
         input.updateFootsteps(moved && !jumpInProgress);
-    }
-
-    private boolean isWalkable(int[][] map, double x, double y){
-        return x >= 0 && x < map.length && y >= 0 && y < map[(int)x].length
-                && map[(int)x][(int)y] == 0;
     }
 
     private void updateJumpHeight(boolean jumpPressed){

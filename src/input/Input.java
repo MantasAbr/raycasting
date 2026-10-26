@@ -3,7 +3,7 @@ package input;
 import gui.GUIElement;
 import gui.StyleColors;
 import items.InventorySlot;
-import items.ItemLinkedList;
+import items.Inventory;
 import raycasting.Pointer;
 import raycasting.Raycasting;
 import sounds.Sounds;
@@ -13,6 +13,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Input implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener, WindowFocusListener{
 
@@ -24,18 +25,17 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     public boolean isWalking = false;
     public boolean soundAlreadyPlaying = false;
 
-    private int carryFromId = 0;
-    private int carryToId = 0;
+    private InventorySlot carryFromSlot;
     public static boolean carryMessageAlertOn = false;
 
     public int mouseX;
     public int mouseY;
 
-    public Point leftClick = new Point();
-    public Point rightClick = new Point();
+    public Point leftClick = new Point(-1, -1);
+    public Point rightClick = new Point(-1, -1);
     public Point mouseOver = new Point();
     private Point mouseCaptureCenter;
-    public int mouseScrollValues;
+    private final AtomicInteger pendingScroll = new AtomicInteger();
 
     public double rotationValue = 0;
     public boolean turningLeft, turningRight = false;
@@ -115,6 +115,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
             if (keyCode == options.getId()) {
                 options.toggle(isPressed);
                 Raycasting.gameIsInOptions = options.isPressed();
+                resetInventoryInteraction();
                 setMousePointerFlag();
                 System.out.println(isPressed);
             }
@@ -124,6 +125,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
             if(keyCode == inventory.getId()){
                 inventory.toggle(isPressed);
                 Raycasting.gameIsInInventory = inventory.isPressed();
+                resetInventoryInteraction();
                 setMousePointerFlag();
             }
         }
@@ -180,6 +182,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     }
 
     public synchronized void setMousePointerFlag(){
+        pendingScroll.set(0);
         mouseCaptureCenter = null;
         rotationValue = 0;
         turningLeft = false;
@@ -247,57 +250,49 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
         }
     }
 
-    public void inventoryScreenHoverHandling(ItemLinkedList items){
-        InventorySlot current = items.getCurrentItem();
-        items.goRight(); //this resets the current list tracking position (i guess? cuz this function doesn't work without this)
-
-        if(current.getBounds().contains(mouseOver)){
-            current.setImage(GUIElement.lighterInventorySlot);
+    public void inventoryScreenHoverHandling(Inventory items){
+        for (InventorySlot slot : items.getSlots()) {
+            slot.setImage(slot.getBounds().contains(mouseOver)
+                    ? GUIElement.lighterInventorySlot : GUIElement.inventorySlot);
         }
-        else{
-            current.setImage(GUIElement.inventorySlot);
-        }
-
     }
 
-    public void inventoryMovementHandling(ItemLinkedList items){
+    public void inventoryMovementHandling(Inventory items){
         swapItems(items);
     }
 
-    public void swapItems(ItemLinkedList items){
-        if(items.getCurrentItem().getBounds().contains(rightClick)){
+    public void swapItems(Inventory items){
+        InventorySlot source = items.getSlotAt(rightClick);
+        InventorySlot target = items.getSlotAt(leftClick);
+        if (source != null) {
             carryMessageAlertOn = false;
-            carryFromId = items.getCurrentItem().getId();
-            System.out.println(carryFromId);
-            rightClick.setLocation(0, 0);
+            carryFromSlot = source;
         }
-        if(items.getCurrentItem().getBounds().contains(leftClick)){
-            if(carryFromId == 0){
-                leftClick.setLocation(0,0);
+        if (target != null) {
+            if (carryFromSlot == null) {
                 carryMessageAlertOn = true;
             }
-            else{
-                carryToId = items.getCurrentItem().getId();
-                System.out.println("carry from: " + carryFromId + ", carry to: " + carryToId);
-                items.swapInfo(items.getNodeById(carryFromId), items.getNodeById(carryToId));
-                items.traverseNodes();
-                leftClick.setLocation(0,0);
-                carryFromId = 0; carryToId = 0;
+            else {
+                items.swapItems(carryFromSlot, target);
+                carryFromSlot = null;
+                carryMessageAlertOn = false;
             }
         }
+        leftClick.setLocation(-1, -1);
+        rightClick.setLocation(-1, -1);
     }
 
-    public void mouseWheelHandling(UserInterface userInterface, ItemLinkedList items){
-        if(mouseScrollValues == 1){
-            items.goRight();
-            System.out.println("Current inv item: " + items.getCurrentItem().getItem().getName());
-        }
-        else if(mouseScrollValues == -1){
-            items.goLeft();
-            System.out.println("Current inv item: " + items.getCurrentItem().getItem().getName());
+    private void resetInventoryInteraction() {
+        carryFromSlot = null;
+        carryMessageAlertOn = false;
+        leftClick.setLocation(-1, -1);
+        rightClick.setLocation(-1, -1);
+    }
 
-        }
-        mouseScrollValues = 0;
+    public void mouseWheelHandling(Inventory items){
+        int steps = pendingScroll.getAndSet(0);
+        if (!(Raycasting.gameIsInInventory || Raycasting.gameIsInOptions))
+            items.selectRelative(steps);
     }
 
     @Override
@@ -328,11 +323,12 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if(SwingUtilities.isLeftMouseButton(e)){
+        if(SwingUtilities.isLeftMouseButton(e)
+                && (Raycasting.gameIsInInventory || Raycasting.gameIsInOptions)){
             leftClick.setLocation(e.getPoint());
             System.out.println("Left click at: " + e.getX() + " " + e.getY());
         }
-        if(SwingUtilities.isRightMouseButton(e)){
+        if(SwingUtilities.isRightMouseButton(e) && Raycasting.gameIsInInventory){
             rightClick.setLocation(e.getPoint());
             System.out.println("Right click at: " + e.getX() + " " + e.getY());
         }
@@ -360,14 +356,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        int notches = e.getWheelRotation();
-
-        if(notches < 0){
-            mouseScrollValues = 1;
-        }
-
-        if(notches > 0) {
-            mouseScrollValues = -1;
-        }
+        if (!(Raycasting.gameIsInInventory || Raycasting.gameIsInOptions))
+            pendingScroll.addAndGet(-e.getWheelRotation());
     }
 }

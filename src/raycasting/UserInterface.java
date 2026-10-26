@@ -5,7 +5,7 @@ import gui.GUIElement;
 import gui.StyleColors;
 import input.Input;
 import items.InventorySlot;
-import items.ItemLinkedList;
+import items.Inventory;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -15,7 +15,7 @@ public class UserInterface {
 
     private Player player;
     private ArrayList<GUIElement> gui;
-    private ItemLinkedList inventorySlots;
+    private Inventory inventorySlots;
     public static ArrayList<CustomButton> buttons;
 
     private final Point sprintBarPoint = new Point(140, Raycasting.SCREEN_HEIGHT - 50);
@@ -36,7 +36,7 @@ public class UserInterface {
     private Rectangle saveGameButton;
     private Rectangle loadGameButton;
 
-    public UserInterface(Player player, ArrayList<GUIElement> gui, ArrayList<CustomButton> buttons, ItemLinkedList inventorySlots){
+    public UserInterface(Player player, ArrayList<GUIElement> gui, ArrayList<CustomButton> buttons, Inventory inventorySlots){
         this.player = player;
         this.gui = gui;
         this.buttons = buttons;
@@ -51,8 +51,6 @@ public class UserInterface {
             drawHealthInfo(g, player);
             drawSelectedItem(g, inventorySlots);
         }
-        else
-            g.dispose();
     }
 
     private void drawHealthInfo(Graphics g, Player player){
@@ -71,8 +69,10 @@ public class UserInterface {
         g.drawImage(gui.get(3).getElementImage(), sprintBarPoint.x - 3, sprintBarPoint.y - 3, null);
     }
 
-    private void drawSelectedItem(Graphics g, ItemLinkedList items){
-        g.drawImage(items.getCurrentItem().getItem().getSprite().getSpriteImage(), selectedItemPoint.x, selectedItemPoint.y, null);
+    private void drawSelectedItem(Graphics g, Inventory items){
+        InventorySlot selected = items.getCurrentItem();
+        if (selected != null)
+            g.drawImage(selected.getItem().getSprite().getSpriteImage(), selectedItemPoint.x, selectedItemPoint.y, null);
     }
 
     // Options screen GUI elements
@@ -111,11 +111,15 @@ public class UserInterface {
         }
     }
 
-    public void drawInventorySlots(Graphics g, ItemLinkedList inventoryList){
-        for(int i = 0; i < inventoryList.getCount(); i++){
-            InventorySlot current = inventoryList.traverseInventorySlots();
+    public void drawInventorySlots(Graphics g, Inventory inventoryList){
+        for (InventorySlot current : inventoryList.getSlots()) {
             g.drawImage(current.getImage().getElementImage(), current.getBounds().x, current.getBounds().y, null);
             g.drawImage(current.getItem().getSprite().getSpriteImage(), current.getBounds().x + 5, current.getBounds().y + 5, null);
+            if (current == inventoryList.getCurrentItem()) {
+                Rectangle bounds = current.getBounds();
+                g.setColor(StyleColors.darkbrown);
+                g.drawRect(bounds.x - 2, bounds.y - 2, bounds.width + 3, bounds.height + 3);
+            }
         }
     }
 

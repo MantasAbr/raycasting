@@ -3,7 +3,8 @@ import fonts.CustomFont;
 import gui.CustomButton;
 import gui.GUIElement;
 import items.InventorySlot;
-import items.ItemLinkedList;
+import items.Inventory;
+import items.Item;
 import input.Input;
 import launcher.Launcher;
 import levels.Level;
@@ -30,7 +31,8 @@ public class Raycasting extends JFrame implements Runnable{
     public static int SCREEN_HEIGHT;
     public static final double MOUSE_SENSITIVITY = 150.5;
     public static int CURRENT_LEVEL;
-    public static int RENDER_DISTANCE = 4;
+    public static double FOG_DENSITY = 0.3;
+    public static int FOG_COLOR = 0x808080;
     public static double FIELD_OF_VIEW = -1;
 
     //Used for the run() method
@@ -61,7 +63,7 @@ public class Raycasting extends JFrame implements Runnable{
     public Player player;
     public Input input;
     public CustomFont fonts;
-    public ItemLinkedList inventoryItems;
+    public Inventory inventoryItems;
     
     //used for showing the ticks and frames each second on the screen
     private int finalTicks = 0;
@@ -93,6 +95,7 @@ public class Raycasting extends JFrame implements Runnable{
         screen = new Screen(levels.get(CURRENT_LEVEL).getMap(), doorMeshes.get(CURRENT_LEVEL).getMap(),
                             levels.get(CURRENT_LEVEL).getMapWidth(), levels.get(CURRENT_LEVEL).getMapHeight(),
                             textures, allLevelEntities, CURRENT_LEVEL, IMAGE_WIDTH, IMAGE_HEIGHT);
+        screen.setLevel(levels.get(CURRENT_LEVEL));
 
         camera = new Camera(levels.get(CURRENT_LEVEL).getPlayerLocX(), levels.get(CURRENT_LEVEL).getPlayerLocY(),
                             FIELD_OF_VIEW, 0, 0, .66, sounds, this, screen, input);
@@ -177,13 +180,15 @@ public class Raycasting extends JFrame implements Runnable{
     }
 
     private void inventoryInit(){
-        inventoryItems = new ItemLinkedList();
-        inventoryItems.addNode(InventorySlot.first);
-        inventoryItems.addNode(InventorySlot.second);
-        inventoryItems.addNode(InventorySlot.third);
-        inventoryItems.addNode(InventorySlot.fourth);
-        inventoryItems.addNode(InventorySlot.fifth);
-
+        Item[] initialItems = {Item.empty, Item.empty, Item.gun, Item.sword, Item.empty};
+        InventorySlot[] slots = new InventorySlot[initialItems.length];
+        int centerX = SCREEN_WIDTH / 2 - GUIElement.inventorySlot.getElementXCenter();
+        int y = SCREEN_HEIGHT / 2 - GUIElement.inventorySlot.getElementYCenter();
+        for (int i = 0; i < slots.length; i++) {
+            int x = centerX + (i - slots.length / 2) * 100;
+            slots[i] = new InventorySlot(i + 1, x, y, GUIElement.inventorySlot, initialItems[i]);
+        }
+        inventoryItems = new Inventory(slots);
     }
     
     private void mouseInit(){
@@ -241,12 +246,10 @@ public class Raycasting extends JFrame implements Runnable{
             if(gameIsInOptions){
                 userInterface.drawOptionsScreen(g);
                 getContentPane().setCursor(Pointer.gamePointer.getPointer());
-                userInterface.drawInterface(g, false);
             }
             if(gameIsInInventory){
                 userInterface.drawInventoryScreen(g);
                 getContentPane().setCursor(Pointer.gamePointer.getPointer());
-                userInterface.drawInterface(g, false);
             }
         }
         else{
@@ -289,7 +292,7 @@ public class Raycasting extends JFrame implements Runnable{
             actions.ChangeLevel(levels, doorMeshes);
             actions.HandleButtonCombos();
             input.mouseMovementHandling(MOUSE_SENSITIVITY);
-            input.mouseWheelHandling(userInterface, inventoryItems);
+            input.mouseWheelHandling(inventoryItems);
             entityActions.moveEntities();
             entityActions.applyHostileEntityDamage();
             player.ApplyUpdates(input);
@@ -330,10 +333,8 @@ public class Raycasting extends JFrame implements Runnable{
                 tick();
                 delta -= 1;
                 shouldRender = true;
-                screen.updateFloorAndCeiling(camera, pixels);
-                screen.updateWalls(camera, pixels);
-                screen.updateSprites(camera, pixels, CURRENT_LEVEL);
-                camera.update(levels.get(CURRENT_LEVEL).getMap());
+                screen.updateWorld(camera, pixels, CURRENT_LEVEL);
+                camera.update(screen.getGeometry());
                 if(input.exit.isPressed())
                     stop();
             }
